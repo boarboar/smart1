@@ -22,6 +22,9 @@
   http://www.arduino.cc/en/Tutorial/Blink
 */
 
+
+// use 8K in parasite nmode if VCC and Gnd shortcut
+
 #include <OneWire.h>
 
 //#define LED_PIN LED_BUILTIN
@@ -74,10 +77,11 @@ void DS_test() {
       return;
   }
   
-  if ( addr[0] != 0x10) {
-      Serial.print("Device is not a DS18S20 family device.\n");
-      return;
-  }
+  if ( addr[0] == 0x10) {
+      Serial.print("Device is a DS18S20 family device.\n");
+  } else if ( addr[0] == 0x28) {
+      Serial.print("Device is a DS18B20 family device.\n");
+  } else return;
 
   // The DallasTemperature library can do all this work for you!
 

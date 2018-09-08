@@ -3,3 +3,6 @@ https://habr.com/post/130421/
 https://iot-playground.com/blog/2-uncategorised/41-esp8266-ds18b20-temperature-sensor-arduino-ide
 https://github.com/milesburton/Arduino-Temperature-Control-Library
 https://www.instructables.com/id/Enable-DeepSleep-on-an-ESP8266-01/
+
+Temperature for device: 0
+Temp C: 85.00 Temp F: 185.00

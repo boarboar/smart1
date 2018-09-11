@@ -23,7 +23,7 @@ DallasTemperature sensors(&oneWire);
 
 const char* ssid = "NETGEAR";
 const char* password = "boarboar";
-const char* host = "192.168.1.122";  
+const char* host = "192.168.1.100";  
 const int   port = 9999;            
 
 /*
@@ -93,10 +93,10 @@ bool doConnect()
   return true;
 } 
 
-bool doMeasure()
+float doMeasure()
 {
   //Serial.print("Requesting temperatures...");
-  //sensors.requestTemperatures(); // Send the command to get temperatures
+  sensors.requestTemperatures(); // Send the command to get temperatures
   // After we got the temperatures, we can print them here.
   // We use the function ByIndex, and as an example get the temperature from the first sensor only.
   float t=sensors.getTempCByIndex(0);
@@ -146,8 +146,9 @@ bool doSend(float t) {
     Serial.print(":");
     Serial.println(port);
     
-    client.print("Hello");
+    client.print(t);
     unsigned long timeout = millis();
+    /*
     while (client.available() == 0) {
       if (millis() - timeout > 5000) {
         Serial.println(">>> Client Timeout !");
@@ -156,6 +157,7 @@ bool doSend(float t) {
       }
       delay(10);
     }
+    */
    Serial.print("Sent in "); 
    Serial.print(millis() - timeout);
    Serial.println("ms"); 

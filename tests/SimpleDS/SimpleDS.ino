@@ -1,10 +1,11 @@
 // Include the libraries we need
 
 #include <ESP8266WiFi.h>
-
+#include <ArduinoJson.h>
 #include <OneWire.h>
 #include <DallasTemperature.h>
 
+#define BUF_SZ 255
 #define SETUP_PIN 0
 
 // do not work with parasite
@@ -26,32 +27,43 @@ const char* password = "boarboar";
 const char* host = "192.168.1.100";  
 const int   port = 9999;            
 
+static bool isSetup = false;
+
 /*
  * The setup function. We only start the sensors here
  */
 void setup(void)
 {
   // start serial port
-  delay(2000);  
+  delay(100);  
   Serial.begin(115200);
   
-  Serial.println("Dallas Temperature IC Control Library Demo");
+  Serial.println(F("Press button1 now to enter setup"));
+  delay(5000);  
+  
+  // read from flash - todo
 
-  pinMode(SETUP_PIN, INPUT);
+  pinMode(SETUP_PIN, INPUT);  
+  isSetup = false;  
   if(digitalRead(SETUP_PIN)==LOW) {
     delay(100);
     if(digitalRead(SETUP_PIN)==LOW) {
-      Serial.println("SETUP MODE!");
+      isSetup = true;
     }
   }
   
-  doConnect();
-
-  // Start up the library
-  sensors.begin();
-  delay(2000);
-  doDiag();
-  doMeasure();
+  if(isSetup) {
+    doSetup();
+  }
+  else {
+    // Start up the library
+    sensors.begin();
+    delay(2000);
+    doDiag();
+  
+    doConnect();
+    doMeasure();
+  }
 }
 
 /*
@@ -100,7 +112,7 @@ float doMeasure()
   // After we got the temperatures, we can print them here.
   // We use the function ByIndex, and as an example get the temperature from the first sensor only.
   float t=sensors.getTempCByIndex(0);
-  Serial.print("Temperature for the device 1 (index 0) is: ");
+  Serial.print("Temperature is: ");
   Serial.println(t);    
   //DEVICE_DISCONNECTED_C;
   //DEVICE_DISCONNECTED_RAW
@@ -129,14 +141,14 @@ bool doDiag()
   Serial.print("  Res: ");
   Serial.print(sensors.getResolution(tempDeviceAddress), DEC); 
   Serial.print("  Mod: ");
-  Serial.print(tempDeviceAddress[0], HEX); 
+  Serial.println(tempDeviceAddress[0], HEX); 
  
   return true;
 }
 
 bool doSend(float t) {
-    WiFiClient client;
-    if (!client.connect(host, port)) {
+  WiFiClient client;
+  if (!client.connect(host, port)) {
       Serial.println("connection failed");
       return false;
     }
@@ -145,24 +157,29 @@ bool doSend(float t) {
     Serial.print(host);
     Serial.print(":");
     Serial.println(port);
-    
-    client.print(t);
+
+
+    char bufout[BUF_SZ];
+    StaticJsonBuffer<400> jsonBufferOut;
+    JsonObject& rootOut = jsonBufferOut.createObject();
+    rootOut["T"] = (int)(t*10);
+    rootOut.printTo(bufout, BUF_SZ-1);
+    client.print(bufout);
     unsigned long timeout = millis();
-    /*
-    while (client.available() == 0) {
-      if (millis() - timeout > 5000) {
-        Serial.println(">>> Client Timeout !");
-        client.stop();
-        return false;
-      }
-      delay(10);
-    }
-    */
-   Serial.print("Sent in "); 
+    Serial.print("Sent in "); 
    Serial.print(millis() - timeout);
    Serial.println("ms"); 
+   
    client.stop();
+   
    return true;         
 }
 
+bool doSetup() {
+  Serial.println("=============SETUP MODE!");
+  delay(5000);
+  // request parametres...
+  ESP.reset(); // to be replaced with deep sleep
+  return true;
+}
 

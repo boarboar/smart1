@@ -48,7 +48,7 @@ void setup(void)
   // start serial port
   delay(100);  
   Serial.begin(115200);
-  
+  Serial.println();
   Serial.println(F("Press button1 now to enter setup"));
   delay(5000);  
 
@@ -194,11 +194,12 @@ bool doSend(TempData *pData) {
 }
 
 bool doSetup() {
+  Serial.setTimeout(-1);
   Serial.println(F("=============SETUP MODE!"));
-  Serial.println(F("Serever IP:"));
+  Serial.println(F("Server IP:"));
   String s=Serial.readString();
   Serial.println(s);
-  Serial.println(F("Serever Port:"));
+  Serial.println(F("Server Port:"));
   int i=Serial.parseInt();
   Serial.println(i);
   delay(2000);

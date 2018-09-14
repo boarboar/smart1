@@ -2,9 +2,11 @@
 
 #include <ESP8266WiFi.h>
 #include <ArduinoJson.h>
+//#include <FS.h>
 #include <OneWire.h>
 #include <DallasTemperature.h>
 
+#define TEMPERATURE_PRECISION 9 // Lower resolution
 #define BUF_SZ 255
 #define SETUP_PIN 0
 
@@ -20,14 +22,23 @@ OneWire oneWire(ONE_WIRE_BUS);
 
 // Pass our oneWire reference to Dallas Temperature. 
 DallasTemperature sensors(&oneWire);
+DeviceAddress tempDeviceAddress;  
 
-
+// move to cfg
 const char* ssid = "NETGEAR";
 const char* password = "boarboar";
 const char* host = "192.168.1.100";  
 const int   port = 9999;            
 
 static bool isSetup = false;
+
+struct TempData {
+  uint8_t id;
+  uint8_t make;
+  uint8_t res;
+  uint8_t isParasite;
+  int16_t t10;
+} tData = {0};
 
 /*
  * The setup function. We only start the sensors here
@@ -40,7 +51,8 @@ void setup(void)
   
   Serial.println(F("Press button1 now to enter setup"));
   delay(5000);  
-  
+
+    
   // read from flash - todo
 
   pinMode(SETUP_PIN, INPUT);  
@@ -51,15 +63,16 @@ void setup(void)
       isSetup = true;
     }
   }
-  
+
+  sensors.begin();
+
   if(isSetup) {
     doSetup();
   }
   else {
     // Start up the library
-    sensors.begin();
     delay(2000);
-    doDiag();
+    doDiag(&tData);
   
     doConnect();
     doMeasure();
@@ -72,7 +85,8 @@ void setup(void)
 void loop(void)
 { 
   delay(5000);
-  doSend(doMeasure());
+  tData.t10 = doMeasure(); 
+  doSend(&tData);
 }
 
 
@@ -105,7 +119,7 @@ bool doConnect()
   return true;
 } 
 
-float doMeasure()
+int16_t doMeasure()
 {
   //Serial.print("Requesting temperatures...");
   sensors.requestTemperatures(); // Send the command to get temperatures
@@ -119,12 +133,11 @@ float doMeasure()
   //#define DEVICE_DISCONNECTED_C -127
   //#define DEVICE_DISCONNECTED_RAW -7040
   
-  return t;
+  return (int16_t)(t*10);
 }
 
-bool doDiag()
+bool doDiag(TempData *pData)
 {
-  static DeviceAddress tempDeviceAddress;
   // call sensors.requestTemperatures() to issue a global temperature 
   // request to all devices on the bus
 
@@ -135,51 +148,124 @@ bool doDiag()
     return false;
   }
 
-  Serial.print("Parasite: "); 
-  if (sensors.isParasitePowerMode()) Serial.println("ON");
-  else Serial.print("OFF");
-  Serial.print("  Res: ");
-  Serial.print(sensors.getResolution(tempDeviceAddress), DEC); 
-  Serial.print("  Mod: ");
-  Serial.println(tempDeviceAddress[0], HEX); 
+  pData->id=0;
+  pData->isParasite = sensors.isParasitePowerMode();
+  pData->res = sensors.getResolution(tempDeviceAddress);
+  pData->make = tempDeviceAddress[0];
+  
+  Serial.print("Parasite: "); Serial.print(pData->isParasite); 
+  Serial.print("  Res: "); Serial.print(pData->res); 
+  Serial.print("  Make: "); Serial.println(pData->make, HEX); 
  
   return true;
 }
 
-bool doSend(float t) {
+bool doSend(TempData *pData) {
   WiFiClient client;
   if (!client.connect(host, port)) {
       Serial.println("connection failed");
       return false;
     }
 
-    Serial.print("connected to ");
-    Serial.print(host);
-    Serial.print(":");
-    Serial.println(port);
+  Serial.print("connected to ");
+  Serial.print(host);
+  Serial.print(":");
+  Serial.println(port);
 
 
-    char bufout[BUF_SZ];
-    StaticJsonBuffer<400> jsonBufferOut;
-    JsonObject& rootOut = jsonBufferOut.createObject();
-    rootOut["T"] = (int)(t*10);
-    rootOut.printTo(bufout, BUF_SZ-1);
-    client.print(bufout);
-    unsigned long timeout = millis();
-    Serial.print("Sent in "); 
-   Serial.print(millis() - timeout);
-   Serial.println("ms"); 
-   
-   client.stop();
-   
-   return true;         
+  char bufout[BUF_SZ];
+  StaticJsonBuffer<400> jsonBufferOut;
+  JsonObject& rootOut = jsonBufferOut.createObject();
+  rootOut["I"] = pData->id;
+  rootOut["M"] = pData->make;
+  rootOut["P"] = pData->isParasite;
+  rootOut["R"] = pData->res;
+  rootOut["T"] = pData->t10;
+  rootOut.printTo(bufout, BUF_SZ-1);
+  client.print(bufout);
+  
+  unsigned long timeout = millis();
+  Serial.print("Sent in "); 
+  Serial.print(millis() - timeout);
+  Serial.println("ms"); 
+ 
+  client.stop(); 
+  return true;         
 }
 
 bool doSetup() {
-  Serial.println("=============SETUP MODE!");
+  Serial.println(F("=============SETUP MODE!"));
+  Serial.println(F("Serever IP:"));
+  String s=Serial.readString();
+  Serial.println(s);
+  Serial.println(F("Serever Port:"));
+  int i=Serial.parseInt();
+  Serial.println(i);
+  delay(2000);
+  doSensorSetup();
   delay(5000);
   // request parametres...
   ESP.reset(); // to be replaced with deep sleep
   return true;
 }
 
+
+
+void doSensorSetup(void)
+{
+  
+  Serial.println("Dallas Temperature IC Setup");
+
+  // Grab a count of devices on the wire
+  int numberOfDevices = sensors.getDeviceCount();
+  
+  // locate devices on the bus
+  Serial.print("Locating devices...");
+  
+  Serial.print("Found ");
+  Serial.print(numberOfDevices, DEC);
+  Serial.println(" devices.");
+
+  // report parasite power requirements
+  Serial.print("Parasite power is: "); 
+  if (sensors.isParasitePowerMode()) Serial.println("ON");
+  else Serial.println("OFF");
+  
+  // Loop through each device, print out address
+  for(int i=0;i<numberOfDevices; i++)
+  {
+    // Search the wire for address
+    if(sensors.getAddress(tempDeviceAddress, i))
+  {
+    Serial.print("Found device ");
+    Serial.print(i, DEC);
+    Serial.print(" with address: ");
+    printAddress(tempDeviceAddress);
+    Serial.println();
+    
+    Serial.print("Setting resolution to ");
+    Serial.println(TEMPERATURE_PRECISION, DEC);
+    
+    // set the resolution to TEMPERATURE_PRECISION bit (Each Dallas/Maxim device is capable of several different resolutions)
+    sensors.setResolution(tempDeviceAddress, TEMPERATURE_PRECISION);
+    
+     Serial.print("Resolution actually set to: ");
+    Serial.print(sensors.getResolution(tempDeviceAddress), DEC); 
+    Serial.println();
+  }else{
+    Serial.print("Found ghost device at ");
+    Serial.print(i, DEC);
+    Serial.print(" but could not detect address. Check power and cabling");
+  }
+  }
+}
+
+// function to print a device address
+void printAddress(DeviceAddress deviceAddress)
+{
+  for (uint8_t i = 0; i < 8; i++)
+  {
+    if (deviceAddress[i] < 16) Serial.print("0");
+    Serial.print(deviceAddress[i], HEX);
+  }
+}

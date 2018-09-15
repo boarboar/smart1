@@ -6,6 +6,7 @@
 #include <OneWire.h>
 #include <DallasTemperature.h>
 
+#define SYS_ID  1
 #define TEMPERATURE_PRECISION 9 // Lower resolution
 #define BUF_SZ 255
 #define SETUP_PIN 0
@@ -38,7 +39,9 @@ struct TempData {
   uint8_t res;
   uint8_t isParasite;
   int16_t t10;
-} tData = {0};
+} tData = {SYS_ID, 0};
+
+ADC_MODE(ADC_VCC);
 
 /*
  * The setup function. We only start the sensors here
@@ -104,7 +107,7 @@ bool doConnect()
   WiFi.begin(ssid, password);
   Serial.print(F("\nConnecting to ")); Serial.print(ssid);
   i = 0;
-  while (WiFi.status() != WL_CONNECTED && i++ < 40) {delay(500); Serial.print(".");}
+  while (WiFi.status() != WL_CONNECTED && i++ < 60) {delay(500); Serial.print(".");}
   Serial.println();
   if(i == 21){
     Serial.print(F("Could not connect to ")); Serial.println(ssid);
@@ -148,7 +151,7 @@ bool doDiag(TempData *pData)
     return false;
   }
 
-  pData->id=0;
+  //pData->id=0;
   pData->isParasite = sensors.isParasitePowerMode();
   pData->res = sensors.getResolution(tempDeviceAddress);
   pData->make = tempDeviceAddress[0];
@@ -181,6 +184,7 @@ bool doSend(TempData *pData) {
   rootOut["P"] = pData->isParasite;
   rootOut["R"] = pData->res;
   rootOut["T"] = pData->t10;
+  rootOut["V"]=ESP.getVcc();
   rootOut.printTo(bufout, BUF_SZ-1);
   client.print(bufout);
   
@@ -194,14 +198,19 @@ bool doSend(TempData *pData) {
 }
 
 bool doSetup() {
+  char buf[BUF_SZ];
+  int16_t cnt=0;
   Serial.setTimeout(-1);
   Serial.println(F("=============SETUP MODE!"));
-  Serial.println(F("Server IP:"));
-  String s=Serial.readString();
-  Serial.println(s);
-  Serial.println(F("Server Port:"));
-  int i=Serial.parseInt();
-  Serial.println(i);
+ 
+  cnt=readLine("Server IP", "0.0.0.0", buf, BUF_SZ);
+  Serial.print(cnt);
+  Serial.print(" ");
+  Serial.println(buf);
+// port
+// id
+// SSID
+// pwd
   delay(2000);
   doSensorSetup();
   delay(5000);
@@ -214,7 +223,7 @@ bool doSetup() {
 
 void doSensorSetup(void)
 {
-  
+
   Serial.println("Dallas Temperature IC Setup");
 
   // Grab a count of devices on the wire
@@ -260,6 +269,51 @@ void doSensorSetup(void)
   }
   }
 }
+
+int16_t readLine(const char *prompt, const char *initv, char *buf, int16_t sz) {
+  boolean res=false;
+  int16_t bytes=0;   
+  buf[bytes]=0; 
+
+  while (Serial.available() > 0)  Serial.read();
+  if(prompt!=NULL) {
+    Serial.print(prompt);
+    if(initv!=NULL) {
+      Serial.print("[");
+      Serial.print(prompt);
+      Serial.print("]");
+    }
+    Serial.print(":");
+  }
+  while (!res && bytes<sz) // 
+  {
+    while(!res && Serial.available()) 
+    {
+      buf[bytes] = Serial.read();
+      //Serial.print(buf[bytes]);
+      if (buf[bytes] == 10 || buf[bytes] == 13)
+      {
+        //if (bytes > 0) { 
+          buf[bytes]=0;        
+        //} 
+        res=true; 
+     }
+      else
+        bytes++;
+    }    
+    if(!res) yield();
+  }
+
+  
+  
+  if(bytes>=sz) { 
+    //Serial.println("OVERFLOW");
+    bytes=0; //overflow, probably caused hang up at start...    
+    buf[bytes]=0; 
+    //return -2;     
+  }
+  return bytes;
+}  
 
 // function to print a device address
 void printAddress(DeviceAddress deviceAddress)

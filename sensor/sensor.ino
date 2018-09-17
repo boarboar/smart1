@@ -26,8 +26,8 @@ DallasTemperature sensors(&oneWire);
 DeviceAddress tempDeviceAddress;  
 
 // move to cfg
-const char* ssid = "NETGEAR";
-const char* password = "boarboar";
+const char* ssid = "";
+const char* password = "";
 const char* host = "192.168.1.100";  
 const int   port = 9999;            
 
@@ -198,15 +198,8 @@ bool doSend(TempData *pData) {
 }
 
 bool doSetup() {
-  char buf[BUF_SZ];
-  int16_t cnt=0;
-  Serial.setTimeout(-1);
-  Serial.println(F("=============SETUP MODE!"));
- 
-  cnt=readLine("Server IP", "0.0.0.0", buf, BUF_SZ);
-  Serial.print(cnt);
-  Serial.print(" ");
-  Serial.println(buf);
+
+  // call cfg setup here
 // port
 // id
 // SSID
@@ -270,50 +263,6 @@ void doSensorSetup(void)
   }
 }
 
-int16_t readLine(const char *prompt, const char *initv, char *buf, int16_t sz) {
-  boolean res=false;
-  int16_t bytes=0;   
-  buf[bytes]=0; 
-
-  while (Serial.available() > 0)  Serial.read();
-  if(prompt!=NULL) {
-    Serial.print(prompt);
-    if(initv!=NULL) {
-      Serial.print("[");
-      Serial.print(prompt);
-      Serial.print("]");
-    }
-    Serial.print(":");
-  }
-  while (!res && bytes<sz) // 
-  {
-    while(!res && Serial.available()) 
-    {
-      buf[bytes] = Serial.read();
-      //Serial.print(buf[bytes]);
-      if (buf[bytes] == 10 || buf[bytes] == 13)
-      {
-        //if (bytes > 0) { 
-          buf[bytes]=0;        
-        //} 
-        res=true; 
-     }
-      else
-        bytes++;
-    }    
-    if(!res) yield();
-  }
-
-  
-  
-  if(bytes>=sz) { 
-    //Serial.println("OVERFLOW");
-    bytes=0; //overflow, probably caused hang up at start...    
-    buf[bytes]=0; 
-    //return -2;     
-  }
-  return bytes;
-}  
 
 // function to print a device address
 void printAddress(DeviceAddress deviceAddress)

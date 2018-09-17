@@ -7,8 +7,6 @@
 #define MAX_CFG_LINE_SZ 80
 
 const int NCFGS=4; 
-const char *CFG_NAMES[NCFGS]={"DBG", "SYSL", "SPP_1", "SPP_2"};
-enum CFG_ID {CFG_DBG=0, CFG_SYSL=1, CFG_PIDS_1=2, CFG_PIDS_2=3};
 
 CfgDrv CfgDrv::Cfg; // singleton
 
@@ -106,4 +104,76 @@ int16_t CfgDrv::store() {
   Serial.print(F("Cfg written in ")); Serial.println(t);
   return 1;
 }
+
+int16_t CfgDrv::setup() 
+{
+  char buf[MAX_CFG_LINE_SZ];
+  int16_t cnt=0;
+  Serial.setTimeout(-1);
+  Serial.println(F("=============SETUP MODE!"));
+ 
+  cnt=readLine("SSID", SSID, buf, MAX_CFG_LINE_SZ);
+  if(cnt>0) {
+    // TODO: add validation
+    strncpy(SSID, buf, MAX_SSID_SZ);
+    SSID[MAX_SSID_SZ-1]=0;
+  }
+  cnt=readLine("PWD", PWD, buf, MAX_CFG_LINE_SZ);
+  if(cnt>0) {
+    // TODO: add validation
+    strncpy(PWD, buf, MAX_PWD_SZ);
+    SSID[MAX_PWD_SZ-1]=0;
+  }
+  cnt=readLine("Server IP", srv_addr, buf, MAX_CFG_LINE_SZ);
+  if(cnt>0) {
+    // TODO: add validation
+    strncpy(srv_addr, buf, MAX_ADDR_SZ);
+    srv_addr[MAX_ADDR_SZ-1]=0;
+  }
+
+  // PORT
+
+  //ID
+
+  return 1;
+}
+
+int16_t CfgDrv::readLine(const char *prompt, const char *initv, char *buf, int16_t sz) {
+  boolean res=false;
+  int16_t bytes=0;   
+  buf[bytes]=0; 
+
+  while (Serial.available() > 0)  Serial.read();
+  if(prompt!=NULL) {
+    Serial.print(prompt);
+    if(initv!=NULL) {
+      Serial.print("[");
+      Serial.print(prompt);
+      Serial.print("]");
+    }
+    Serial.print(":");
+  }
+  while (!res && bytes<sz) // 
+  {
+    while(!res && Serial.available()) 
+    {
+      buf[bytes] = Serial.read();
+      if (buf[bytes] == 10 || buf[bytes] == 13)
+      {
+        buf[bytes]=0;        
+        res=true; 
+     }
+      else
+        bytes++;
+    }    
+    if(!res) yield();
+  }
+ 
+  if(bytes>=sz) { 
+    //Serial.println("OVERFLOW");
+    bytes=0; //overflow, probably caused hang up at start...    
+    buf[bytes]=0; 
+  }
+  return bytes;
+}  
 

@@ -67,11 +67,12 @@ void setup(void)
 
   sensors.begin();
 
-  if(isSetup || isCfgValid) {
+  if(isSetup || !isCfgValid) {
     do {
       CfgDrv::Cfg.setup();
       isCfgValid = CfgDrv::Cfg.validate();      
     } while (!isCfgValid);
+    CfgDrv::Cfg.store();
     delay(1000);
     Serial.println(F("Cfg OK"));
     delay(1000);

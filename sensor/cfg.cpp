@@ -6,6 +6,18 @@
 
 #define MAX_CFG_LINE_SZ 80
 
+/*
+{"SSID":"NETGEAR","PWD":"boarboar","ADDR":"192.168.1.149","PORT":9999,"ID":1}
+Cfg sz 78, read in 5
+ID=1
+SSID=
+PWD=
+ADDR=192.168.1.149
+PORT=9999
+Cfg loaded
+Invalid config, force setup!
+*/
+
 const int NCFGS=4; 
 
 CfgDrv CfgDrv::Cfg; // singleton
@@ -56,12 +68,18 @@ int16_t CfgDrv::load() {
       if (json.success()) {
         id = json["ID"];
         srv_port = json["PORT"];
-        strncpy(srv_addr, json["ADDR"], MAX_ADDR_SZ);
-        srv_addr[MAX_ADDR_SZ-1]=0;
-        strncpy(SSID, json["SSID"], MAX_SSID_SZ);
-        SSID[MAX_SSID_SZ-1]=0;
-        strncpy(PWD, json["PWD"], MAX_PWD_SZ);
-        PWD[MAX_PWD_SZ-1]=0;        
+        if(json["ADDR"]!=NULL) {
+          strncpy(srv_addr, json["ADDR"], MAX_ADDR_SZ);
+          srv_addr[MAX_ADDR_SZ-1]=0;
+        }
+        if(json["SSID"]!=NULL) {
+          strncpy(SSID, json["SSID"], MAX_SSID_SZ);
+          SSID[MAX_SSID_SZ-1]=0;
+        }
+        if(json["PWD"]!=NULL) {
+         strncpy(PWD, json["PWD"], MAX_PWD_SZ);
+         PWD[MAX_PWD_SZ-1]=0;
+        }        
       }
     } // new line
   } // while !EOF

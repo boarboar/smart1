@@ -13,6 +13,7 @@ public:
   int16_t load();
   int16_t store();
   int16_t setup(); 
+  bool validate();
  public: 
   char SSID[MAX_SSID_SZ];
   char PWD[MAX_PWD_SZ];
@@ -24,6 +25,7 @@ protected:
   const char *szFileName = "/config.json";  
   CfgDrv();
   int16_t readLine(const char *prompt, const char *initv, char *buf, int16_t sz);
+  int16_t readInt(const char *prompt, int initv);
   bool fs_ok;
 };
 

@@ -130,16 +130,28 @@ int16_t CfgDrv::setup()
     strncpy(srv_addr, buf, MAX_ADDR_SZ);
     srv_addr[MAX_ADDR_SZ-1]=0;
   }
-
-  // PORT
-
-  //ID
-
+  cnt=readInt("Server port", srv_port);
+  if(cnt>0) {
+    // TODO: add validation
+    srv_port=cnt;
+  }
+  cnt=readInt("Sensor ID", id);
+  if(cnt>0) {
+    // TODO: add validation
+    id=cnt;
+  }  
   return 1;
 }
 
+bool CfgDrv::validate() {
+  if(!*SSID || !*PWD || !*srv_addr || !srv_port || !id) return false;
+  return true;
+}
+
+
 int16_t CfgDrv::readLine(const char *prompt, const char *initv, char *buf, int16_t sz) {
   boolean res=false;
+  boolean leadingspace=true;
   int16_t bytes=0;   
   buf[bytes]=0; 
 
@@ -148,7 +160,7 @@ int16_t CfgDrv::readLine(const char *prompt, const char *initv, char *buf, int16
     Serial.print(prompt);
     if(initv!=NULL) {
       Serial.print("[");
-      Serial.print(prompt);
+      Serial.print(initv);
       Serial.print("]");
     }
     Serial.print(":");
@@ -163,8 +175,11 @@ int16_t CfgDrv::readLine(const char *prompt, const char *initv, char *buf, int16
         buf[bytes]=0;        
         res=true; 
      }
-      else
-        bytes++;
+      else 
+        if(leadingspace) {
+          if(!isspace(buf[bytes])) leadingspace=false;
+        }
+        if(!leadingspace) bytes++;
     }    
     if(!res) yield();
   }
@@ -176,4 +191,18 @@ int16_t CfgDrv::readLine(const char *prompt, const char *initv, char *buf, int16
   }
   return bytes;
 }  
+
+int16_t CfgDrv::readInt(const char *prompt, int initv) {
+  while (Serial.available() > 0)  Serial.read();
+  if(prompt!=NULL) {
+    Serial.print(prompt);
+    if(initv!=0) {
+      Serial.print("[");
+      Serial.print(initv);
+      Serial.print("]");
+    }
+    Serial.print(":");
+  }
+  return Serial.parseInt();
+}
 

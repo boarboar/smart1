@@ -2,11 +2,10 @@
 
 #include <ESP8266WiFi.h>
 #include <ArduinoJson.h>
-//#include <FS.h>
 #include <OneWire.h>
 #include <DallasTemperature.h>
+#include "cfg.h"
 
-#define SYS_ID  1
 #define TEMPERATURE_PRECISION 9 // Lower resolution
 #define BUF_SZ 255
 #define SETUP_PIN 0
@@ -15,23 +14,10 @@
 
 // 5k res
 
-// Data wire is plugged into port 2 on the Arduino
 #define ONE_WIRE_BUS 2
-
-// Setup a oneWire instance to communicate with any OneWire devices (not just Maxim/Dallas temperature ICs)
 OneWire oneWire(ONE_WIRE_BUS);
-
-// Pass our oneWire reference to Dallas Temperature. 
 DallasTemperature sensors(&oneWire);
 DeviceAddress tempDeviceAddress;  
-
-// move to cfg
-const char* ssid = "";
-const char* password = "";
-const char* host = "192.168.1.100";  
-const int   port = 9999;            
-
-static bool isSetup = false;
 
 struct TempData {
   uint8_t id;
@@ -39,7 +25,7 @@ struct TempData {
   uint8_t res;
   uint8_t isParasite;
   int16_t t10;
-} tData = {SYS_ID, 0};
+} tData = {0};
 
 ADC_MODE(ADC_VCC);
 
@@ -48,50 +34,69 @@ ADC_MODE(ADC_VCC);
  */
 void setup(void)
 {
+  bool isSetup = false;
+  bool isCfgValid = false;
+  
   // start serial port
   delay(100);  
   Serial.begin(115200);
   Serial.println();
-  Serial.println(F("Press button1 now to enter setup"));
-  delay(5000);  
 
-    
-  // read from flash - todo
-
-  pinMode(SETUP_PIN, INPUT);  
-  isSetup = false;  
-  if(digitalRead(SETUP_PIN)==LOW) {
-    delay(100);
-    if(digitalRead(SETUP_PIN)==LOW) {
-      isSetup = true;
+  if(CfgDrv::Cfg.init() && CfgDrv::Cfg.load()) {
+    Serial.println(F("Cfg loaded"));
+    isCfgValid = CfgDrv::Cfg.validate();
+    if(!isCfgValid) {
+      Serial.println(F("Invalid config, force setup!"));
     }
+  } else {
+    Serial.println(F("Failed to load cfg!"));
   }
+
+  if(isCfgValid) {
+    Serial.println(F("Press button1 now to enter setup"));
+    delay(5000);  
+    pinMode(SETUP_PIN, INPUT);  
+    isSetup = false;  
+    if(digitalRead(SETUP_PIN)==LOW) {
+      delay(100);
+      if(digitalRead(SETUP_PIN)==LOW) {
+        isSetup = true;
+      }
+    }
+   }
 
   sensors.begin();
 
-  if(isSetup) {
-    doSetup();
+  if(isSetup || isCfgValid) {
+    do {
+      CfgDrv::Cfg.setup();
+      isCfgValid = CfgDrv::Cfg.validate();      
+    } while (!isCfgValid);
+    delay(1000);
+    Serial.println(F("Cfg OK"));
+    delay(1000);
+    doSensorSetup();
   }
-  else {
-    // Start up the library
-    delay(2000);
-    doDiag(&tData);
   
-    doConnect();
-    doMeasure();
+    // Start up the library
+  delay(2000);
+
+  tData.id = CfgDrv::Cfg.id;
+  doDiag(&tData);  
+  doMeasure();
+
+  if(doConnect()) {
+    doSend(&tData);
   }
+
 }
 
-/*
- * Main function, get and show the temperature
- */
 void loop(void)
 { 
   delay(5000);
   tData.t10 = doMeasure(); 
   doSend(&tData);
 }
-
 
 bool doConnect()
 {
@@ -104,13 +109,13 @@ bool doConnect()
     if(i<5) Serial.print(F(":"));
   }
  
-  WiFi.begin(ssid, password);
-  Serial.print(F("\nConnecting to ")); Serial.print(ssid);
+  WiFi.begin(CfgDrv::Cfg.SSID, CfgDrv::Cfg.PWD);
+  Serial.print(F("\nConnecting to ")); Serial.print(CfgDrv::Cfg.SSID);
   i = 0;
   while (WiFi.status() != WL_CONNECTED && i++ < 60) {delay(500); Serial.print(".");}
   Serial.println();
   if(i == 21){
-    Serial.print(F("Could not connect to ")); Serial.println(ssid);
+    Serial.print(F("Could not connect to ")); Serial.println(CfgDrv::Cfg.SSID);
     //delay(10000);
     //ESP.reset();
     return false;
@@ -165,15 +170,15 @@ bool doDiag(TempData *pData)
 
 bool doSend(TempData *pData) {
   WiFiClient client;
-  if (!client.connect(host, port)) {
+  if (!client.connect(CfgDrv::Cfg.srv_addr, CfgDrv::Cfg.srv_port)) {
       Serial.println("connection failed");
       return false;
     }
 
   Serial.print("connected to ");
-  Serial.print(host);
+  Serial.print(CfgDrv::Cfg.srv_addr);
   Serial.print(":");
-  Serial.println(port);
+  Serial.println(CfgDrv::Cfg.srv_port);
 
 
   char bufout[BUF_SZ];
@@ -197,37 +202,16 @@ bool doSend(TempData *pData) {
   return true;         
 }
 
-bool doSetup() {
-
-  // call cfg setup here
-// port
-// id
-// SSID
-// pwd
-  delay(2000);
-  doSensorSetup();
-  delay(5000);
-  // request parametres...
-  ESP.reset(); // to be replaced with deep sleep
-  return true;
-}
-
-
 
 void doSensorSetup(void)
 {
 
   Serial.println("Dallas Temperature IC Setup");
-
   // Grab a count of devices on the wire
   int numberOfDevices = sensors.getDeviceCount();
-  
   // locate devices on the bus
   Serial.print("Locating devices...");
-  
-  Serial.print("Found ");
-  Serial.print(numberOfDevices, DEC);
-  Serial.println(" devices.");
+  Serial.print("Found "); Serial.print(numberOfDevices, DEC); Serial.println(" devices.");
 
   // report parasite power requirements
   Serial.print("Parasite power is: "); 
@@ -240,19 +224,14 @@ void doSensorSetup(void)
     // Search the wire for address
     if(sensors.getAddress(tempDeviceAddress, i))
   {
-    Serial.print("Found device ");
-    Serial.print(i, DEC);
-    Serial.print(" with address: ");
-    printAddress(tempDeviceAddress);
+    Serial.print("Found device "); Serial.print(i, DEC);
+    Serial.print(" with address: "); printAddress(tempDeviceAddress);
     Serial.println();
     
-    Serial.print("Setting resolution to ");
-    Serial.println(TEMPERATURE_PRECISION, DEC);
-    
+    Serial.print("Setting resolution to "); Serial.println(TEMPERATURE_PRECISION, DEC);
     // set the resolution to TEMPERATURE_PRECISION bit (Each Dallas/Maxim device is capable of several different resolutions)
-    sensors.setResolution(tempDeviceAddress, TEMPERATURE_PRECISION);
-    
-     Serial.print("Resolution actually set to: ");
+    sensors.setResolution(tempDeviceAddress, TEMPERATURE_PRECISION);   
+    Serial.print("Resolution actually set to: ");
     Serial.print(sensors.getResolution(tempDeviceAddress), DEC); 
     Serial.println();
   }else{

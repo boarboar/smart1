@@ -63,21 +63,31 @@ int16_t CfgDrv::load() {
     if(p>buf) { //non-empty
       *p=0; 
       Serial.println(buf);  
-      StaticJsonBuffer<200> jsonBuffer;
+      const char *ps;
+      StaticJsonBuffer<400> jsonBuffer;
       JsonObject& json = jsonBuffer.parseObject(buf);  
       if (json.success()) {
         id = json["ID"];
         srv_port = json["PORT"];
-        if(json["ADDR"]!=NULL) {
-          strncpy(srv_addr, json["ADDR"], MAX_ADDR_SZ);
+        ps=json["ADDR"];
+        if(ps!=NULL) {
+          strncpy(srv_addr, ps, MAX_ADDR_SZ);
           srv_addr[MAX_ADDR_SZ-1]=0;
         }
-        if(json["SSID"]!=NULL) {
-          strncpy(SSID, json["SSID"], MAX_SSID_SZ);
+       // Serial.println("check SSID");        
+        ps=json["SSID"];
+        if(ps!=NULL) {
+          //Serial.print("SSID not NULL: ");
+          //Serial.println(ps);
+          strncpy(SSID, ps, MAX_SSID_SZ);
           SSID[MAX_SSID_SZ-1]=0;
         }
-        if(json["PWD"]!=NULL) {
-         strncpy(PWD, json["PWD"], MAX_PWD_SZ);
+         //Serial.println("check PWD"); 
+        ps=json["PWD"];
+        if(ps!=NULL) {
+          //Serial.print("PWD not NULL: ");
+          //Serial.println(ps);
+         strncpy(PWD, ps, MAX_PWD_SZ);
          PWD[MAX_PWD_SZ-1]=0;
         }        
       }

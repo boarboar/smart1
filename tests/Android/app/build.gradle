@@ -32,9 +32,13 @@ dependencies {
 
     implementation 'com.android.support:recyclerview-v7:27.0.2'
 
+    implementation "org.jetbrains.anko:anko-common:$anko_version"
+    implementation "org.jetbrains.anko:anko-support-v4:$anko_version"
+
     implementation "org.jetbrains.anko:anko-recyclerview-v7:$anko_version"
     implementation "org.jetbrains.anko:anko-cardview-v7:$anko_version"
     implementation "org.jetbrains.anko:anko-design:$anko_version"
+    implementation "org.jetbrains.anko:anko-gridlayout-v7:$anko_version"
 
     // Anko Layouts
     implementation "org.jetbrains.anko:anko-sdk25:$anko_version" // sdk15, sdk19, sdk21, sdk23 are also available

@@ -32,5 +32,16 @@ class MainActivity : AppCompatActivity() {
         list.add(Movie("The Imitation Game",2014))
 
         recyclerView.adapter = MovieAdapter(list)
+
+        doAsync {
+            //var result = runLongTask()
+            for (i in 1..10) {
+                Thread.sleep(5_000)
+                uiThread {
+                    toast("Wakeup $i")
+                }
+            }
+        }
+
     }
 }

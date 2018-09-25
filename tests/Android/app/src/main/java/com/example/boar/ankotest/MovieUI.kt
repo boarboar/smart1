@@ -36,6 +36,6 @@ class MovieUI : AnkoComponent<ViewGroup>{
                 text = "2009"
                 textSize = 14f
             }
-        }
+        }//.lparams{width = matchParent, height = matchParent}
     }
 }

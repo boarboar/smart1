@@ -6,6 +6,8 @@ import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
 
 import android.support.v7.widget.LinearLayoutManager
+import android.util.Log
+import com.example.boar.ankotest.R.id.recyclerView
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
@@ -35,10 +37,14 @@ class MainActivity : AppCompatActivity() {
 
         doAsync {
             //var result = runLongTask()
-            for (i in 1..10) {
+            for (i in 1..6) {
                 Thread.sleep(5_000)
                 uiThread {
                     toast("Wakeup $i")
+                    Log.d("Listener", "Tick!")
+                    list[i-1].year=i
+                    recyclerView.adapter.notifyItemChanged(i-1)
+                    Log.d("Listener", "Update!")
                 }
             }
         }

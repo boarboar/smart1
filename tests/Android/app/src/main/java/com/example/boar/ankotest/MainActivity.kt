@@ -16,9 +16,10 @@ import android.support.v4.content.ContextCompat.getSystemService
 import android.net.wifi.WifiManager
 import android.text.format.Formatter.formatIpAddress
 
-
+import java.net.ServerSocket
 
 private fun getLocalIpAddress(ctx : Context): String? {
+
     fun ipToString(i: Int): String {
         return (i and 0xFF).toString() + "." +
                 (i shr 8 and 0xFF) + "." +
@@ -26,6 +27,7 @@ private fun getLocalIpAddress(ctx : Context): String? {
                 (i shr 24 and 0xFF)
 
     }
+
 
     try {
         val wifiManager: WifiManager = ctx?.getSystemService(WIFI_SERVICE) as WifiManager
@@ -75,6 +77,7 @@ class MainActivity : AppCompatActivity() {
             //String ip = String.format("%d.%d.%d.%d", (ipAddress & 0xff),(ipAddress >> 8 & 0xff),(ipAddress >> 16 & 0xff),(ipAddress >> 24 & 0xff))
             */
 
+            /*
             Log.d("Listener", "Start")
 
             val ips = getLocalIpAddress(applicationContext) ?: "No Wifi IP"
@@ -84,7 +87,58 @@ class MainActivity : AppCompatActivity() {
             uiThread {
                 toast(ips)
             }
+*/
 
+            val server = ServerSocket(9999)
+            //println("Server running on port ${server.localPort}")
+
+            Log.d("Listener", "Server running on port ${server.inetAddress.hostAddress} : ${server.localPort} (${server.inetAddress.hostName})")
+
+            uiThread {
+                toast("Server running on port ${server.inetAddress.hostAddress} : ${server.localPort} (${server.inetAddress.hostName})")
+            }
+
+
+            // LocalServerSocket ?
+
+            while (true) {
+
+                val client = server.accept()
+                //println("Client conected : ${client.inetAddress.hostAddress}")
+
+                Log.d("Listener", "Client connected : ${client.inetAddress.hostAddress}")
+
+
+                uiThread {
+                    toast("Client connected : ${client.inetAddress.hostAddress}")
+                }
+
+
+                /*
+                val serializer = CustomSerializer()
+
+                val scanner = Scanner(client.inputStream)
+                while (scanner.hasNextLine()) {
+                    val text = scanner.nextLine()
+                    val requestBytes = text.toByteArray(Charset.defaultCharset())
+                    val request = serializer.DeserializeRequest(requestBytes)
+
+                    println("${request.operandA} ${request.operator} ${request.operandB}")
+
+                    val response = calculate(request.operandA, request.operandB, request.operator)
+                    println(response)
+                }
+
+                scanner.close()
+                */
+
+                client.close()
+            }
+
+            server.close()
+
+
+            /*
             for (i in 1..6) {
                 Thread.sleep(5_000)
                 uiThread {
@@ -95,6 +149,7 @@ class MainActivity : AppCompatActivity() {
                     Log.d("Listener", "Update!")
                 }
             }
+            */
         }
 
     }

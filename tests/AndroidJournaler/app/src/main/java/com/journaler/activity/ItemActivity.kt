@@ -6,6 +6,6 @@ import com.journaler.R
 
 abstract class ItemActivity : BaseActivity() {
 
-   // override fun getActivityTitle() = R.string.app_name
+   override fun getActivityTitle() = R.string.app_name
 
 }

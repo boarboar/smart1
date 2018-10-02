@@ -6,4 +6,10 @@
     <string name="pick_time">Pick time</string>
     <string name="hlp">H</string>
     <string name="lorem_ipsum_sit_dolore">Lorem ipsum sit dolore</string>
+    <string name="mnu">Menu</string>
+    <string name="today">Today</string>
+    <string name="next_seven_days">Next 7 days</string>
+    <string name="todos">TODOs</string>
+    <string name="notes">Notes</string>
+    <string name="choose_a_type">Choose a type:</string>
 </resources>

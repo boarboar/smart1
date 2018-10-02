@@ -18,6 +18,7 @@
 
         <EditText
             android:id="@+id/note_title"
+            style="@style/edit_text_transparent"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/title"
@@ -25,6 +26,7 @@
 
         <EditText
             android:id="@+id/note_content"
+            style="@style/edit_text_gery_text"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="top"

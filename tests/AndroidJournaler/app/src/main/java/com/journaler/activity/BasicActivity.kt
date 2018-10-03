@@ -1,25 +1,35 @@
 package com.journaler.activity
 
+import android.Manifest
+import android.app.Activity
 import android.os.Bundle
-import android.support.v4.app.FragmentActivity
-import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.Toolbar
 import android.util.Log
 import android.view.Menu
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import com.journaler.R
-import kotlinx.android.synthetic.main.activity_header.*
+import com.journaler.permission.PermissionCompatActivity
 import kotlinx.android.synthetic.main.activity_main.*
 
 
-//abstract class BaseActivity : FragmentActivity() {
-abstract class BaseActivity : AppCompatActivity() {
+abstract class BaseActivity : PermissionCompatActivity() {
+    companion object {
+        val REQUEST_GPS = 0
+        }
     protected abstract val tag : String
     protected abstract fun getLayout(): Int
     protected abstract fun getActivityTitle(): Int
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
         setContentView(getLayout())
         //activity_title.setText(getActivityTitle())
         setSupportActionBar(toolbar)
+        requestPermissions(
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+        )
         Log.v(tag, "[ ON CREATE ]")
     }
 
@@ -43,6 +53,8 @@ abstract class BaseActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         Log.v(tag, "[ ON RESUME ]")
+        val animation = getAnimation(R.anim.top_to_bottom)
+        findViewById<Toolbar>(R.id.toolbar).startAnimation(animation)
     }
     override fun onPostResume() {
         super.onPostResume()
@@ -51,6 +63,8 @@ abstract class BaseActivity : AppCompatActivity() {
     override fun onPause() {
         super.onPause()
         Log.v(tag, "[ ON PAUSE ]")
+        val animation = getAnimation(R.anim.hide_to_top)
+        findViewById<Toolbar>(R.id.toolbar).startAnimation(animation)
     }
     override fun onStop() {
         super.onStop()
@@ -60,4 +74,8 @@ abstract class BaseActivity : AppCompatActivity() {
         super.onDestroy()
         Log.v(tag, "[ ON DESTROY ]")
     }
+
 }
+
+fun Activity.getAnimation(animation: Int): Animation =
+        AnimationUtils.loadAnimation(this, animation)

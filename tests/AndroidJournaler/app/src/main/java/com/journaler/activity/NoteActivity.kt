@@ -10,6 +10,7 @@ import android.text.TextWatcher
 import android.util.Log
 import com.journaler.R
 import com.journaler.database.Db
+import com.journaler.execution.TaskExecutor
 import com.journaler.location.LocationProvider
 import com.journaler.model.Note
 import kotlinx.android.synthetic.main.activity_note.*
@@ -19,6 +20,8 @@ import java.util.*
 class NoteActivity : ItemActivity() {
     override val tag = "Note activity"
     override fun getLayout() = R.layout.activity_note
+
+    private val executor = TaskExecutor.getInstance(1)
 
     private var note: Note? = null
     private var location: Location? = null
@@ -50,27 +53,20 @@ class NoteActivity : ItemActivity() {
                 val title = getNoteTitle()
                 val content = getNoteContent()
                 note = Note(title, content, p0)
-                val task = object : AsyncTask<Note, Void, Boolean>() {
-                    override fun doInBackground(vararg params: Note?): Boolean {
-                        if (!params.isEmpty()) {
-                            val param = params[0]
-                            param?.let {
-                                return Db.NOTE.insert(param) > 0
-                            }
-                        }
-                        return false
+
+                executor.execute {
+                    val param = note
+                    var result = false
+                    param?.let {
+                        result = Db.NOTE.insert(param)>0
                     }
-                    override fun onPostExecute(result: Boolean?) {
-                        result?.let {
-                            if (result) {
-                                Log.i(tag, "Note inserted.")
-                            } else {
-                                Log.e(tag, "Note not inserted.")
-                            }
-                        }
+                    if (result) {
+                        Log.i(tag, "Note inserted.")
+                    } else {
+                        Log.e(tag, "Note not inserted.")
                     }
                 }
-                task.execute(note)
+
             }
         }
         override fun onStatusChanged(p0: String?, p1: Int, p2: Bundle?) {}
@@ -84,37 +80,53 @@ class NoteActivity : ItemActivity() {
         note_content.addTextChangedListener(textWatcher)
     }
 
+    private fun insertNote() {
+        val title = getNoteTitle()
+        val content = getNoteContent()
+        val p0 = Location("dummyprovider")
+        p0.longitude = 30.0
+        p0.latitude = 60.0
+
+        note = Note(title, content, p0)
+
+        executor.execute {
+            val param = note
+            var result = false
+            param?.let {
+                result = Db.NOTE.insert(param)>0
+            }
+            if (result) {
+                Log.i(tag, "Note inserted.")
+            } else {
+                Log.e(tag, "Note not inserted.")
+            }
+        }
+    }
+
     private fun updateNote() {
         if (note == null) {
             if (!TextUtils.isEmpty(getNoteTitle()) &&
                     !TextUtils.isEmpty(getNoteContent())) {
-                LocationProvider.subscribe(locationListener)
+                //LocationProvider.subscribe(locationListener)
+                insertNote()
             }
         } else {
             note?.title = getNoteTitle()
             note?.message = getNoteContent()
-            val task = object : AsyncTask<Note, Void, Boolean>() {
-                override fun doInBackground(vararg params: Note?):
-                        Boolean {
-                    if (!params.isEmpty()) {
-                        val param = params[0]
-                        param?.let {
-                            return Db.NOTE.update(param) > 0
-                        }
-                    }
-                    return false
+
+            executor.execute {
+                val param = note
+                var result = false
+                param?.let {
+                    result = Db.NOTE.update(param)>0
                 }
-                override fun onPostExecute(result: Boolean?) {
-                    result?.let {
-                        if (result) {
-                            Log.i(tag, "Note updated.")
-                        } else {
-                            Log.e(tag, "Note not updated.")
-                        }
-                    }
+                if (result) {
+                    Log.i(tag, "Note updated.")
+                } else {
+                    Log.e(tag, "Note not updated.")
                 }
             }
-            task.execute(note)
+
         }
     }
 

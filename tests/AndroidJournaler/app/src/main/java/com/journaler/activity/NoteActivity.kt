@@ -2,8 +2,8 @@ package com.journaler.activity
 
 import android.location.Location
 import android.location.LocationListener
-import android.os.AsyncTask
-import android.os.Bundle
+import android.os.*
+import android.support.v4.content.ContextCompat
 import android.text.Editable
 import android.text.TextUtils
 import android.text.TextWatcher
@@ -22,6 +22,7 @@ class NoteActivity : ItemActivity() {
     override fun getLayout() = R.layout.activity_note
 
     private val executor = TaskExecutor.getInstance(1)
+    private var handler: Handler? = null
 
     private var note: Note? = null
     private var location: Location? = null
@@ -78,6 +79,22 @@ class NoteActivity : ItemActivity() {
         super.onCreate(savedInstanceState)
         note_title.addTextChangedListener(textWatcher)
         note_content.addTextChangedListener(textWatcher)
+
+        handler = object : Handler(Looper.getMainLooper()) {
+            override fun handleMessage(msg: Message?) {
+                msg?.let {
+                    var color = R.color.vermilion
+                    if (msg.arg1 > 0) {
+                        color = R.color.green
+                    }
+                    indicator.setBackgroundColor(ContextCompat.getColor(
+                            this@NoteActivity,
+                            color
+                    ))
+                }
+                super.handleMessage(msg)
+            }
+        }
     }
 
     private fun insertNote() {
@@ -100,6 +117,9 @@ class NoteActivity : ItemActivity() {
             } else {
                 Log.e(tag, "Note not inserted.")
             }
+
+            sendMessage(result)
+
         }
     }
 
@@ -125,6 +145,8 @@ class NoteActivity : ItemActivity() {
                 } else {
                     Log.e(tag, "Note not updated.")
                 }
+
+                sendMessage(result)
             }
 
         }
@@ -135,5 +157,15 @@ class NoteActivity : ItemActivity() {
     }
     private fun getNoteTitle(): String {
         return note_title.text.toString()
+    }
+
+    private fun sendMessage(result: Boolean) {
+        val msg = handler?.obtainMessage()
+        if (result) {
+            msg?.arg1 = 1
+        } else {
+            msg?.arg1 = 0
+        }
+        handler?.sendMessage(msg)
     }
 }

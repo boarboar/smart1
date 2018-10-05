@@ -7,12 +7,14 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
+import android.support.v4.content.ContextCompat
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.BounceInterpolator
+import android.widget.ListView
 import com.journaler.R
 import com.journaler.activity.NoteActivity
 import com.journaler.activity.TodoActivity
@@ -70,6 +72,33 @@ class ItemsFragment : BaseFragment() {
         return view
     }
 
+    override fun onResume() {
+        super.onResume()
+        val btn = view?.findViewById<FloatingActionButton>(R.id.new_item)
+        btn?.let {
+            animate(btn, false)
+        }
+        /*
+        val items = view?.findViewById<ListView>(R.id.items)
+        items?.let {
+            items.postDelayed({
+
+                activity?.let {
+                    if (!activity.isFinishing) {
+                        val ctx = this@ItemsFragment.context
+                        ctx?.let {
+                            val colorValue = ContextCompat.getColor(ctx, R.color.grey_text_middle)
+                            items.setBackgroundColor(colorValue)
+                            Log.i(logTag, "Shaded")
+                        }
+                    }
+                }
+
+            }, 3000)
+        }
+        */
+    }
+
     private fun openCreateNote() {
         val intent = Intent(context, NoteActivity::class.java)
         val data = Bundle()
@@ -86,8 +115,7 @@ class ItemsFragment : BaseFragment() {
         val data = Bundle()
         data.putInt(MODE.EXTRAS_KEY, MODE.CREATE.mode)
         data.putString(TodoActivity.EXTRA_DATE, dateFormat.format(date))
-        data.putString(TodoActivity.EXTRA_TIME,
-                timeFormat.format(date))
+        data.putString(TodoActivity.EXTRA_TIME, timeFormat.format(date))
         intent.putExtras(data)
         startActivityForResult(intent, TODO_REQUEST)
     }
@@ -96,8 +124,8 @@ class ItemsFragment : BaseFragment() {
                                   data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        val btn = view?.findViewById<FloatingActionButton>(R.id.new_item)
-        btn?.let{animate(btn, false)}
+        //val btn = view?.findViewById<FloatingActionButton>(R.id.new_item)
+        //btn?.let{animate(btn, false)}
 
         when (requestCode) {
             TODO_REQUEST -> {

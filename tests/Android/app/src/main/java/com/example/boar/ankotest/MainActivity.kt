@@ -17,6 +17,8 @@ import android.net.wifi.WifiManager
 import android.text.format.Formatter.formatIpAddress
 
 import java.net.ServerSocket
+import java.nio.charset.Charset
+import java.util.*
 
 private fun getLocalIpAddress(ctx : Context): String? {
 
@@ -77,17 +79,17 @@ class MainActivity : AppCompatActivity() {
             //String ip = String.format("%d.%d.%d.%d", (ipAddress & 0xff),(ipAddress >> 8 & 0xff),(ipAddress >> 16 & 0xff),(ipAddress >> 24 & 0xff))
             */
 
-            /*
+
             Log.d("Listener", "Start")
 
             val ips = getLocalIpAddress(applicationContext) ?: "No Wifi IP"
 
-            Log.d("Listener", ips)
+            Log.d("Listener", "WiFi Address detected as: $ips")
 
             uiThread {
-                toast(ips)
+                toast("WiFi Address detacted as: $ips")
             }
-*/
+
 
             val server = ServerSocket(9999)
             //println("Server running on port ${server.localPort}")
@@ -114,23 +116,31 @@ class MainActivity : AppCompatActivity() {
                 }
 
 
-                /*
-                val serializer = CustomSerializer()
+
+                //val serializer = CustomSerializer()
 
                 val scanner = Scanner(client.inputStream)
                 while (scanner.hasNextLine()) {
                     val text = scanner.nextLine()
-                    val requestBytes = text.toByteArray(Charset.defaultCharset())
-                    val request = serializer.DeserializeRequest(requestBytes)
 
-                    println("${request.operandA} ${request.operator} ${request.operandB}")
+                    Log.d("Client", "$text")
 
-                    val response = calculate(request.operandA, request.operandB, request.operator)
-                    println(response)
+                    uiThread {
+                        toast("Client : $text")
+                    }
+
+
+                    //val requestBytes = text.toByteArray(Charset.defaultCharset())
+                    //val request = serializer.DeserializeRequest(requestBytes)
+
+                    //println("${request.operandA} ${request.operator} ${request.operandB}")
+
+                    //val response = calculate(request.operandA, request.operandB, request.operator)
+                    //println(response)
                 }
 
                 scanner.close()
-                */
+
 
                 client.close()
             }

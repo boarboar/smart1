@@ -1,6 +1,7 @@
 package com.journaler.navigation
 
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,6 +14,7 @@ class NavigationDrawerAdapter(
         val ctx: Context,
         val items: List<NavigationDrawerItem>
 ) : BaseAdapter() {
+    private val tag = "Nav. drw. adptr."
     override fun getView(position: Int, v: View?, group: ViewGroup?): View {
         val inflater = LayoutInflater.from(ctx)
         var view = v
@@ -25,7 +27,11 @@ class NavigationDrawerAdapter(
         val title = view.findViewById<Button>(R.id.drawer_item)
         title.text = item.title
         title.setOnClickListener {
-            item.onClick.run()
+            if (item.enabled) {
+                item.onClick.run()
+            } else {
+                Log.w(tag, "Item is disabled: $item")
+            }
         }
         return view
     }

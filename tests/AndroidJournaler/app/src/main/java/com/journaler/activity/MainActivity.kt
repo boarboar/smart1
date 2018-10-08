@@ -116,6 +116,9 @@ class MainActivity : BaseActivity() {
         val navgationDraweAdapter =
                 NavigationDrawerAdapter(this, menuItems)
         left_drawer.adapter = navgationDraweAdapter
+
+        val serviceIntent = Intent(this, MainService::class.java)
+        startService(serviceIntent)
     }
 
     override fun onResume() {

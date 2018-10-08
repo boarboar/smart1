@@ -1,5 +1,6 @@
 package com.journaler.activity
 
+import android.content.Intent
 import android.location.Location
 import android.location.LocationListener
 import android.os.*
@@ -12,7 +13,9 @@ import com.journaler.R
 import com.journaler.database.Db
 import com.journaler.execution.TaskExecutor
 import com.journaler.location.LocationProvider
+import com.journaler.model.MODE
 import com.journaler.model.Note
+import com.journaler.service.DatabaseService
 import kotlinx.android.synthetic.main.activity_note.*
 import java.util.*
 
@@ -39,6 +42,7 @@ class NoteActivity : ItemActivity() {
 
     private val locationListener = object : LocationListener {
         override fun onLocationChanged(p0: Location?) {
+            /*
             p0?.let {
 
                 Log.i(
@@ -69,6 +73,7 @@ class NoteActivity : ItemActivity() {
                 }
 
             }
+            */
         }
         override fun onStatusChanged(p0: String?, p1: Int, p2: Bundle?) {}
         override fun onProviderEnabled(p0: String?) {}
@@ -106,6 +111,7 @@ class NoteActivity : ItemActivity() {
 
         note = Note(title, content, p0)
 
+        /*
         executor.execute {
             val param = note
             var result = false
@@ -121,6 +127,16 @@ class NoteActivity : ItemActivity() {
             sendMessage(result)
 
         }
+        */
+
+        val dbIntent = Intent(this@NoteActivity,
+                DatabaseService::class.java)
+        dbIntent.putExtra(DatabaseService.EXTRA_ENTRY, note)
+        dbIntent.putExtra(DatabaseService.EXTRA_OPERATION,
+                MODE.CREATE.mode)
+        startService(dbIntent)
+        sendMessage(true)
+
     }
 
     private fun updateNote() {
@@ -134,6 +150,7 @@ class NoteActivity : ItemActivity() {
             note?.title = getNoteTitle()
             note?.message = getNoteContent()
 
+            /*
             executor.execute {
                 val param = note
                 var result = false
@@ -148,6 +165,16 @@ class NoteActivity : ItemActivity() {
 
                 sendMessage(result)
             }
+            */
+
+            // Switching to intent service.
+            val dbIntent = Intent(this@NoteActivity,
+                    DatabaseService::class.java)
+            dbIntent.putExtra(DatabaseService.EXTRA_ENTRY, note)
+            dbIntent.putExtra(DatabaseService.EXTRA_OPERATION,
+                    MODE.EDIT.mode)
+            startService(dbIntent)
+            sendMessage(true)
 
         }
     }

@@ -1,6 +1,9 @@
 package com.journaler.activity
 
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.location.Location
 import android.location.LocationListener
 import android.os.*
@@ -10,6 +13,7 @@ import android.text.TextUtils
 import android.text.TextWatcher
 import android.util.Log
 import com.journaler.R
+import com.journaler.database.Crud
 import com.journaler.database.Db
 import com.journaler.execution.TaskExecutor
 import com.journaler.location.LocationProvider
@@ -38,6 +42,16 @@ class NoteActivity : ItemActivity() {
         Int, p3: Int) {}
         override fun onTextChanged(p0: CharSequence?, p1: Int, p2:
         Int, p3: Int) {}
+    }
+
+    private val crudOperationListener = object : BroadcastReceiver() {
+        override fun onReceive(ctx: Context?, intent: Intent?) {
+            intent?.let {
+                val crudResultValue =
+                        intent.getIntExtra(MODE.EXTRAS_KEY, 0)
+                sendMessage(crudResultValue == 1)
+            }
+        }
     }
 
     private val locationListener = object : LocationListener {
@@ -100,6 +114,13 @@ class NoteActivity : ItemActivity() {
                 super.handleMessage(msg)
             }
         }
+        val intentFiler = IntentFilter(Crud.BROADCAST_ACTION)
+        registerReceiver(crudOperationListener, intentFiler)
+    }
+
+    override fun onDestroy() {
+        unregisterReceiver(crudOperationListener)
+        super.onDestroy()
     }
 
     private fun insertNote() {
@@ -186,7 +207,8 @@ class NoteActivity : ItemActivity() {
         return note_title.text.toString()
     }
 
-    private fun sendMessage(result: Boolean) {
+   private fun sendMessage(result: Boolean) {
+        Log.v(tag, "Crud operation result [ $result ]")
         val msg = handler?.obtainMessage()
         if (result) {
             msg?.arg1 = 1

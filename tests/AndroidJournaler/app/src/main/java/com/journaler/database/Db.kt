@@ -3,6 +3,8 @@ package com.journaler.database
 import android.content.ContentValues
 import android.location.Location
 import android.util.Log
+import com.github.salomonbrys.kotson.fromJson
+import com.google.gson.Gson
 import com.journaler.model.Note
 import com.journaler.model.Todo
 
@@ -10,6 +12,8 @@ object Db {
     private val tag = "Db"
     private val version = 1
     private val name = "students"
+
+    private val gson = Gson()
 
     val NOTE = object : Crud<Note> {
     // Crud implementations
@@ -28,10 +32,7 @@ object Db {
                 val table = DbHelper.TABLE_NOTES
                 values.put(DbHelper.COLUMN_TITLE, item.title)
                 values.put(DbHelper.COLUMN_MESSAGE, item.message)
-                values.put(DbHelper.COLUMN_LOCATION_LATITUDE,
-                        item.location.latitude)
-                values.put(DbHelper.COLUMN_LOCATION_LONGITUDE,
-                        item.location.longitude)
+                values.put(DbHelper.COLUMN_LOCATION, gson.toJson(item.location))
                 val id = db.insert(table, null, values)
                 if (id > 0) {
                     items.add(id)
@@ -59,10 +60,7 @@ object Db {
                 val table = DbHelper.TABLE_NOTES
                 values.put(DbHelper.COLUMN_TITLE, item.title)
                 values.put(DbHelper.COLUMN_MESSAGE, item.message)
-                values.put(DbHelper.COLUMN_LOCATION_LATITUDE,
-                        item.location.latitude)
-                values.put(DbHelper.COLUMN_LOCATION_LONGITUDE,
-                        item.location.longitude)
+                values.put(DbHelper.COLUMN_LOCATION, gson.toJson(item.location))
                 db.update(table, values, "_id = ?",
                         arrayOf(item.id.toString()))
                 updated++
@@ -135,15 +133,9 @@ object Db {
                 val title = cursor.getString(titleIdx)
                 val messageIdx = cursor.getColumnIndexOrThrow(DbHelper.COLUMN_MESSAGE)
                 val message = cursor.getString(messageIdx)
-                val latitudeIdx = cursor.getColumnIndexOrThrow(DbHelper.COLUMN_LOCATION_LATITUDE
-                )
-                val latitude = cursor.getDouble(latitudeIdx)
-                val longitudeIdx = cursor.getColumnIndexOrThrow(DbHelper.COLUMN_LOCATION_LONGITUDE
-                )
-                val longitude = cursor.getDouble(longitudeIdx)
-                val location = Location("")
-                location.latitude = latitude
-                location.longitude = longitude
+                val locationIdx = cursor.getColumnIndexOrThrow(DbHelper.COLUMN_LOCATION)
+                val locationJson = cursor.getString(locationIdx)
+                val location = gson.fromJson<Location>(locationJson)
                 val note = Note(title, message, location)
                 note.id = id
                 result.add(note)
@@ -166,17 +158,9 @@ object Db {
                 val title = cursor.getString(titleIdx)
                 val messageIdx = cursor.getColumnIndexOrThrow(DbHelper.COLUMN_MESSAGE)
                 val message = cursor.getString(messageIdx)
-                val latitudeIdx = cursor.getColumnIndexOrThrow(
-                        DbHelper.COLUMN_LOCATION_LATITUDE
-                )
-                val latitude = cursor.getDouble(latitudeIdx)
-                val longitudeIdx = cursor.getColumnIndexOrThrow(
-                        DbHelper.COLUMN_LOCATION_LONGITUDE
-                )
-                val longitude = cursor.getDouble(longitudeIdx)
-                val location = Location("")
-                location.latitude = latitude
-                location.longitude = longitude
+                val locationIdx = cursor.getColumnIndexOrThrow(DbHelper.COLUMN_LOCATION)
+                val locationJson = cursor.getString(locationIdx)
+                val location = gson.fromJson<Location>(locationJson)
                 val note = Note(title, message, location)
                 note.id = id
                 result.add(note)
@@ -205,10 +189,7 @@ object Db {
                 val values = ContentValues()
                 values.put(DbHelper.COLUMN_TITLE, item.title)
                 values.put(DbHelper.COLUMN_MESSAGE, item.message)
-                values.put(DbHelper.COLUMN_LOCATION_LATITUDE,
-                        item.location.latitude)
-                values.put(DbHelper.COLUMN_LOCATION_LONGITUDE,
-                        item.location.longitude)
+                values.put(DbHelper.COLUMN_LOCATION, gson.toJson(item.location))
                 values.put(DbHelper.COLUMN_SCHEDULED, item.scheduledFor)
                 val id = db.insert(table, null, values)
                 if (id > 0) {
@@ -237,10 +218,7 @@ object Db {
                 val values = ContentValues()
                 values.put(DbHelper.COLUMN_TITLE, item.title)
                 values.put(DbHelper.COLUMN_MESSAGE, item.message)
-                values.put(DbHelper.COLUMN_LOCATION_LATITUDE,
-                        item.location.latitude)
-                values.put(DbHelper.COLUMN_LOCATION_LONGITUDE,
-                        item.location.longitude)
+                values.put(DbHelper.COLUMN_LOCATION, gson.toJson(item.location))
                 values.put(DbHelper.COLUMN_SCHEDULED, item.scheduledFor)
                 db.update(table, values, "_id = ?",
                         arrayOf(item.id.toString()))
@@ -311,21 +289,11 @@ object Db {
                 val title = cursor.getString(titleIdx)
                 val messageIdx = cursor.getColumnIndexOrThrow(DbHelper.COLUMN_MESSAGE)
                 val message = cursor.getString(messageIdx)
-                val latitudeIdx = cursor.getColumnIndexOrThrow(
-                        DbHelper.COLUMN_LOCATION_LATITUDE
-                )
-                val latitude = cursor.getDouble(latitudeIdx)
-                val longitudeIdx = cursor.getColumnIndexOrThrow(
-                        DbHelper.COLUMN_LOCATION_LONGITUDE
-                )
-                val longitude = cursor.getDouble(longitudeIdx)
-                val location = Location("")
-                val scheduledForIdx = cursor.getColumnIndexOrThrow(
-                        DbHelper.COLUMN_SCHEDULED
-                )
+                val locationIdx = cursor.getColumnIndexOrThrow(DbHelper.COLUMN_LOCATION)
+                val locationJson = cursor.getString(locationIdx)
+                val location = gson.fromJson<Location>(locationJson)
+                val scheduledForIdx = cursor.getColumnIndexOrThrow(DbHelper.COLUMN_SCHEDULED)
                 val scheduledFor = cursor.getLong(scheduledForIdx)
-                location.latitude = latitude
-                location.longitude = longitude
                 val todo = Todo(title, message, location, scheduledFor)
                 todo.id = id
                 result.add(todo)
@@ -348,21 +316,11 @@ object Db {
                 val title = cursor.getString(titleIdx)
                 val messageIdx = cursor.getColumnIndexOrThrow(DbHelper.COLUMN_MESSAGE)
                 val message = cursor.getString(messageIdx)
-                val latitudeIdx = cursor.getColumnIndexOrThrow(
-                        DbHelper.COLUMN_LOCATION_LATITUDE
-                )
-                val latitude = cursor.getDouble(latitudeIdx)
-                val longitudeIdx = cursor.getColumnIndexOrThrow(
-                        DbHelper.COLUMN_LOCATION_LONGITUDE
-                )
-                val longitude = cursor.getDouble(longitudeIdx)
-                val location = Location("")
-                val scheduledForIdx = cursor.getColumnIndexOrThrow(
-                        DbHelper.COLUMN_SCHEDULED
-                )
+                val locationIdx = cursor.getColumnIndexOrThrow(DbHelper.COLUMN_LOCATION)
+                val locationJson = cursor.getString(locationIdx)
+                val location = gson.fromJson<Location>(locationJson)
+                val scheduledForIdx = cursor.getColumnIndexOrThrow(DbHelper.COLUMN_SCHEDULED)
                 val scheduledFor = cursor.getLong(scheduledForIdx)
-                location.latitude = latitude
-                location.longitude = longitude
                 val todo = Todo(title, message, location, scheduledFor)
                 todo.id = id
                 result.add(todo)

@@ -15,6 +15,7 @@ import android.net.wifi.WifiInfo
 import android.support.v4.content.ContextCompat.getSystemService
 import android.net.wifi.WifiManager
 import android.text.format.Formatter.formatIpAddress
+import com.google.gson.Gson
 
 import java.net.ServerSocket
 import java.nio.charset.Charset
@@ -45,6 +46,8 @@ private fun getLocalIpAddress(ctx : Context): String? {
 
 class MainActivity : AppCompatActivity() {
 
+    private val gson = Gson()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -57,7 +60,9 @@ class MainActivity : AppCompatActivity() {
         }*/
         recyclerView.layoutManager = LinearLayoutManager(this)
 
+
         val list: ArrayList<Movie> = arrayListOf()
+        /*
         list.add(Movie("Sherlock Holmes",2009))
         list.add(Movie("The Shawshank Redemption",1994))
         list.add(Movie("Forrest Gump",1994))
@@ -65,6 +70,10 @@ class MainActivity : AppCompatActivity() {
         list.add(Movie("Taxi",1998))
         list.add(Movie("Inception",1994))
         list.add(Movie("The Imitation Game",2014))
+        */
+
+        list.add(Movie("Window",-100))
+        list.add(Movie("Balcony",-100))
 
         recyclerView.adapter = MovieAdapter(list)
 
@@ -101,6 +110,14 @@ class MainActivity : AppCompatActivity() {
             }
 
 
+            val msg = gson.fromJson("{I:1,M:64,P:0,R:8,T:210,V:310}", SensorMessage::class.java)
+
+            Log.d("Client", "MsgTst: $msg")
+
+            uiThread {
+                toast("SensorTST : $msg")
+            }
+
             // LocalServerSocket ?
 
             while (true) {
@@ -123,10 +140,14 @@ class MainActivity : AppCompatActivity() {
                 while (scanner.hasNextLine()) {
                     val text = scanner.nextLine()
 
-                    Log.d("Client", "$text")
+                    Log.d("Client", "Raw: $text")
+
+                    val msg = gson.fromJson(text, SensorMessage::class.java)
+
+                    Log.d("Client", "Msg: $msg")
 
                     uiThread {
-                        toast("Client : $text")
+                        toast("Sensor : $msg")
                     }
 
 

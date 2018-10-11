@@ -4,10 +4,12 @@ import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.app.Activity
 import android.app.AlertDialog
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
 import android.support.v4.content.ContextCompat
+import android.support.v4.view.ViewCompat.animate
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -18,6 +20,9 @@ import android.widget.ListView
 import com.journaler.R
 import com.journaler.activity.NoteActivity
 import com.journaler.activity.TodoActivity
+import com.journaler.adapter.EntryAdapter
+import com.journaler.execution.TaskExecutor
+import com.journaler.database.Db
 import com.journaler.model.MODE
 import java.text.SimpleDateFormat
 import java.util.*
@@ -27,10 +32,10 @@ class ItemsFragment : BaseFragment() {
     private val TODO_REQUEST = 1
     private val NOTE_REQUEST = 0
 
+    private val executor = TaskExecutor.getInstance(5)
+
     override val logTag = "Items fragment"
-    override fun getLayout(): Int {
-        return R.layout.fragment_items
-    }
+    override fun getLayout(): Int { return R.layout.fragment_items }
     override fun onCreateView(
             inflater: LayoutInflater,
             container: ViewGroup?,
@@ -78,6 +83,25 @@ class ItemsFragment : BaseFragment() {
         btn?.let {
             animate(btn, false)
         }
+
+
+        executor.execute {
+            val notes = Db.NOTE.selectAll()
+
+            this@ItemsFragment.context
+
+            //val adapter = EntryAdapter(activity, notes)
+            //val adapter = EntryAdapter(this@ItemsFragment.context!!, notes)
+            activity?.let {
+                val adapter = EntryAdapter(activity as Context, notes)
+                activity?.runOnUiThread {
+                    view?.findViewById<ListView>(R.id.items)?.adapter = adapter
+                }
+            }
+
+        }
+
+
         /*
         val items = view?.findViewById<ListView>(R.id.items)
         items?.let {

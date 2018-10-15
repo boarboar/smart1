@@ -8,7 +8,7 @@
 
 
     <TextView
-        android:id="@+id/ststus"
+        android:id="@+id/status"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="LOCAL TIME 00:00"

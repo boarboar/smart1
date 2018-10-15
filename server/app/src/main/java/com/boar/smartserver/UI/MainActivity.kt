@@ -3,26 +3,32 @@ package com.boar.smartserver.UI
 //import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
-import android.util.Log
+import android.support.v7.widget.Toolbar
+//import android.support.v7.widget.Toolbar
+//import android.util.Log
 import com.boar.smartserver.R
 import com.boar.smartserver.domain.Sensor
 import kotlinx.android.synthetic.main.activity_main.*
+import org.jetbrains.anko.find
 import java.util.ArrayList
 
 //import com.boar.smartserver.SmartServer
 //import org.jetbrains.anko.startActivity
 
-class MainActivity : BaseActivity() {
+class MainActivity : BaseActivity(), ToolbarManager {
     override val tag = "Main activity"
+    override val toolbar by lazy { find<Toolbar>(R.id.toolbar) }
 
     override fun getLayout() = R.layout.activity_main
     override fun getActivityTitle() = R.string.app_name
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Log.v(tag, "[ ON CREATE - CHECK]")
+        //Log.v(tag, "[ ON CREATE - CHECK]")
 
         sensorList.layoutManager = LinearLayoutManager(this)
+
+        initToolbar()
 
         val sensors: ArrayList<Sensor> = arrayListOf()
         sensors.add(Sensor(1, "Window", System.currentTimeMillis()-60*1000*15, 20.5f, 3.04f))
@@ -36,5 +42,7 @@ class MainActivity : BaseActivity() {
         }
 
         sensorList.adapter = adapter
+
+        toolbarTitle = "Updated"
     }
 }

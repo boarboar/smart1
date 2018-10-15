@@ -6,14 +6,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-
-    <TextView
-        android:id="@+id/status"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="LOCAL TIME 00:00"
-        />
-
     <android.support.v7.widget.RecyclerView
         android:id="@+id/sensorList"
         android:layout_width="match_parent"
@@ -21,5 +13,7 @@
         android:clipToPadding="false"
         android:paddingTop="?attr/actionBarSize"/>
 
+
+    <include layout="@layout/toolbar"/>
 
 </FrameLayout>

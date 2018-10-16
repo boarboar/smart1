@@ -31,10 +31,10 @@ class SensorListAdapter(private val sensors: List<Sensor>,
 
         fun bindForecast(sensor: Sensor) {
             with(sensor) {
-                itemView.date.text = convertTime(dateLast)
+                itemView.date.text = if(updated !=0L ) convertTime(updated) else "--:--:--"
                 itemView.description.text = description
-                itemView.temperature.text = "${tempLast}º"
-                itemView.vcc.text = "${vccLast} v"
+                itemView.temperature.text = "${temperatureAsString}º"
+                itemView.vcc.text = "${vccAsString} v"
                 itemView.setOnClickListener { itemClick(this) }
             }
         }

@@ -6,6 +6,7 @@ import android.support.v7.widget.Toolbar
 import com.boar.smartserver.R
 import com.boar.smartserver.domain.Sensor
 import com.boar.smartserver.domain.SensorList
+import com.boar.smartserver.domain.SensorMeasurement
 import kotlinx.android.synthetic.main.activity_main.*
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.find
@@ -44,8 +45,9 @@ class MainActivity : BaseActivity(), ToolbarManager {
 
     private fun loadSensors() {
         doAsync {
-            sensors.add(Sensor(1, "Window", System.currentTimeMillis() - 60 * 1000 * 15, 21.5f, 3.04f))
-            sensors.add(Sensor(2, "Balcony", System.currentTimeMillis() - 60 * 1000 * 5, -28.5f, 3.14f))
+            sensors.add(Sensor(1, "Window"))
+            sensors.add(Sensor(2, "Balcony"))
+
         }
         updateUI()
     }

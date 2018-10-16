@@ -1,18 +1,16 @@
 package com.boar.smartserver.UI
 
-//import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.Toolbar
-//import android.support.v7.widget.Toolbar
-//import android.util.Log
 import com.boar.smartserver.R
 import com.boar.smartserver.domain.Sensor
+import com.boar.smartserver.domain.SensorList
 import kotlinx.android.synthetic.main.activity_main.*
+import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.find
 import java.util.ArrayList
 
-//import com.boar.smartserver.SmartServer
 //import org.jetbrains.anko.startActivity
 
 class MainActivity : BaseActivity(), ToolbarManager {
@@ -22,6 +20,10 @@ class MainActivity : BaseActivity(), ToolbarManager {
     override fun getLayout() = R.layout.activity_main
     override fun getActivityTitle() = R.string.app_name
 
+   // private val sensors: ArrayList<Sensor> = arrayListOf()
+   private val sensors = SensorList()
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         //Log.v(tag, "[ ON CREATE - CHECK]")
@@ -29,11 +31,26 @@ class MainActivity : BaseActivity(), ToolbarManager {
         sensorList.layoutManager = LinearLayoutManager(this)
 
         initToolbar()
+        loadSensors()
+    }
 
-        val sensors: ArrayList<Sensor> = arrayListOf()
-        sensors.add(Sensor(1, "Window", System.currentTimeMillis()-60*1000*15, 20.5f, 3.04f))
-        sensors.add(Sensor(2, "Balcony", System.currentTimeMillis()-60*1000*5, 26.5f, 3.14f))
+    /*
+    private fun loadForecast() = async(UI) {
+        val result = bg { RequestForecastCommand(zipCode).execute()
+        }
+        updateUI(result.await())
+    }
+*/
 
+    private fun loadSensors() {
+        doAsync {
+            sensors.add(Sensor(1, "Window", System.currentTimeMillis() - 60 * 1000 * 15, 21.5f, 3.04f))
+            sensors.add(Sensor(2, "Balcony", System.currentTimeMillis() - 60 * 1000 * 5, -28.5f, 3.14f))
+        }
+        updateUI()
+    }
+
+    private fun updateUI() {
         val adapter = SensorListAdapter(sensors) {
             /*
             startActivity<DetailActivity>(DetailActivity.ID to it.id,
@@ -42,7 +59,7 @@ class MainActivity : BaseActivity(), ToolbarManager {
         }
 
         sensorList.adapter = adapter
-
         toolbarTitle = "Updated"
     }
+
 }

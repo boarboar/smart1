@@ -16,18 +16,21 @@
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/date"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-            tools:text="May 14, 2015"/>
-
-        <TextView
             android:id="@+id/description"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:textColor = "@android:color/holo_green_light"
             tools:text="Light Rain"/>
+
+        <TextView
+            android:id="@+id/date"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor = "@android:color/holo_green_light"
+            android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+            tools:text="--:--"/>
+
 
     </LinearLayout>
 
@@ -42,6 +45,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:textColor = "@android:color/holo_green_light"
             tools:text="--º"/>
 
         <TextView
@@ -49,6 +53,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+            android:textColor = "@android:color/holo_green_light"
             tools:text="--v"/>
 
     </LinearLayout>

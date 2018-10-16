@@ -11,6 +11,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clipToPadding="false"
+        android:background="?attr/colorPrimary"
+        android:textColor = "@android:color/holo_green_light"
         android:paddingTop="?attr/actionBarSize"/>
 
 

@@ -119,17 +119,23 @@ class MainActivity : BaseActivity() {
 
         val serviceIntent = Intent(this, MainService::class.java)
         startService(serviceIntent)
-    }
 
-    override fun onResume() {
-        super.onResume()
         val intent = Intent(this, MainService::class.java)
         bindService(intent, serviceConnection,
                 android.content.Context.BIND_AUTO_CREATE)
     }
+
+    override fun onResume() {
+        super.onResume()
+        /*
+        val intent = Intent(this, MainService::class.java)
+        bindService(intent, serviceConnection,
+                android.content.Context.BIND_AUTO_CREATE)
+                */
+    }
     override fun onPause() {
-        super.onPause()
-        unbindService(serviceConnection)
+        //super.onPause()
+        //unbindService(serviceConnection)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

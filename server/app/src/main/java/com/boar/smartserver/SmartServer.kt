@@ -2,7 +2,9 @@ package com.boar.smartserver
 
 import android.app.Application
 import android.content.Context
+import android.content.Intent
 import android.util.Log
+import com.boar.smartserver.service.MainService
 
 class SmartServer : Application() {
 
@@ -35,5 +37,6 @@ class SmartServer : Application() {
         stopService(serviceIntent)
     }
     */
+
 }
 

@@ -1,6 +1,10 @@
 package com.boar.smartserver.UI
 
+import android.content.ComponentName
+import android.content.Intent
+import android.content.ServiceConnection
 import android.os.Bundle
+import android.os.IBinder
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.Toolbar
 import android.util.Log
@@ -8,6 +12,7 @@ import com.boar.smartserver.R
 import com.boar.smartserver.domain.Sensor
 import com.boar.smartserver.domain.SensorList
 import com.boar.smartserver.domain.SensorMeasurement
+import com.boar.smartserver.service.MainService
 import kotlinx.android.synthetic.main.activity_main.*
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.find
@@ -27,6 +32,28 @@ class MainActivity : BaseActivity(), ToolbarManager {
     private val sensors = SensorList()
 
 
+    private var service: MainService? = null
+    var isBound = false
+
+    private val serviceConnection = object : ServiceConnection {
+        override fun onServiceDisconnected(p0: ComponentName?) {
+            service = null
+            isBound = false
+            //synchronize.enabled = false
+        }
+        override fun onServiceConnected(p0: ComponentName?, binder: IBinder?) {
+            if (binder is MainService.MainServiceBinder) {
+                service = binder.getService()
+                service?.let {
+                    isBound = true
+                    //synchronize.enabled = true
+                }
+            }
+        }
+
+    }
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         //Log.v(tag, "[ ON CREATE - CHECK]")
@@ -43,7 +70,33 @@ class MainActivity : BaseActivity(), ToolbarManager {
 
         loadSensors()
 
+        val intent = Intent(this, MainService::class.java)
+        bindService(intent, serviceConnection,  android.content.Context.BIND_AUTO_CREATE)
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        unbindService(serviceConnection)
+    }
+
+/*
+    override fun onStart() {
+        super.onStart()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        //unbindService(serviceConnection)
+    }
+
+    override fun onResume() {
+        super.onResume()
+    }
+
+    override fun onPause() {
+        super.onPause()
+    }
+*/
 
     private fun loadSensors() {
         doAsync {

@@ -3,6 +3,7 @@ package com.boar.smartserver.UI
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.Toolbar
+import android.util.Log
 import com.boar.smartserver.R
 import com.boar.smartserver.domain.Sensor
 import com.boar.smartserver.domain.SensorList
@@ -10,6 +11,8 @@ import com.boar.smartserver.domain.SensorMeasurement
 import kotlinx.android.synthetic.main.activity_main.*
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.find
+import org.jetbrains.anko.toast
+import org.jetbrains.anko.uiThread
 import java.util.ArrayList
 
 //import org.jetbrains.anko.startActivity
@@ -21,8 +24,7 @@ class MainActivity : BaseActivity(), ToolbarManager {
     override fun getLayout() = R.layout.activity_main
     override fun getActivityTitle() = R.string.app_name
 
-   // private val sensors: ArrayList<Sensor> = arrayListOf()
-   private val sensors = SensorList()
+    private val sensors = SensorList()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,17 +33,17 @@ class MainActivity : BaseActivity(), ToolbarManager {
 
         sensorList.layoutManager = LinearLayoutManager(this)
 
-        initToolbar()
-        loadSensors()
-    }
-
-    /*
-    private fun loadForecast() = async(UI) {
-        val result = bg { RequestForecastCommand(zipCode).execute()
+        initToolbar {
+            when (it) {
+                //R.id.action_settings -> startActivity<SettingsActivity>()
+                R.id.action_sim -> runSimulation()
+                else -> toast("Unknown option")
+            }
         }
-        updateUI(result.await())
+
+        loadSensors()
+
     }
-*/
 
     private fun loadSensors() {
         doAsync {
@@ -62,6 +64,26 @@ class MainActivity : BaseActivity(), ToolbarManager {
 
         sensorList.adapter = adapter
         toolbarTitle = "Updated"
+
+        Log.v(tag, "Sensors updated")
+
+        //runSimulation()
+
     }
 
+    private fun runSimulation() {
+        Log.v(tag, "Start simulation")
+        doAsync {
+            while(true) {
+                Thread.sleep(5_000)
+                val idx = sensors.simulate()
+                if (idx!=-1) {
+                    Log.v(tag, "Siimulated : idx=$idx")
+                    uiThread {
+                        sensorList.adapter?.notifyItemChanged(idx)
+                    }
+                }
+            }
+        }
+    }
 }

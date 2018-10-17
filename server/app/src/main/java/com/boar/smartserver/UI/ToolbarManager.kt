@@ -1,21 +1,8 @@
 package com.boar.smartserver.UI
 
-import android.support.v7.graphics.drawable.DrawerArrowDrawable
-//import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
 import com.boar.smartserver.R
-/*
-import android.support.v7.widget.RecyclerView.OnScrollListener
-import com.example.boar.myapplication.R
-import com.example.boar.myapplication.extensions.ctx
-import com.example.boar.myapplication.extensions.slideEnter
-import com.example.boar.myapplication.extensions.slideExit
-import com.example.boar.myapplication.ui.App
-*/
-/*
-import org.jetbrains.anko.startActivity
-import org.jetbrains.anko.toast
-*/
+
 
 interface ToolbarManager {
 
@@ -27,25 +14,22 @@ interface ToolbarManager {
             toolbar.title = value
         }
 
-    fun initToolbar() {
+    fun initToolbar(handle: (Int) -> Unit) {
         toolbar.inflateMenu(R.menu.menu_main)
-        /*
         toolbar.setOnMenuItemClickListener {
-            when (it.itemId) {
-                R.id.action_settings -> toolbar.ctx.startActivity<SettingsActivity>()
-                else -> App.instance.toast("Unknown option")
-            }
+            handle(it.itemId)
             true
         }
-        */
     }
 
+    /*
     fun enableHomeAsUp(up: () -> Unit) {
         toolbar.navigationIcon = createUpDrawable()
         toolbar.setNavigationOnClickListener { up() }
     }
 
     private fun createUpDrawable() = DrawerArrowDrawable(toolbar.context).apply { progress = 1f }
+    */
 
     /*
     fun attachToScroll(recyclerView: RecyclerView) {
@@ -56,4 +40,6 @@ interface ToolbarManager {
         })
     }
     */
+
+    //fun oncommand(val cmd_id: Int)
 }

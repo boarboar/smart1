@@ -1,7 +1,11 @@
 package com.boar.smartserver.domain
 
 import com.google.gson.annotations.SerializedName
-import java.util.ArrayList
+import java.util.*
+
+fun Random.nextInt(range: IntRange): Int {
+    return range.start + nextInt(range.last - range.start)
+}
 
 class SensorList : ArrayList<Sensor>() {
     fun update(newmeas: SensorMeasurement) : Int {
@@ -10,6 +14,14 @@ class SensorList : ArrayList<Sensor>() {
         set(sensorIdx, this[sensorIdx].copy(meas=newmeas))
         return sensorIdx
     }
+    fun simulate() : Int {
+        val random = Random()
+        val id = random.nextInt(1..3).toShort()
+        val temp10 = random.nextInt(-25..35).toShort()
+        val vcc100 = random.nextInt(254..495).toShort()
+        return update(SensorMeasurement(id, temp10=temp10, vcc100=vcc100))
+    }
+
     /*
     simulate
     SensorMeasurement(id=1, temp10=215, vcc100=312)

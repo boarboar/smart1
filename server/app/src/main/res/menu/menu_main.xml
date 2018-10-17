@@ -7,5 +7,17 @@
         android:id="@+id/action_settings"
         android:orderInCategory="100"
         android:title="@string/settings"
+        android:icon="@android:drawable/ic_menu_preferences"
+        app:showAsAction="ifRoom"/>
+    <item
+        android:id="@+id/action_add"
+        android:orderInCategory="101"
+        android:title="@string/add_sensor"
+        android:icon="@android:drawable/ic_menu_add"
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/action_sim"
+        android:orderInCategory="101"
+        android:title="@string/simulation"
         app:showAsAction="never"/>
 </menu>

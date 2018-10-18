@@ -12,13 +12,13 @@ class MainService : Service() {
     //private var executor = TaskExecutor.getInstance(1)
     override fun onCreate() {
         super.onCreate()
-        // not called
+        // called
         Log.v(tag, "[ ON CREATE ]")
 
     }
-
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Log.v(tag, "[ ON START COMMAND ]")
+        // called
         return Service.START_STICKY
     }
 
@@ -54,5 +54,9 @@ class MainService : Service() {
 
     inner class MainServiceBinder : Binder() {
         fun getService(): MainService = this@MainService
+    }
+
+    fun addSensor() {
+        Log.v(tag, "[ ADD SENSOR ]")
     }
 }

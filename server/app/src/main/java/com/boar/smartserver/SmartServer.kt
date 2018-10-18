@@ -15,6 +15,7 @@ class SmartServer : Application() {
     override fun onCreate() {
         super.onCreate()
         ctx = applicationContext
+        startService()
         Log.v(tag, "[ ON CREATE ]")
     }
 
@@ -27,7 +28,7 @@ class SmartServer : Application() {
         super.onTrimMemory(level)
         Log.d(tag, "[ ON TRIM MEMORY ]: $level")
     }
-    /*
+
     private fun startService() {
         val serviceIntent = Intent(this, MainService::class.java)
         startService(serviceIntent)
@@ -36,7 +37,7 @@ class SmartServer : Application() {
         val serviceIntent = Intent(this, MainService::class.java)
         stopService(serviceIntent)
     }
-    */
+
 
 }
 

@@ -39,6 +39,7 @@ class MainActivity : BaseActivity(), ToolbarManager {
         override fun onServiceDisconnected(p0: ComponentName?) {
             service = null
             isBound = false
+            Log.v(tag, "[ SRV ONBOUND ]")
             //synchronize.enabled = false
         }
         override fun onServiceConnected(p0: ComponentName?, binder: IBinder?) {
@@ -47,6 +48,7 @@ class MainActivity : BaseActivity(), ToolbarManager {
                 service?.let {
                     isBound = true
                     //synchronize.enabled = true
+                    Log.v(tag, "[ SRV BOUND ]")
                 }
             }
         }
@@ -63,6 +65,7 @@ class MainActivity : BaseActivity(), ToolbarManager {
         initToolbar {
             when (it) {
                 //R.id.action_settings -> startActivity<SettingsActivity>()
+                R.id.action_add -> service?.addSensor()
                 R.id.action_sim -> runSimulation()
                 else -> toast("Unknown option")
             }

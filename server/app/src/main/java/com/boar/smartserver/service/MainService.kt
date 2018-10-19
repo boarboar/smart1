@@ -5,10 +5,13 @@ import android.content.Intent
 import android.os.Binder
 import android.os.IBinder
 import android.util.Log
+import com.boar.smartserver.domain.Sensor
+import com.boar.smartserver.domain.SensorList
 
 class MainService : Service() {
     private val tag = "Main service"
     private var binder = getServiceBinder()
+    private var sensors = SensorList()
     //private var executor = TaskExecutor.getInstance(1)
     override fun onCreate() {
         super.onCreate()
@@ -19,6 +22,12 @@ class MainService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Log.v(tag, "[ ON START COMMAND ]")
         // called
+
+
+        sensors.add(Sensor(1, "Window"))
+        sensors.add(Sensor(2, "Balcony"))
+
+
         return Service.START_STICKY
     }
 
@@ -56,7 +65,18 @@ class MainService : Service() {
         fun getService(): MainService = this@MainService
     }
 
+    fun getSensors() : SensorList {
+        Thread.sleep(5_000)
+        return sensors
+    }
+
     fun addSensor() {
         Log.v(tag, "[ ADD SENSOR ]")
+
+        val intent = Intent()
+        intent.action = "com.example.Broadcast"
+        intent.putExtra("MyData", 1000)
+        sendBroadcast(intent)
+
     }
 }

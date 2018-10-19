@@ -2,6 +2,7 @@ package com.boar.smartserver.UI
 
 import android.content.ComponentName
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
@@ -12,6 +13,7 @@ import com.boar.smartserver.R
 import com.boar.smartserver.domain.Sensor
 import com.boar.smartserver.domain.SensorList
 import com.boar.smartserver.domain.SensorMeasurement
+import com.boar.smartserver.receiver.MainServiceReceiver
 import com.boar.smartserver.service.MainService
 import kotlinx.android.synthetic.main.activity_main.*
 import org.jetbrains.anko.doAsync
@@ -29,8 +31,11 @@ class MainActivity : BaseActivity(), ToolbarManager {
     override fun getLayout() = R.layout.activity_main
     override fun getActivityTitle() = R.string.app_name
 
-    private val sensors = SensorList()
+    private var sensors = SensorList()
 
+    val receiver: MainServiceReceiver = MainServiceReceiver()
+
+    //private lateinit var sensors
 
     private var service: MainService? = null
     var isBound = false
@@ -47,6 +52,7 @@ class MainActivity : BaseActivity(), ToolbarManager {
                 service = binder.getService()
                 service?.let {
                     isBound = true
+                    loadSensors()
                     //synchronize.enabled = true
                     Log.v(tag, "[ SRV BOUND ]")
                 }
@@ -71,15 +77,20 @@ class MainActivity : BaseActivity(), ToolbarManager {
             }
         }
 
-        loadSensors()
 
         val intent = Intent(this, MainService::class.java)
         bindService(intent, serviceConnection,  android.content.Context.BIND_AUTO_CREATE)
+
+        val filter = IntentFilter()
+        filter.addAction("com.example.Broadcast")
+        registerReceiver(receiver, filter)
+
     }
 
     override fun onDestroy() {
         super.onDestroy()
         unbindService(serviceConnection)
+        unregisterReceiver(receiver)
     }
 
 /*
@@ -103,11 +114,15 @@ class MainActivity : BaseActivity(), ToolbarManager {
 
     private fun loadSensors() {
         doAsync {
-            sensors.add(Sensor(1, "Window"))
-            sensors.add(Sensor(2, "Balcony"))
+            service?.getSensors()?.let { sensors = it}
+            //Log.v(tag, "Sensors : $sensors")
+
+            uiThread {
+                updateUI()
+            }
 
         }
-        updateUI()
+        //updateUI()
     }
 
     private fun updateUI() {
@@ -121,9 +136,7 @@ class MainActivity : BaseActivity(), ToolbarManager {
         sensorList.adapter = adapter
         toolbarTitle = "Updated"
 
-        Log.v(tag, "Sensors updated")
-
-        //runSimulation()
+        //Log.v(tag, "Sensors updated")
 
     }
 

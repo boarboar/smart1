@@ -9,6 +9,15 @@ import com.boar.smartserver.domain.Sensor
 import com.boar.smartserver.domain.SensorList
 
 class MainService : Service() {
+
+    companion object {
+        val BROADCAST_ACTION = "com.boar.smartserver.service"
+        val BROADCAST_EXTRAS_OPERATION = "operation"
+        val BROADCAST_EXTRAS_OP_ADD = "add"
+        val BROADCAST_EXTRAS_OP_UPD = "update"
+        val BROADCAST_EXTRAS_IDX = "param_idx"
+    }
+
     private val tag = "Main service"
     private var binder = getServiceBinder()
     private var sensors = SensorList()
@@ -74,8 +83,9 @@ class MainService : Service() {
         Log.v(tag, "[ ADD SENSOR ]")
 
         val intent = Intent()
-        intent.action = "com.example.Broadcast"
-        intent.putExtra("MyData", 1000)
+        intent.action = BROADCAST_ACTION
+        intent.putExtra(BROADCAST_EXTRAS_OPERATION, BROADCAST_EXTRAS_OP_ADD)
+        intent.putExtra(BROADCAST_EXTRAS_IDX, 666)
         sendBroadcast(intent)
 
     }

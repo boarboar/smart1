@@ -21,7 +21,7 @@
             android:layout_height="wrap_content"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium"
             android:textColor = "@android:color/holo_green_light"
-            tools:text="Light Rain"/>
+            tools:text="Location"/>
 
         <TextView
             android:id="@+id/date"

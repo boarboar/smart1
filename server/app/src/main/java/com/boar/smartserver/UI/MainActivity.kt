@@ -82,7 +82,7 @@ class MainActivity : BaseActivity(), ToolbarManager {
         bindService(intent, serviceConnection,  android.content.Context.BIND_AUTO_CREATE)
 
         val filter = IntentFilter()
-        filter.addAction("com.example.Broadcast")
+        filter.addAction(MainService.BROADCAST_ACTION)
         registerReceiver(receiver, filter)
 
     }

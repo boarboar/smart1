@@ -7,6 +7,7 @@ import android.os.IBinder
 import android.util.Log
 import com.boar.smartserver.domain.Sensor
 import com.boar.smartserver.domain.SensorList
+import org.jetbrains.anko.doAsync
 
 class MainService : Service() {
 
@@ -88,5 +89,23 @@ class MainService : Service() {
         intent.putExtra(BROADCAST_EXTRAS_IDX, 666)
         sendBroadcast(intent)
 
+    }
+
+    fun runSimulation() {
+        Log.v(tag, "Start simulation")
+        doAsync {
+            while(true) {
+                Thread.sleep(5_000)
+                val idx = sensors.simulate()
+                if (idx!=-1) {
+                    Log.v(tag, "Siimulated : idx=$idx")
+                    val intent = Intent()
+                    intent.action = BROADCAST_ACTION
+                    intent.putExtra(BROADCAST_EXTRAS_OPERATION, BROADCAST_EXTRAS_OP_UPD)
+                    intent.putExtra(BROADCAST_EXTRAS_IDX, idx)
+                    sendBroadcast(intent)
+                }
+            }
+        }
     }
 }

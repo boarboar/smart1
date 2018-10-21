@@ -10,9 +10,6 @@ import com.boar.smartserver.service.MainService
 class MainServiceReceiver : BroadcastReceiver() {
     private val tag = "Main receiver"
     override fun onReceive(context: Context, intent: Intent) {
-        // TODO: This method is called when the BroadcastReceiver is receiving
-        // an Intent broadcast.
-       // throw UnsupportedOperationException("Not yet implemented")
         val op = intent.getStringExtra(MainService.BROADCAST_EXTRAS_OPERATION)
         val idx = intent.getIntExtra(MainService.BROADCAST_EXTRAS_IDX, -1)
         Log.v(tag, "[ BRDCST $op $idx]")
@@ -25,3 +22,6 @@ class MainServiceReceiver : BroadcastReceiver() {
         }
     }
 }
+
+//https://stackoverflow.com/questions/47742474/kotlin-call-a-function-to-update-ui-from-broadcastreceiver-onreceive
+//https://startandroid.ru/ru/uroki/vse-uroki-spiskom/161-urok-96-service-obratnaja-svjaz-s-pomoschju-broadcastreceiver.html

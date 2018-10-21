@@ -72,7 +72,7 @@ class MainActivity : BaseActivity(), ToolbarManager {
             when (it) {
                 //R.id.action_settings -> startActivity<SettingsActivity>()
                 R.id.action_add -> service?.addSensor()
-                R.id.action_sim -> runSimulation()
+                R.id.action_sim -> service?.runSimulation()
                 else -> toast("Unknown option")
             }
         }
@@ -139,7 +139,7 @@ class MainActivity : BaseActivity(), ToolbarManager {
         //Log.v(tag, "Sensors updated")
 
     }
-
+/*
     private fun runSimulation() {
         Log.v(tag, "Start simulation")
         doAsync {
@@ -155,4 +155,5 @@ class MainActivity : BaseActivity(), ToolbarManager {
             }
         }
     }
+    */
 }

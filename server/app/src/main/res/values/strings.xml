@@ -2,5 +2,6 @@
     <string name="app_name">SmartServer</string>
     <string name="settings">Settings</string>
     <string name="add_sensor">Add sensor</string>
-    <string name="simulation">Start simulation</string>
+    <string name="sim_start">Start simulation</string>
+    <string name="sim_stop">Sop simulation</string>
 </resources>

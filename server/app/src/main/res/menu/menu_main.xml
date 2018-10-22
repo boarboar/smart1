@@ -16,8 +16,13 @@
         android:icon="@android:drawable/ic_menu_add"
         app:showAsAction="never"/>
     <item
-        android:id="@+id/action_sim"
-        android:orderInCategory="101"
-        android:title="@string/simulation"
+        android:id="@+id/action_sim_start"
+        android:orderInCategory="102"
+        android:title="@string/sim_start"
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/action_sim_stop"
+        android:orderInCategory="103"
+        android:title="@string/sim_stop"
         app:showAsAction="never"/>
 </menu>

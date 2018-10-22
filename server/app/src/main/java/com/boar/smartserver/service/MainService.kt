@@ -1,13 +1,41 @@
 package com.boar.smartserver.service
 
 import android.app.Service
+import android.content.Context
 import android.content.Intent
+import android.net.wifi.WifiManager
 import android.os.Binder
 import android.os.IBinder
 import android.util.Log
 import com.boar.smartserver.domain.Sensor
 import com.boar.smartserver.domain.SensorList
 import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.toast
+import org.jetbrains.anko.uiThread
+import java.net.ServerSocket
+import java.util.*
+import java.util.concurrent.Future
+
+
+private fun getLocalIpAddress(ctx : Context): String? {
+
+    fun ipToString(i: Int): String {
+        return (i and 0xFF).toString() + "." +
+                (i shr 8 and 0xFF) + "." +
+                (i shr 16 and 0xFF) + "." +
+                (i shr 24 and 0xFF)
+
+    }
+
+    try {
+        val wifiManager: WifiManager = ctx?.getSystemService(Context.WIFI_SERVICE) as WifiManager
+        return ipToString(wifiManager.connectionInfo.ipAddress)
+    } catch (ex: Exception) {
+        Log.e("IP Address", ex.toString())
+    }
+
+    return null
+}
 
 class MainService : Service() {
 
@@ -21,6 +49,9 @@ class MainService : Service() {
 
     private val tag = "Main service"
     private var binder = getServiceBinder()
+    private var executor = TaskExecutor.getInstance(2)
+    private var simFuture  : Future<Unit>? = null
+
     private var sensors = SensorList()
     //private var executor = TaskExecutor.getInstance(1)
     override fun onCreate() {
@@ -37,6 +68,51 @@ class MainService : Service() {
         sensors.add(Sensor(1, "Window"))
         sensors.add(Sensor(2, "Balcony"))
 
+        executor.execute {
+            Log.i(tag, "Listener thread [ START ]")
+            val ips = getLocalIpAddress(applicationContext) ?: "No Wifi IP"
+            Log.d("Listener", "WiFi Address detected as: $ips")
+            val server = ServerSocket(9999)
+            Log.d("Listener", "Server running on port ${server.inetAddress.hostAddress} : ${server.localPort} (${server.inetAddress.hostName})")
+
+            while (true) {
+
+                val client = server.accept()
+                //println("Client conected : ${client.inetAddress.hostAddress}")
+
+                Log.d("Listener", "Client connected : ${client.inetAddress.hostAddress}")
+
+                /*
+                val scanner = Scanner(client.inputStream)
+                while (scanner.hasNextLine()) {
+                    val text = scanner.nextLine()
+
+                    Log.d("Client", "Raw: $text")
+
+
+                    val msg = gson.fromJson(text, SensorMessage::class.java)
+
+                    Log.d("Client", "Msg: $msg")
+
+
+                    //val requestBytes = text.toByteArray(Charset.defaultCharset())
+                    //val request = serializer.DeserializeRequest(requestBytes)
+
+                    //println("${request.operandA} ${request.operator} ${request.operandB}")
+
+                    //val response = calculate(request.operandA, request.operandB, request.operator)
+                    //println(response)
+                }
+
+                scanner.close()
+                */
+
+                client.close()
+            }
+
+            server.close()
+            Log.i(tag, "Listener thread [ STOP ]")
+            }
 
         return Service.START_STICKY
     }
@@ -93,7 +169,7 @@ class MainService : Service() {
 
     fun runSimulation() {
         Log.v(tag, "Start simulation")
-        doAsync {
+        simFuture = doAsync {
             while(true) {
                 Thread.sleep(5_000)
                 val idx = sensors.simulate()
@@ -107,5 +183,9 @@ class MainService : Service() {
                 }
             }
         }
+    }
+
+    fun stopSimulation() {
+        simFuture?.cancel(true)
     }
 }

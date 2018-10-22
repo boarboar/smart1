@@ -98,7 +98,8 @@ class MainActivity : BaseActivity(), ToolbarManager {
         when (it) {
             //R.id.action_settings -> startActivity<SettingsActivity>()
             R.id.action_add -> service?.addSensor()
-            R.id.action_sim -> service?.runSimulation()
+            R.id.action_sim_start -> service?.runSimulation()
+            R.id.action_sim_stop -> service?.stopSimulation()
             else -> toast("Unknown option")
         }
     }

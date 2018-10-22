@@ -6,6 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/sensorList"
         android:layout_width="match_parent"
@@ -15,6 +16,14 @@
         android:textColor = "@android:color/holo_green_light"
         android:paddingTop="?attr/actionBarSize"/>
 
+    <ProgressBar
+        android:id="@+id/pBar"
+        style="?android:attr/progressBarStyle"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        />
 
     <include layout="@layout/toolbar"/>
 

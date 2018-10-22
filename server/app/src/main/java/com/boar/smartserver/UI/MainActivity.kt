@@ -1,14 +1,13 @@
 package com.boar.smartserver.UI
 
-import android.content.ComponentName
-import android.content.Intent
-import android.content.IntentFilter
-import android.content.ServiceConnection
+import android.content.*
 import android.os.Bundle
 import android.os.IBinder
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.Toolbar
 import android.util.Log
+import android.view.View
+import android.widget.ProgressBar
 import android.widget.Toast
 import com.boar.smartserver.R
 import com.boar.smartserver.domain.Sensor
@@ -31,13 +30,14 @@ import java.util.ArrayList
 class MainActivity : BaseActivity(), ToolbarManager {
     override val tag = "Main activity"
     override val toolbar by lazy { find<Toolbar>(R.id.toolbar) }
+    val pBar by lazy { find<ProgressBar>(R.id.pBar) }
 
     override fun getLayout() = R.layout.activity_main
     override fun getActivityTitle() = R.string.app_name
 
     private var sensors = SensorList()
 
-    val receiver: MainServiceReceiver = MainServiceReceiver {op, idx ->
+    private val receiver: MainServiceReceiver = MainServiceReceiver {op, idx ->
         when (op) {
             MainService.BROADCAST_EXTRAS_OP_ADD -> Toast.makeText(this, "ADD $idx", Toast.LENGTH_LONG).show()
             MainService.BROADCAST_EXTRAS_OP_UPD -> sensorList.adapter?.notifyItemChanged(idx)
@@ -74,33 +74,10 @@ class MainActivity : BaseActivity(), ToolbarManager {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        //Log.v(tag, "[ ON CREATE - CHECK]")
-
-        sensorList.layoutManager = LinearLayoutManager(this)
-
-        initToolbar {
-            when (it) {
-                //R.id.action_settings -> startActivity<SettingsActivity>()
-                R.id.action_add -> service?.addSensor()
-                R.id.action_sim -> service?.runSimulation()
-                else -> toast("Unknown option")
-            }
-        }
-
-
-        val intent = Intent(this, MainService::class.java)
-        bindService(intent, serviceConnection,  android.content.Context.BIND_AUTO_CREATE)
-
-        val filter = IntentFilter()
-        filter.addAction(MainService.BROADCAST_ACTION)
-        registerReceiver(receiver, filter)
-
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        unbindService(serviceConnection)
-        unregisterReceiver(receiver)
     }
 
 /*
@@ -112,17 +89,39 @@ class MainActivity : BaseActivity(), ToolbarManager {
         super.onStop()
         //unbindService(serviceConnection)
     }
-
+*/
     override fun onResume() {
         super.onResume()
+    sensorList.layoutManager = LinearLayoutManager(this)
+
+    initToolbar {
+        when (it) {
+            //R.id.action_settings -> startActivity<SettingsActivity>()
+            R.id.action_add -> service?.addSensor()
+            R.id.action_sim -> service?.runSimulation()
+            else -> toast("Unknown option")
+        }
     }
+
+
+    val intent = Intent(this, MainService::class.java)
+    bindService(intent, serviceConnection,  android.content.Context.BIND_AUTO_CREATE)
+
+    val filter = IntentFilter()
+    filter.addAction(MainService.BROADCAST_ACTION)
+    registerReceiver(receiver, filter)
+
+}
 
     override fun onPause() {
         super.onPause()
+        unbindService(serviceConnection)
+        unregisterReceiver(receiver)
     }
-*/
+
 
     private fun loadSensors() {
+        pBar.visibility = View.VISIBLE
         doAsync {
             service?.getSensors()?.let { sensors = it}
             //Log.v(tag, "Sensors : $sensors")
@@ -132,7 +131,7 @@ class MainActivity : BaseActivity(), ToolbarManager {
             }
 
         }
-        //updateUI()
+        //pBar.visibility = View.GONE
     }
 
     private fun updateUI() {
@@ -145,6 +144,7 @@ class MainActivity : BaseActivity(), ToolbarManager {
 
         sensorList.adapter = adapter
         toolbarTitle = "Updated"
+        pBar.visibility = View.GONE
 
         //Log.v(tag, "Sensors updated")
 

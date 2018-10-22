@@ -9,6 +9,7 @@ import android.os.IBinder
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.Toolbar
 import android.util.Log
+import android.widget.Toast
 import com.boar.smartserver.R
 import com.boar.smartserver.domain.Sensor
 import com.boar.smartserver.domain.SensorList
@@ -24,6 +25,9 @@ import java.util.ArrayList
 
 //import org.jetbrains.anko.startActivity
 
+
+
+
 class MainActivity : BaseActivity(), ToolbarManager {
     override val tag = "Main activity"
     override val toolbar by lazy { find<Toolbar>(R.id.toolbar) }
@@ -33,7 +37,13 @@ class MainActivity : BaseActivity(), ToolbarManager {
 
     private var sensors = SensorList()
 
-    val receiver: MainServiceReceiver = MainServiceReceiver()
+    val receiver: MainServiceReceiver = MainServiceReceiver {op, idx ->
+        when (op) {
+            MainService.BROADCAST_EXTRAS_OP_ADD -> Toast.makeText(this, "ADD $idx", Toast.LENGTH_LONG).show()
+            MainService.BROADCAST_EXTRAS_OP_UPD -> sensorList.adapter?.notifyItemChanged(idx)
+            else -> Log.v(tag, "[ BRDCST $op $idx]")
+        }
+    }
 
     //private lateinit var sensors
 
@@ -139,21 +149,4 @@ class MainActivity : BaseActivity(), ToolbarManager {
         //Log.v(tag, "Sensors updated")
 
     }
-/*
-    private fun runSimulation() {
-        Log.v(tag, "Start simulation")
-        doAsync {
-            while(true) {
-                Thread.sleep(5_000)
-                val idx = sensors.simulate()
-                if (idx!=-1) {
-                    Log.v(tag, "Siimulated : idx=$idx")
-                    uiThread {
-                        sensorList.adapter?.notifyItemChanged(idx)
-                    }
-                }
-            }
-        }
-    }
-    */
 }

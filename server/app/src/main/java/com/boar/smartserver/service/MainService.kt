@@ -9,12 +9,15 @@ import android.os.IBinder
 import android.util.Log
 import com.boar.smartserver.domain.Sensor
 import com.boar.smartserver.domain.SensorList
+import com.boar.smartserver.domain.SensorMeasurement
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.toast
 import org.jetbrains.anko.uiThread
 import java.net.ServerSocket
+import java.net.Socket
 import java.util.*
 import java.util.concurrent.Future
+import com.google.gson.Gson
 
 
 private fun getLocalIpAddress(ctx : Context): String? {
@@ -52,6 +55,8 @@ class MainService : Service() {
     private var executor = TaskExecutor.getInstance(2)
     private var simFuture  : Future<Unit>? = null
 
+    private val gson = Gson()
+
     private var sensors = SensorList()
     //private var executor = TaskExecutor.getInstance(1)
     override fun onCreate() {
@@ -82,30 +87,7 @@ class MainService : Service() {
 
                 Log.d("Listener", "Client connected : ${client.inetAddress.hostAddress}")
 
-                /*
-                val scanner = Scanner(client.inputStream)
-                while (scanner.hasNextLine()) {
-                    val text = scanner.nextLine()
-
-                    Log.d("Client", "Raw: $text")
-
-
-                    val msg = gson.fromJson(text, SensorMessage::class.java)
-
-                    Log.d("Client", "Msg: $msg")
-
-
-                    //val requestBytes = text.toByteArray(Charset.defaultCharset())
-                    //val request = serializer.DeserializeRequest(requestBytes)
-
-                    //println("${request.operandA} ${request.operator} ${request.operandB}")
-
-                    //val response = calculate(request.operandA, request.operandB, request.operator)
-                    //println(response)
-                }
-
-                scanner.close()
-                */
+                handleClient(client)
 
                 client.close()
             }
@@ -187,5 +169,26 @@ class MainService : Service() {
 
     fun stopSimulation() {
         simFuture?.cancel(true)
+    }
+
+    fun handleClient(client: Socket) {
+
+        // THIS TO BE EXeced in thrpool!!!
+
+                val scanner = Scanner(client.inputStream)
+                while (scanner.hasNextLine()) {
+                    val text = scanner.nextLine()
+
+                    Log.d("Client", "Raw: $text")
+
+
+                    val msg = gson.fromJson(text, SensorMeasurement::class.java)
+
+                    sensors.update(msg)
+
+                }
+
+                scanner.close()
+
     }
 }

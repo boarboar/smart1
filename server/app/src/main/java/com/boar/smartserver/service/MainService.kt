@@ -184,7 +184,15 @@ class MainService : Service() {
 
                     val msg = gson.fromJson(text, SensorMeasurement::class.java)
 
-                    sensors.update(msg)
+                    val idx = sensors.update(msg)
+
+                    if(idx!=-1) {
+                        val intent = Intent()
+                        intent.action = BROADCAST_ACTION
+                        intent.putExtra(BROADCAST_EXTRAS_OPERATION, BROADCAST_EXTRAS_OP_UPD)
+                        intent.putExtra(BROADCAST_EXTRAS_IDX, idx)
+                        sendBroadcast(intent)
+                    }
 
                 }
 
@@ -192,3 +200,18 @@ class MainService : Service() {
 
     }
 }
+
+/*
+
+1
+10-23 19:18:05.899 1622-1635/com.boar.smartserver E/AndroidRuntime: FATAL EXCEPTION: pool-1-thread-1
+    com.google.gson.JsonSyntaxException: java.io.EOFException: End of input at line 1 column 45 path $.V
+        at com.google.gson.Gson.fromJson(Gson.java:897)
+        at com.google.gson.Gson.fromJson(Gson.java:852)
+        at com.google.gson.Gson.fromJson(Gson.java:801)
+        at com.google.gson.Gson.fromJson(Gson.java:773)
+        at com.boar.smartserver.service.MainService.handleClient(MainService.kt:185)
+
+
+2 No time displayed
+ */

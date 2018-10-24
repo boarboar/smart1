@@ -1,5 +1,7 @@
 package com.boar.smartserver.domain
 
+import android.util.Log
+import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 import java.util.*
 
@@ -8,12 +10,28 @@ fun Random.nextInt(range: IntRange): Int {
 }
 
 class SensorList : ArrayList<Sensor>() {
+
+    private val gson = Gson()
+    private val tag = "Sensor list"
+
     fun update(newmeas: SensorMeasurement) : Int {
         val sensorIdx = indexOfFirst {it.id == newmeas.id}
         if(sensorIdx==-1) return -1
         set(sensorIdx, this[sensorIdx].copy(meas=newmeas))
         return sensorIdx
     }
+
+    fun update(text: String) : Int {
+        lateinit var newmeas : SensorMeasurement
+        try {
+            newmeas = gson.fromJson(text, SensorMeasurement::class.java)
+        } catch (t: Throwable) {
+            Log.w(tag, "Json error: ${t.message}")
+            return -1
+        }
+        return update(newmeas.copy(updated=System.currentTimeMillis()))
+    }
+
     fun simulate() : Int {
         val random = Random()
         val id = random.nextInt(1..3).toShort()

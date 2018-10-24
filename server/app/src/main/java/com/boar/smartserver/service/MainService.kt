@@ -9,15 +9,11 @@ import android.os.IBinder
 import android.util.Log
 import com.boar.smartserver.domain.Sensor
 import com.boar.smartserver.domain.SensorList
-import com.boar.smartserver.domain.SensorMeasurement
 import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.toast
-import org.jetbrains.anko.uiThread
 import java.net.ServerSocket
 import java.net.Socket
 import java.util.*
 import java.util.concurrent.Future
-import com.google.gson.Gson
 
 
 private fun getLocalIpAddress(ctx : Context): String? {
@@ -55,8 +51,6 @@ class MainService : Service() {
     private var executor = TaskExecutor.getInstance(2)
     private var simFuture  : Future<Unit>? = null
 
-    private val gson = Gson()
-
     private var sensors = SensorList()
     //private var executor = TaskExecutor.getInstance(1)
     override fun onCreate() {
@@ -87,9 +81,9 @@ class MainService : Service() {
 
                 Log.d("Listener", "Client connected : ${client.inetAddress.hostAddress}")
 
-                handleClient(client)
+                executor.execute { handleClient(client) }
 
-                client.close()
+                //client.close()
             }
 
             server.close()
@@ -172,46 +166,30 @@ class MainService : Service() {
     }
 
     fun handleClient(client: Socket) {
+        val scanner = Scanner(client.inputStream)
+        while (scanner.hasNextLine()) {
+            val text = scanner.nextLine()
 
-        // THIS TO BE EXeced in thrpool!!!
+            Log.d("Client", "Raw: $text")
 
-                val scanner = Scanner(client.inputStream)
-                while (scanner.hasNextLine()) {
-                    val text = scanner.nextLine()
+            val idx = sensors.update(text)
 
-                    Log.d("Client", "Raw: $text")
+            if(idx!=-1) {
+                val intent = Intent()
+                intent.action = BROADCAST_ACTION
+                intent.putExtra(BROADCAST_EXTRAS_OPERATION, BROADCAST_EXTRAS_OP_UPD)
+                intent.putExtra(BROADCAST_EXTRAS_IDX, idx)
+                sendBroadcast(intent)
+            }
+        }
 
-
-                    val msg = gson.fromJson(text, SensorMeasurement::class.java)
-
-                    val idx = sensors.update(msg)
-
-                    if(idx!=-1) {
-                        val intent = Intent()
-                        intent.action = BROADCAST_ACTION
-                        intent.putExtra(BROADCAST_EXTRAS_OPERATION, BROADCAST_EXTRAS_OP_UPD)
-                        intent.putExtra(BROADCAST_EXTRAS_IDX, idx)
-                        sendBroadcast(intent)
-                    }
-
-                }
-
-                scanner.close()
-
+        scanner.close()
+        client.close()
     }
 }
 
 /*
 
-1
-10-23 19:18:05.899 1622-1635/com.boar.smartserver E/AndroidRuntime: FATAL EXCEPTION: pool-1-thread-1
-    com.google.gson.JsonSyntaxException: java.io.EOFException: End of input at line 1 column 45 path $.V
-        at com.google.gson.Gson.fromJson(Gson.java:897)
-        at com.google.gson.Gson.fromJson(Gson.java:852)
-        at com.google.gson.Gson.fromJson(Gson.java:801)
-        at com.google.gson.Gson.fromJson(Gson.java:773)
-        at com.boar.smartserver.service.MainService.handleClient(MainService.kt:185)
+TODO - try to send json with missing field
 
-
-2 No time displayed
  */

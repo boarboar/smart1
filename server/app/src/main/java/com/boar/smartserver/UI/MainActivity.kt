@@ -16,11 +16,13 @@ import com.boar.smartserver.domain.SensorMeasurement
 import com.boar.smartserver.receiver.MainServiceReceiver
 import com.boar.smartserver.service.MainService
 import kotlinx.android.synthetic.main.activity_main.*
-import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.find
-import org.jetbrains.anko.toast
-import org.jetbrains.anko.uiThread
-import java.util.ArrayList
+import org.jetbrains.anko.*
+import java.text.DateFormat
+import java.util.*
+import kotlin.concurrent.schedule
+
+import java.text.SimpleDateFormat
+
 
 //import org.jetbrains.anko.startActivity
 
@@ -28,6 +30,14 @@ import java.util.ArrayList
 
 
 class MainActivity : BaseActivity(), ToolbarManager {
+
+    companion object {
+        val df_time = SimpleDateFormat("HH:mm")
+        val df_date = DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.getDefault())
+        var df_dt = DateFormat.getDateTimeInstance(
+                DateFormat.SHORT, DateFormat.SHORT)
+    }
+
     override val tag = "Main activity"
     override val toolbar by lazy { find<Toolbar>(R.id.toolbar) }
     val pBar by lazy { find<ProgressBar>(R.id.pBar) }
@@ -74,6 +84,23 @@ class MainActivity : BaseActivity(), ToolbarManager {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        sensorList.layoutManager = LinearLayoutManager(this)
+
+        initToolbar {
+            when (it) {
+                R.id.action_settings -> startActivity<SettingsActivity>()
+                R.id.action_add -> service?.addSensor()
+                R.id.action_sim_start -> service?.runSimulation()
+                R.id.action_sim_stop -> service?.stopSimulation()
+                else -> toast("Unknown option")
+            }
+        }
+
+        Timer().schedule(1000, 1000){
+            runOnUiThread { toolbarTitle = df_dt.format(System.currentTimeMillis()) }
+        }
+
     }
 
     override fun onDestroy() {
@@ -91,19 +118,26 @@ class MainActivity : BaseActivity(), ToolbarManager {
     }
 */
     override fun onResume() {
-        super.onResume()
+    super.onResume()
+    /*
     sensorList.layoutManager = LinearLayoutManager(this)
 
     initToolbar {
         when (it) {
-            //R.id.action_settings -> startActivity<SettingsActivity>()
+            R.id.action_settings -> startActivity<SettingsActivity>()
             R.id.action_add -> service?.addSensor()
             R.id.action_sim_start -> service?.runSimulation()
             R.id.action_sim_stop -> service?.stopSimulation()
             else -> toast("Unknown option")
         }
+
     }
 
+        Timer().schedule(1000, 1000){
+        runOnUiThread { toolbarTitle = df_dt.format(System.currentTimeMillis()) }
+    }
+
+    */
 
     val intent = Intent(this, MainService::class.java)
     bindService(intent, serviceConnection,  android.content.Context.BIND_AUTO_CREATE)
@@ -125,7 +159,6 @@ class MainActivity : BaseActivity(), ToolbarManager {
         pBar.visibility = View.VISIBLE
         doAsync {
             service?.getSensors()?.let { sensors = it}
-            //Log.v(tag, "Sensors : $sensors")
 
             uiThread {
                 updateUI()
@@ -144,10 +177,6 @@ class MainActivity : BaseActivity(), ToolbarManager {
         }
 
         sensorList.adapter = adapter
-        toolbarTitle = "Updated"
         pBar.visibility = View.GONE
-
-        //Log.v(tag, "Sensors updated")
-
     }
 }

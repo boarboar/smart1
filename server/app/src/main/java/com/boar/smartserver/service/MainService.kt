@@ -9,13 +9,14 @@ import android.os.IBinder
 import android.util.Log
 import com.boar.smartserver.domain.Sensor
 import com.boar.smartserver.domain.SensorList
+import com.boar.smartserver.extensions.getLocalIpAddress
 import org.jetbrains.anko.doAsync
 import java.net.ServerSocket
 import java.net.Socket
 import java.util.*
 import java.util.concurrent.Future
 
-
+/*
 private fun getLocalIpAddress(ctx : Context): String? {
 
     fun ipToString(i: Int): String {
@@ -35,6 +36,7 @@ private fun getLocalIpAddress(ctx : Context): String? {
 
     return null
 }
+*/
 
 class MainService : Service() {
 
@@ -69,8 +71,7 @@ class MainService : Service() {
 
         executor.execute {
             Log.i(tag, "Listener thread [ START ]")
-            val ips = getLocalIpAddress(applicationContext) ?: "No Wifi IP"
-            Log.d("Listener", "WiFi Address detected as: $ips")
+            Log.d("Listener", "WiFi Address detected as: {$applicationContext.getLocalIpAddress()}")
             val server = ServerSocket(9999)
             Log.d("Listener", "Server running on port ${server.inetAddress.hostAddress} : ${server.localPort} (${server.inetAddress.hostName})")
 
@@ -128,7 +129,7 @@ class MainService : Service() {
     }
 
     fun getSensors() : SensorList {
-        Thread.sleep(5_000)
+        Thread.sleep(2_000)
         return sensors
     }
 
@@ -147,7 +148,7 @@ class MainService : Service() {
         Log.v(tag, "Start simulation")
         simFuture = doAsync {
             while(true) {
-                Thread.sleep(5_000)
+                Thread.sleep(2_000)
                 val idx = sensors.simulate()
                 if (idx!=-1) {
                     Log.v(tag, "Siimulated : idx=$idx")

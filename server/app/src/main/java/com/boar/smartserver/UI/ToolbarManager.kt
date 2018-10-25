@@ -41,5 +41,4 @@ interface ToolbarManager {
     }
     */
 
-    //fun oncommand(val cmd_id: Int)
 }

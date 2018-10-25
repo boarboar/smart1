@@ -4,4 +4,5 @@
     <string name="add_sensor">Add sensor</string>
     <string name="sim_start">Start simulation</string>
     <string name="sim_stop">Stop simulation</string>
+    <string name="wifi_ip">WiFi IP:</string>
 </resources>

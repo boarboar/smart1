@@ -29,6 +29,11 @@ class SensorListAdapter(private val sensors: List<Sensor>,
     class ViewHolder(view: View, private val itemClick: (Sensor) -> Unit)
         : RecyclerView.ViewHolder(view) {
 
+        companion object {
+            val df_time = SimpleDateFormat("HH:mm:ss")
+            val df_date = DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.getDefault())
+        }
+
         fun bindForecast(sensor: Sensor) {
             with(sensor) {
                 itemView.date.text = if(updated !=0L ) convertTime(updated) else "--:--:--"
@@ -42,13 +47,13 @@ class SensorListAdapter(private val sensors: List<Sensor>,
 
         // TODO: move formatters to instance, they rae not tredsafe bit it's no issue cince called from UIThread only
         private fun convertTime(date: Long): String {
-            val df = SimpleDateFormat("HH:mm:ss")
-            return df.format(date)
+            //val df = SimpleDateFormat("HH:mm:ss")
+            return df_time.format(date)
         }
 
         private fun convertDate(date: Long): String {
-            val df = DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.getDefault())
-            return df.format(date)
+            //val df = DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.getDefault())
+            return df_date.format(date)
         }
 
     }

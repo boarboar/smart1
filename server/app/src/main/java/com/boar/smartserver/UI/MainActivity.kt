@@ -86,6 +86,7 @@ class MainActivity : BaseActivity(), ToolbarManager {
         super.onCreate(savedInstanceState)
 
         sensorList.layoutManager = LinearLayoutManager(this)
+        sensorList.setHasFixedSize(true)   // all items of the same size (?)
 
         initToolbar {
             when (it) {

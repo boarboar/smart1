@@ -3,6 +3,7 @@ package com.boar.smartserver.UI
 import android.content.*
 import android.os.Bundle
 import android.os.IBinder
+import android.support.v7.app.AlertDialog
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.Toolbar
 import android.util.Log
@@ -16,6 +17,7 @@ import com.boar.smartserver.domain.SensorMeasurement
 import com.boar.smartserver.receiver.MainServiceReceiver
 import com.boar.smartserver.service.MainService
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.sensor_prop.*
 import org.jetbrains.anko.*
 import java.text.DateFormat
 import java.util.*
@@ -35,7 +37,7 @@ class MainActivity : BaseActivity(), ToolbarManager {
         val df_time = SimpleDateFormat("HH:mm")
         val df_date = DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.getDefault())
         var df_dt = DateFormat.getDateTimeInstance(
-                DateFormat.SHORT, DateFormat.SHORT)
+                DateFormat.SHORT, DateFormat.SHORT, Locale.GERMAN)
     }
 
     override val tag = "Main activity"
@@ -84,24 +86,7 @@ class MainActivity : BaseActivity(), ToolbarManager {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        sensorList.layoutManager = LinearLayoutManager(this)
-        sensorList.setHasFixedSize(true)   // all items of the same size (?)
-
-        initToolbar {
-            when (it) {
-                R.id.action_settings -> startActivity<SettingsActivity>()
-                R.id.action_add -> service?.addSensor()
-                R.id.action_sim_start -> service?.runSimulation()
-                R.id.action_sim_stop -> service?.stopSimulation()
-                else -> toast("Unknown option")
-            }
-        }
-
-        Timer().schedule(1000, 1000){
-            runOnUiThread { toolbarTitle = df_dt.format(System.currentTimeMillis()) }
-        }
-
+        initUI()
     }
 
     override fun onDestroy() {
@@ -120,25 +105,8 @@ class MainActivity : BaseActivity(), ToolbarManager {
 */
     override fun onResume() {
     super.onResume()
-    /*
-    sensorList.layoutManager = LinearLayoutManager(this)
 
-    initToolbar {
-        when (it) {
-            R.id.action_settings -> startActivity<SettingsActivity>()
-            R.id.action_add -> service?.addSensor()
-            R.id.action_sim_start -> service?.runSimulation()
-            R.id.action_sim_stop -> service?.stopSimulation()
-            else -> toast("Unknown option")
-        }
-
-    }
-
-        Timer().schedule(1000, 1000){
-        runOnUiThread { toolbarTitle = df_dt.format(System.currentTimeMillis()) }
-    }
-
-    */
+    //initUI
 
     val intent = Intent(this, MainService::class.java)
     bindService(intent, serviceConnection,  android.content.Context.BIND_AUTO_CREATE)
@@ -146,7 +114,6 @@ class MainActivity : BaseActivity(), ToolbarManager {
     val filter = IntentFilter()
     filter.addAction(MainService.BROADCAST_ACTION)
     registerReceiver(receiver, filter)
-
 }
 
     override fun onPause() {
@@ -155,6 +122,24 @@ class MainActivity : BaseActivity(), ToolbarManager {
         unregisterReceiver(receiver)
     }
 
+    private fun initUI() {
+        sensorList.layoutManager = LinearLayoutManager(this)
+        sensorList.setHasFixedSize(true)   // all items of the same size (?)
+
+        initToolbar {
+            when (it) {
+                R.id.action_settings -> startActivity<SettingsActivity>()
+                R.id.action_add -> showSensorPropUI()
+                R.id.action_sim_start -> service?.runSimulation()
+                R.id.action_sim_stop -> service?.stopSimulation()
+                else -> toast("Unknown option")
+            }
+        }
+
+        Timer().schedule(1000, 1000){
+            runOnUiThread { toolbarTitle = df_dt.format(System.currentTimeMillis()) }
+        }
+    }
 
     private fun loadSensors() {
         pBar.visibility = View.VISIBLE
@@ -179,5 +164,16 @@ class MainActivity : BaseActivity(), ToolbarManager {
 
         sensorList.adapter = adapter
         pBar.visibility = View.GONE
+    }
+
+    private fun showSensorPropUI() {
+        val sensDlg = SensorPropDialog(this)
+
+        sensDlg.create().onCancel{
+            Log.v(tag, "DCLOSE")
+        }.onDone{
+            Log.v(tag, "DOK ${sensDlg.sensorId.text} : ${sensDlg.sensorLoc.text}")
+        }
+        .show()
     }
 }

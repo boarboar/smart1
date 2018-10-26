@@ -12,7 +12,7 @@ abstract class BaseDialog {
 
     //  required bools
     protected var cancelable: Boolean = true
-    protected var isBackGroundTransparent: Boolean = true
+    protected var isBackGroundTransparent: Boolean = false
 
     //  dialog
     protected var dialog: AlertDialog? = null

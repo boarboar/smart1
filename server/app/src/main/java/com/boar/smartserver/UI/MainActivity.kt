@@ -51,7 +51,8 @@ class MainActivity : BaseActivity(), ToolbarManager {
 
     private val receiver: MainServiceReceiver = MainServiceReceiver {op, idx ->
         when (op) {
-            MainService.BROADCAST_EXTRAS_OP_ADD -> Toast.makeText(this, "ADD $idx", Toast.LENGTH_LONG).show()
+            //MainService.BROADCAST_EXTRAS_OP_ADD -> Toast.makeText(this, "ADD $idx", Toast.LENGTH_LONG).show()
+            MainService.BROADCAST_EXTRAS_OP_ADD -> sensorList.adapter?.notifyItemInserted(idx)
             MainService.BROADCAST_EXTRAS_OP_UPD -> sensorList.adapter?.notifyItemChanged(idx)
             else -> Log.v(tag, "[ BRDCST $op $idx]")
         }
@@ -167,12 +168,15 @@ class MainActivity : BaseActivity(), ToolbarManager {
     }
 
     private fun showSensorPropUI() {
-        val sensDlg = SensorPropDialog(this)
+        val sensDlg = SensorPropDialog(this, Sensor(77, "New"))
 
         sensDlg.create().onCancel{
             Log.v(tag, "DCLOSE")
         }.onDone{
-            Log.v(tag, "DOK ${sensDlg.sensorId.text} : ${sensDlg.sensorLoc.text}")
+            //Log.v(tag, "DOK ${sensDlg.sensorId.text} : ${sensDlg.sensorLoc.text}")
+            val sensor = sensDlg.sensor
+            Log.v(tag, "DOK ${sensor}")
+            sensor?.let {service?.addSensor(sensor)}
         }
         .show()
     }

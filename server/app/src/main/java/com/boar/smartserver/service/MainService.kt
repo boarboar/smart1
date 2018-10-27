@@ -133,13 +133,13 @@ class MainService : Service() {
         return sensors
     }
 
-    fun addSensor() {
+    fun addSensor(sensor: Sensor) {
         Log.v(tag, "[ ADD SENSOR ]")
-
+        sensors.add(sensor)
         val intent = Intent()
         intent.action = BROADCAST_ACTION
         intent.putExtra(BROADCAST_EXTRAS_OPERATION, BROADCAST_EXTRAS_OP_ADD)
-        intent.putExtra(BROADCAST_EXTRAS_IDX, 666)
+        intent.putExtra(BROADCAST_EXTRAS_IDX, sensors.size-1)
         sendBroadcast(intent)
 
     }

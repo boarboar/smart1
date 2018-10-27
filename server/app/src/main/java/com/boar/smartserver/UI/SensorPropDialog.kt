@@ -8,8 +8,9 @@ import android.view.View
 import android.widget.EditText
 import android.widget.ImageView
 import com.boar.smartserver.R
+import com.boar.smartserver.domain.Sensor
 
-class SensorPropDialog(context: Context) : BaseDialog() {
+class SensorPropDialog(context: Context, var sensor: Sensor?) : BaseDialog() {
 
     //  dialog view
     override val dialogView: View by lazy {
@@ -20,19 +21,34 @@ class SensorPropDialog(context: Context) : BaseDialog() {
 
     override fun create(): SensorPropDialog {
         super.create()
+        sensorId.setText(sensor?.id.toString())
+        sensorLoc.setText(sensor?.description)
         return this
     }
 
     fun onCancel(func: (() -> Unit)? = null): SensorPropDialog {
         with(closeIcon) {
-            setClickListenerToDialogIcon(func)
+            //setClickListenerToDialogIcon(func)
+            setOnClickListener {
+                func?.invoke()
+                dialog?.dismiss()
+            }
         }
         return this
     }
 
     fun onDone(func: (() -> Unit)? = null): SensorPropDialog {
         with(doneIcon) {
-            setClickListenerToDialogIcon(func)
+            //setClickListenerToDialogIcon(func)
+
+            setOnClickListener {
+                val sens_id = sensorId.text.toString()
+                val sens_loc = sensorLoc.text.toString()
+                // verify TODO
+                sensor = Sensor(sens_id.toShortOrNull()?:0, sens_loc)
+                func?.invoke()
+                dialog?.dismiss()
+            }
         }
         return this
     }

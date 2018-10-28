@@ -37,7 +37,7 @@ class SensorPropDialog(context: Context, var sensor: Sensor?) : BaseDialog() {
         return this
     }
 
-    fun onDone(func: (() -> Unit)? = null): SensorPropDialog {
+    fun onDone(func: ((Sensor) -> Boolean)? = null): SensorPropDialog {
         with(doneIcon) {
             //setClickListenerToDialogIcon(func)
 
@@ -45,9 +45,10 @@ class SensorPropDialog(context: Context, var sensor: Sensor?) : BaseDialog() {
                 val sens_id = sensorId.text.toString()
                 val sens_loc = sensorLoc.text.toString()
                 // verify TODO
-                sensor = Sensor(sens_id.toShortOrNull()?:0, sens_loc)
-                func?.invoke()
-                dialog?.dismiss()
+                //sensor = Sensor(sens_id.toShortOrNull()?:0, sens_loc)
+                val res: Boolean =
+                        func?.invoke(Sensor(sens_id.toShortOrNull()?:0, sens_loc)) ?: false
+                if (res) dialog?.dismiss()
             }
         }
         return this

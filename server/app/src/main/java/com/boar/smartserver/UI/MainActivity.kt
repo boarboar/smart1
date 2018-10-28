@@ -145,7 +145,9 @@ class MainActivity : BaseActivity(), ToolbarManager {
     private fun loadSensors() {
         pBar.visibility = View.VISIBLE
         doAsync {
-            service?.getSensors()?.let { sensors = it}
+            //service?.getSensors()?.let { sensors = it}
+
+            service?.sensors?.let { sensors = it}
 
             uiThread {
                 updateUI()
@@ -174,9 +176,16 @@ class MainActivity : BaseActivity(), ToolbarManager {
             Log.v(tag, "DCLOSE")
         }.onDone{
             //Log.v(tag, "DOK ${sensDlg.sensorId.text} : ${sensDlg.sensorLoc.text}")
-            val sensor = sensDlg.sensor
-            Log.v(tag, "DOK ${sensor}")
-            sensor?.let {service?.addSensor(sensor)}
+            //val sensor = sensDlg.sensor
+            if(!it.validate()) {
+                Toast.makeText(this, "Check data", Toast.LENGTH_LONG).show()
+                false
+            } else {
+                Log.v(tag, "DOK ${it}")
+                //sensor?.let {service?.addSensor(sensor)}
+                service?.addSensor(it)
+                true
+            }
         }
         .show()
     }

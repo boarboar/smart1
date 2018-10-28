@@ -72,6 +72,8 @@ data class Sensor(val id: Short, val description: String,
     val vccAsString : String
         get() = if(meas!=null) "${meas.vcc100.toFloat()/100f}" else "-.--"
 
+    fun validate() : Boolean = id>0 && description.isNotEmpty()
+
 }
 
 //b?.length ?: -1

@@ -53,8 +53,14 @@ class MainService : Service() {
     private var executor = TaskExecutor.getInstance(2)
     private var simFuture  : Future<Unit>? = null
 
-    private var sensors = SensorList()
-    //private var executor = TaskExecutor.getInstance(1)
+    //private var sensors = SensorList()
+
+    //val sensors = SensorList()
+
+    val sensors : SensorList by lazy {
+        loadSensors()
+    }
+
     override fun onCreate() {
         super.onCreate()
         // called
@@ -65,9 +71,7 @@ class MainService : Service() {
         Log.v(tag, "[ ON START COMMAND ]")
         // called
 
-
-        sensors.add(Sensor(1, "Window"))
-        sensors.add(Sensor(2, "Balcony"))
+        loadSensors()
 
         executor.execute {
             Log.i(tag, "Listener thread [ START ]")
@@ -127,10 +131,19 @@ class MainService : Service() {
     inner class MainServiceBinder : Binder() {
         fun getService(): MainService = this@MainService
     }
-
+/*
     fun getSensors() : SensorList {
         Thread.sleep(2_000)
         return sensors
+    }
+  */
+
+    private fun loadSensors() : SensorList {
+        val ss = SensorList()
+        ss.add(Sensor(1, "Window"))
+        ss.add(Sensor(2, "Balcony"))
+        Thread.sleep(2_000) // test
+        return ss
     }
 
     fun addSensor(sensor: Sensor) {

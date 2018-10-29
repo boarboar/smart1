@@ -7,6 +7,7 @@ import android.net.wifi.WifiManager
 import android.os.Binder
 import android.os.IBinder
 import android.util.Log
+import com.boar.smartserver.db.SensorDb
 import com.boar.smartserver.domain.Sensor
 import com.boar.smartserver.domain.SensorList
 import com.boar.smartserver.extensions.getLocalIpAddress
@@ -61,6 +62,10 @@ class MainService : Service() {
         loadSensors()
     }
 
+    val db : SensorDb by lazy {
+        SensorDb()
+    }
+
     override fun onCreate() {
         super.onCreate()
         // called
@@ -69,9 +74,17 @@ class MainService : Service() {
     }
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Log.v(tag, "[ ON START COMMAND ]")
-        // called
 
-        loadSensors()
+
+        // test to lazy init here!
+        // test
+
+        val sensfromdb = db.requestSensors()
+        Log.v(tag, "Sens DB load total ${sensfromdb.size}")
+
+
+        //loadSensors()
+        // TODO: exec it here and send broadcast too init UI!
 
         executor.execute {
             Log.i(tag, "Listener thread [ START ]")

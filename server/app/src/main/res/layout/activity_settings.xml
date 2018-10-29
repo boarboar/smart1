@@ -11,7 +11,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="?attr/actionBarSize"
-        android:orientation="horizontal"
         android:padding="@dimen/spacing_xlarge"
         android:background="?attr/colorPrimary"
         >

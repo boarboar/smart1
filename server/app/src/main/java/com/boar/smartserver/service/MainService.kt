@@ -7,11 +7,14 @@ import android.net.wifi.WifiManager
 import android.os.Binder
 import android.os.IBinder
 import android.util.Log
+import android.widget.Toast
 import com.boar.smartserver.db.SensorDb
 import com.boar.smartserver.domain.Sensor
 import com.boar.smartserver.domain.SensorList
 import com.boar.smartserver.extensions.getLocalIpAddress
 import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.runOnUiThread
+import org.jetbrains.anko.toast
 import java.net.ServerSocket
 import java.net.Socket
 import java.util.*
@@ -44,6 +47,7 @@ class MainService : Service() {
     companion object {
         val BROADCAST_ACTION = "com.boar.smartserver.service"
         val BROADCAST_EXTRAS_OPERATION = "operation"
+        val BROADCAST_EXTRAS_OP_LOAD = "load"
         val BROADCAST_EXTRAS_OP_ADD = "add"
         val BROADCAST_EXTRAS_OP_UPD = "update"
         val BROADCAST_EXTRAS_IDX = "param_idx"
@@ -57,10 +61,13 @@ class MainService : Service() {
     //private var sensors = SensorList()
 
     //val sensors = SensorList()
-
+    /*
     val sensors : SensorList by lazy {
         loadSensors()
     }
+    */
+
+    var sensors : SensorList = SensorList()
 
     val db : SensorDb by lazy {
         SensorDb()
@@ -72,15 +79,16 @@ class MainService : Service() {
         Log.v(tag, "[ ON CREATE ]")
 
     }
+
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Log.v(tag, "[ ON START COMMAND ]")
-
 
         // test to lazy init here!
         // test
 
-        val sensfromdb = db.requestSensors()
-        Log.v(tag, "Sens DB load total ${sensfromdb.size}")
+
+        sensors = db.requestSensors()
+        //Log.v(tag, "Sens DB load total ${sensors.size}")
 
 
         //loadSensors()
@@ -161,12 +169,22 @@ class MainService : Service() {
 
     fun addSensor(sensor: Sensor) {
         Log.v(tag, "[ ADD SENSOR ]")
-        sensors.add(sensor)
-        val intent = Intent()
-        intent.action = BROADCAST_ACTION
-        intent.putExtra(BROADCAST_EXTRAS_OPERATION, BROADCAST_EXTRAS_OP_ADD)
-        intent.putExtra(BROADCAST_EXTRAS_IDX, sensors.size-1)
-        sendBroadcast(intent)
+        executor.execute {
+            val (res, errmsg) = db.saveSensor(sensor)
+            if(res) {
+                sensors.add(sensor)
+                val intent = Intent()
+                intent.action = BROADCAST_ACTION
+                intent.putExtra(BROADCAST_EXTRAS_OPERATION, BROADCAST_EXTRAS_OP_ADD)
+                intent.putExtra(BROADCAST_EXTRAS_IDX, sensors.size - 1)
+                sendBroadcast(intent)
+            }
+            else {
+                runOnUiThread {
+                    Toast.makeText(this, "DB Err : $errmsg", Toast.LENGTH_LONG).show()
+                }
+            }
+        }
 
     }
 

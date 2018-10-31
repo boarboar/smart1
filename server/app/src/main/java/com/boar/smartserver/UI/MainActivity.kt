@@ -52,6 +52,7 @@ class MainActivity : BaseActivity(), ToolbarManager {
     private val receiver: MainServiceReceiver = MainServiceReceiver {op, idx ->
         when (op) {
             //MainService.BROADCAST_EXTRAS_OP_ADD -> Toast.makeText(this, "ADD $idx", Toast.LENGTH_LONG).show()
+            MainService.BROADCAST_EXTRAS_OP_LOAD -> loadSensors()
             MainService.BROADCAST_EXTRAS_OP_ADD -> sensorList.adapter?.notifyItemInserted(idx)
             MainService.BROADCAST_EXTRAS_OP_UPD -> sensorList.adapter?.notifyItemChanged(idx)
             else -> Log.v(tag, "[ BRDCST $op $idx]")
@@ -147,12 +148,13 @@ class MainActivity : BaseActivity(), ToolbarManager {
         doAsync {
             //service?.getSensors()?.let { sensors = it}
 
-            service?.sensors?.let { sensors = it}
-
-            uiThread {
-                updateUI()
+            //service?.sensors?.let { sensors = it}
+            service?.sensors?.let {
+                sensors = it
+                uiThread {
+                    updateUI()
+                }
             }
-
         }
         //pBar.visibility = View.GONE
     }

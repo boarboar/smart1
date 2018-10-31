@@ -1,6 +1,9 @@
 package com.boar.smartserver.db
 
+import android.database.sqlite.SQLiteConstraintException
+import android.util.Log
 import com.boar.smartserver.domain.Sensor
+import com.boar.smartserver.domain.SensorList
 import org.jetbrains.anko.db.*
 import java.util.HashMap
 
@@ -24,51 +27,46 @@ class SensorDb(private val dbHelper: DbHelper = DbHelper.instance
     }
     */
 
-    fun requestSensors() : List<Sensor> {
-
+    fun requestSensors() : SensorList {
         lateinit var sensors : List<Sensor>
-
+        //lateinit var sensors : SensorList
         dbHelper.use {
-
-        sensors = select(SensorTable.NAME).parseList(parser)
-
+            // what if error ?
+            try {
+                sensors = select(SensorTable.NAME, SensorTable.ID, SensorTable.DESCRIPTION).parseList(parser)
+            }
+            catch (t: Throwable) {
+                val msg = t.message ?: "Unknown DB error"
+                Log.w(tag, "DB error: $msg")
+                sensors = listOf()
+            }
         }
-        return sensors
+        val slist = SensorList()
+        for (s in sensors) slist.add(s)
+        return slist
     }
 
-    /*
-    override fun requestForecastByZipCode(zipCode: Long, date: Long) = forecastDbHelper.use {
+    fun saveSensor(sensor : Sensor) : Pair<Boolean, String> {
+        var result : Boolean = false
+        var msg = ""
+        dbHelper.use {
+            try {
+            insertOrThrow(SensorTable.NAME, SensorTable.ID to  sensor.id,
+                    SensorTable.DESCRIPTION to sensor.description)
+                result = true
+            }
 
-        val dailyRequest = "${DayForecastTable.CITY_ID} = ? AND ${DayForecastTable.DATE} >= ?"
-        val dailyForecast = select(DayForecastTable.NAME)
-                .whereSimple(dailyRequest, zipCode.toString(), date.toString())
-                .parseList { DayForecast(HashMap(it)) }
-
-        val city = select(CityForecastTable.NAME)
-                .whereSimple("${CityForecastTable.ID} = ?", zipCode.toString())
-                .parseOpt { CityForecast(HashMap(it), dailyForecast) }
-
-        //if (city != null) dataMapper.convertToDomain(city) else null
-        city?.let { dataMapper.convertToDomain(it) }
-    }
-
-    override fun requestDayForecast(id: Long) = forecastDbHelper.use {
-        val forecast = select(DayForecastTable.NAME).byId(id).
-                parseOpt { DayForecast(HashMap(it)) }
-
-        //if (forecast != null) dataMapper.convertDayToDomain(forecast) else null
-        forecast?.let { dataMapper.convertDayToDomain(it) }
-    }
-
-    fun saveForecast(forecast: ForecastList) = forecastDbHelper.use {
-
-        clear(CityForecastTable.NAME)
-        clear(DayForecastTable.NAME)
-
-        with(dataMapper.convertFromDomain(forecast)) {
-            insert(CityForecastTable.NAME, *map.toVarargArray())
-            dailyForecast.forEach { insert(DayForecastTable.NAME, *it.map.toVarargArray()) }
+            catch (t: SQLiteConstraintException) {
+                msg = t.message ?: "Unknown DB error"
+                Log.w(tag, "Constraint error: $msg")
+            }
+            catch (t: Throwable) {
+                msg = t.message ?: "Unknown DB error"
+                Log.w(tag, "DB error: $msg")
+            }
         }
+        return Pair(result, msg)
     }
-*/
+
+
 }

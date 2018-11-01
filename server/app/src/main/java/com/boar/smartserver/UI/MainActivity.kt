@@ -14,10 +14,12 @@ import com.boar.smartserver.R
 import com.boar.smartserver.domain.Sensor
 import com.boar.smartserver.domain.SensorList
 import com.boar.smartserver.domain.SensorMeasurement
+import com.boar.smartserver.network.WeatherServiceApi
 import com.boar.smartserver.receiver.MainServiceReceiver
 import com.boar.smartserver.service.MainService
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.sensor_prop.*
+import kotlinx.android.synthetic.main.weather.*
 import org.jetbrains.anko.*
 import java.text.DateFormat
 import java.util.*
@@ -140,6 +142,22 @@ class MainActivity : BaseActivity(), ToolbarManager {
 
         Timer().schedule(1000, 1000){
             runOnUiThread { toolbarTitle = df_dt.format(System.currentTimeMillis()) }
+        }
+
+        doAsync {
+            val service = WeatherServiceApi.obtain()
+            val weatherResponse = service.getWeather("192071,Ru").execute()
+            if (weatherResponse.isSuccessful) {
+                val resp = weatherResponse.body()
+                resp?.let {
+                    Log.i(tag, "Get weather  $resp")
+                    uiThread {
+                        weather_city.text = "${resp.name}"
+                        weather_now_temp.text = "${resp.main.temp}º"
+                    }
+                }
+            }
+            Log.i(tag, "Get weather OK")
         }
     }
 

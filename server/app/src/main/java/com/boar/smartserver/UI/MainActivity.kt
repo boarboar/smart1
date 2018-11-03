@@ -8,6 +8,7 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.Toolbar
 import android.util.Log
 import android.view.View
+import android.view.WindowManager
 import android.widget.ProgressBar
 import android.widget.Toast
 import com.boar.smartserver.R
@@ -91,6 +92,7 @@ class MainActivity : BaseActivity(), ToolbarManager {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         initUI()
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
     }
 
     override fun onDestroy() {
@@ -143,7 +145,7 @@ class MainActivity : BaseActivity(), ToolbarManager {
         Timer().schedule(1000, 1000){
             runOnUiThread { toolbarTitle = df_dt.format(System.currentTimeMillis()) }
         }
-
+        /*
         doAsync {
             val service = WeatherServiceApi.obtain()
             val weatherResponse = service.getWeather("192071,Ru").execute()
@@ -152,6 +154,23 @@ class MainActivity : BaseActivity(), ToolbarManager {
                 resp?.let {
                     Log.i(tag, "Get weather  $resp")
                     uiThread {
+                        weather_city.text = "${resp.name}"
+                        weather_now_temp.text = "${resp.main.temp}º"
+                    }
+                }
+            }
+            Log.i(tag, "Get weather OK")
+        }
+        */
+
+        Timer().schedule(1000, 1000*60*15){
+            val service = WeatherServiceApi.obtain()
+            val weatherResponse = service.getWeather("192071,Ru").execute()
+            if (weatherResponse.isSuccessful) {
+                val resp = weatherResponse.body()
+                resp?.let {
+                    Log.i(tag, "Get weather  $resp")
+                    runOnUiThread {
                         weather_city.text = "${resp.name}"
                         weather_now_temp.text = "${resp.main.temp}º"
                     }

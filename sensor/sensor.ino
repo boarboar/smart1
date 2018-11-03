@@ -9,12 +9,14 @@
 #define TEMPERATURE_PRECISION 9 // Lower resolution
 #define BUF_SZ 255
 #define SETUP_PIN 0
+#define LED_PIN 12
 
 // do not work with parasite
 
 // 5k res
 
-#define ONE_WIRE_BUS 2
+//#define ONE_WIRE_BUS 2
+#define ONE_WIRE_BUS 13
 OneWire oneWire(ONE_WIRE_BUS);
 DallasTemperature sensors(&oneWire);
 DeviceAddress tempDeviceAddress;  
@@ -36,11 +38,19 @@ void setup(void)
 {
   bool isSetup = false;
   bool isCfgValid = false;
+
+  pinMode(LED_PIN, OUTPUT);
+
+  digitalWrite(LED_PIN, HIGH); 
+  
   
   // start serial port
   delay(100);  
   Serial.begin(115200);
   Serial.println();
+
+  digitalWrite(LED_PIN, LOW); 
+  
 
   if(CfgDrv::Cfg.init() && CfgDrv::Cfg.load()) {
     Serial.println(F("Cfg loaded"));
@@ -68,6 +78,8 @@ void setup(void)
   sensors.begin();
 
   if(isSetup || !isCfgValid) {
+    digitalWrite(LED_PIN, HIGH); 
+
     do {
       CfgDrv::Cfg.setup();
       isCfgValid = CfgDrv::Cfg.validate();      
@@ -77,18 +89,35 @@ void setup(void)
     Serial.println(F("Cfg OK"));
     delay(1000);
     doSensorSetup();
+
+    digitalWrite(LED_PIN, LOW); 
+
   }
   
     // Start up the library
-  delay(2000);
+  digitalWrite(LED_PIN, HIGH); 
+  delay(1000);
+  digitalWrite(LED_PIN, LOW);
 
+  
   tData.id = CfgDrv::Cfg.id;
   doDiag(&tData);  
-  doMeasure();
+  tData.t10 = doMeasure(); 
+
+// do -127 chexck here
 
   if(doConnect()) {
     doSend(&tData);
   }
+
+  Serial.println(F("deep sleep"));
+   digitalWrite(LED_PIN, HIGH); 
+
+  delay(500); //
+    digitalWrite(LED_PIN, LOW);
+
+
+  ESP.deepSleep(10000000);
 
 }
 

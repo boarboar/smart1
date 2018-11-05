@@ -4,7 +4,7 @@
 #include "FS.h"
 #include "cfg.h"
 
-#define MAX_CFG_LINE_SZ 80
+#define MAX_CFG_LINE_SZ 120
 
 /*
 {"SSID":"NETGEAR","PWD":"boarboar","ADDR":"192.168.1.149","PORT":9999,"ID":1}
@@ -22,7 +22,7 @@ const int NCFGS=4;
 
 CfgDrv CfgDrv::Cfg; // singleton
 
-CfgDrv::CfgDrv() : srv_port(0), id(0), fs_ok(false)
+CfgDrv::CfgDrv() : srv_port(0), id(0), sleep_min(1), fs_ok(false)
  {
    *srv_addr=0;
    *SSID=0;
@@ -69,6 +69,7 @@ int16_t CfgDrv::load() {
       if (json.success()) {
         id = json["ID"];
         srv_port = json["PORT"];
+        sleep_min = json["SLP"];
         ps=json["ADDR"];
         if(ps!=NULL) {
           strncpy(srv_addr, ps, MAX_ADDR_SZ);
@@ -101,7 +102,7 @@ int16_t CfgDrv::load() {
   Serial.print(F("PWD=")); Serial.println(PWD);
   Serial.print(F("ADDR=")); Serial.println(srv_addr); 
   Serial.print(F("PORT=")); Serial.println(srv_port); 
-
+  Serial.print(F("SLP=")); Serial.println(sleep_min); 
   return 1;
 }
 
@@ -124,6 +125,7 @@ int16_t CfgDrv::store() {
   json["ADDR"]=srv_addr;
   json["PORT"]=srv_port;
   json["ID"]=id;
+  json["SLP"]=sleep_min;
 
   json.printTo(f);
   f.write('\n');
@@ -146,33 +148,44 @@ int16_t CfgDrv::setup()
     strncpy(SSID, buf, MAX_SSID_SZ);
     SSID[MAX_SSID_SZ-1]=0;
   }
+  Serial.println(SSID);
   cnt=readLine("PWD", PWD, buf, MAX_CFG_LINE_SZ);
   if(cnt>0) {
     // TODO: add validation
     strncpy(PWD, buf, MAX_PWD_SZ);
-    SSID[MAX_PWD_SZ-1]=0;
+    PWD[MAX_PWD_SZ-1]=0;
   }
+  Serial.println(PWD);
   cnt=readLine("Server IP", srv_addr, buf, MAX_CFG_LINE_SZ);
   if(cnt>0) {
     // TODO: add validation
     strncpy(srv_addr, buf, MAX_ADDR_SZ);
     srv_addr[MAX_ADDR_SZ-1]=0;
   }
+  Serial.println(srv_addr);
   cnt=readInt("Server port", srv_port);
   if(cnt>0) {
     // TODO: add validation
     srv_port=cnt;
   }
+  Serial.println(srv_port);
   cnt=readInt("Sensor ID", id);
   if(cnt>0) {
     // TODO: add validation
     id=cnt;
   }  
+  Serial.println(id);
+  cnt=readInt("Sleep (min)", sleep_min);
+  if(cnt>0) {
+    // TODO: add validation
+    sleep_min=cnt;
+  }  
+  Serial.println(sleep_min);
   return 1;
 }
 
 bool CfgDrv::validate() {
-  if(!*SSID || !*PWD || !*srv_addr || !srv_port || !id) return false;
+  if(!*SSID || !*PWD || !*srv_addr || !srv_port || !id || !sleep_min) return false;
   return true;
 }
 

@@ -41,16 +41,12 @@ void setup(void)
 
   pinMode(LED_PIN, OUTPUT);
 
-  digitalWrite(LED_PIN, HIGH); 
-  
-  
+  blink(200, 1);
+
   // start serial port
-  delay(100);  
+
   Serial.begin(115200);
   Serial.println();
-
-  digitalWrite(LED_PIN, LOW); 
-  
 
   if(CfgDrv::Cfg.init() && CfgDrv::Cfg.load()) {
     Serial.println(F("Cfg loaded"));
@@ -79,7 +75,6 @@ void setup(void)
 
   if(isSetup || !isCfgValid) {
     digitalWrite(LED_PIN, HIGH); 
-
     do {
       CfgDrv::Cfg.setup();
       isCfgValid = CfgDrv::Cfg.validate();      
@@ -89,35 +84,34 @@ void setup(void)
     Serial.println(F("Cfg OK"));
     delay(1000);
     doSensorSetup();
-
     digitalWrite(LED_PIN, LOW); 
-
   }
-  
-    // Start up the library
-  digitalWrite(LED_PIN, HIGH); 
-  delay(1000);
-  digitalWrite(LED_PIN, LOW);
-
   
   tData.id = CfgDrv::Cfg.id;
   doDiag(&tData);  
   tData.t10 = doMeasure(); 
 
-// do -127 chexck here
-
+  if(tData.t10==-1270) {
+    Serial.println(F("Bad temp!"));
+    blink(400, 2);
+  }
+  
   if(doConnect()) {
-    doSend(&tData);
+    if(!doSend(&tData)) {
+      Serial.println(F("Failed to send"));
+      blink(400, 4);
+    }
+  } else {
+    blink(400, 3);
   }
 
-  Serial.println(F("deep sleep"));
-   digitalWrite(LED_PIN, HIGH); 
+  Serial.print(F("deep sleep for "));
+  Serial.print(CfgDrv::Cfg.sleep_min);
+  Serial.print(F(" min"));
 
-  delay(500); //
-    digitalWrite(LED_PIN, LOW);
+  blink(200, 1);
 
-
-  ESP.deepSleep(10000000);
+  ESP.deepSleep(60000000L*CfgDrv::Cfg.sleep_min);
 
 }
 
@@ -280,5 +274,15 @@ void printAddress(DeviceAddress deviceAddress)
   {
     if (deviceAddress[i] < 16) Serial.print("0");
     Serial.print(deviceAddress[i], HEX);
+  }
+}
+
+void blink(uint16_t dly, uint16_t n)
+{
+  for(uint16_t i=0; i<n; i++) {
+    if(i) delay(dly);
+    digitalWrite(LED_PIN, HIGH); 
+    delay(dly); 
+    digitalWrite(LED_PIN, LOW);
   }
 }

@@ -20,7 +20,8 @@ public:
   char srv_addr[MAX_ADDR_SZ];
   //IPAddress srv_addr;
   uint16_t srv_port;
-  int8_t id;
+  uint8_t id;
+  uint8_t sleep_min;
 protected:  
   const char *szFileName = "/config.json";  
   CfgDrv();

@@ -10,18 +10,15 @@ import java.util.concurrent.TimeUnit
 
 object WeatherServiceRetrofit {
     fun obtain(
-            readTimeoutInSeconds: Long = 1,
-            connectTimeoutInSeconds: Long = 1
+            readTimeoutInSeconds: Long = 5,
+            connectTimeoutInSeconds: Long = 5
     ): Retrofit {
-        //val loggingInterceptor = HttpLoggingInterceptor()
-        //loggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
         return Retrofit.Builder()
                 .baseUrl("http://api.openweathermap.org/data/2.5/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(
                         OkHttpClient
                                 .Builder()
-                                //.addInterceptor(loggingInterceptor)
                                 .addInterceptor(makeLoggingInterceptor())
                                 .addInterceptor(makeHeadersInterceptor())
                                 .addInterceptor(makeAddQuerySecurityInterceptor())

@@ -8,6 +8,7 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.Toolbar
 import android.util.Log
 import android.view.View
+import android.view.Window
 import android.view.WindowManager
 import android.widget.ProgressBar
 import android.widget.Toast
@@ -16,11 +17,13 @@ import com.boar.smartserver.domain.Sensor
 import com.boar.smartserver.domain.SensorList
 import com.boar.smartserver.domain.SensorMeasurement
 import com.boar.smartserver.network.WeatherServiceApi
+import com.boar.smartserver.presenter.MainPresenter
 import com.boar.smartserver.receiver.MainServiceReceiver
 import com.boar.smartserver.service.MainService
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.sensor_prop.*
 import kotlinx.android.synthetic.main.weather.*
+import kotlinx.android.synthetic.main.weather.view.*
 import org.jetbrains.anko.*
 import java.text.DateFormat
 import java.util.*
@@ -67,6 +70,8 @@ class MainActivity : BaseActivity(), ToolbarManager {
     private var service: MainService? = null
     var isBound = false
 
+    private val presenter : MainPresenter by lazy  { MainPresenter(this) }
+
     private val serviceConnection = object : ServiceConnection {
         override fun onServiceDisconnected(p0: ComponentName?) {
             service = null
@@ -91,8 +96,11 @@ class MainActivity : BaseActivity(), ToolbarManager {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        //requestWindowFeature(Window.FEATURE_NO_TITLE)
+        window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN) // request full screen
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)  // request keeps on
         initUI()
-        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
     }
 
     override fun onDestroy() {
@@ -142,30 +150,14 @@ class MainActivity : BaseActivity(), ToolbarManager {
             }
         }
 
-        Timer().schedule(1000, 1000){
+        Timer().schedule(1000, 1000){// Time
             runOnUiThread { toolbarTitle = df_dt.format(System.currentTimeMillis()) }
         }
-        /*
-        doAsync {
-            val service = WeatherServiceApi.obtain()
-            val weatherResponse = service.getWeather("192071,Ru").execute()
-            if (weatherResponse.isSuccessful) {
-                val resp = weatherResponse.body()
-                resp?.let {
-                    Log.i(tag, "Get weather  $resp")
-                    uiThread {
-                        weather_city.text = "${resp.name}"
-                        weather_now_temp.text = "${resp.main.temp}º"
-                    }
-                }
-            }
-            Log.i(tag, "Get weather OK")
-        }
-        */
 
-        Timer().schedule(1000, 1000*60*15){
-            val service = WeatherServiceApi.obtain()
-            val weatherResponse = service.getWeather("192071,Ru").execute()
+        Timer().schedule(1000, 1000*60*15){// Weather
+            /*
+            val wservice = WeatherServiceApi.obtain()
+            val weatherResponse = wservice.getWeather("192071,Ru").execute()
             if (weatherResponse.isSuccessful) {
                 val resp = weatherResponse.body()
                 resp?.let {
@@ -177,15 +169,21 @@ class MainActivity : BaseActivity(), ToolbarManager {
                 }
             }
             Log.i(tag, "Get weather OK")
+            */
+            presenter.refreshWeather {
+                runOnUiThread {
+                    weather_city.text = "${it.name}"
+                    weather_now_temp.text = "${it.main.temp}º"
+                    humidity.text = "${it.main.humidity} %"
+                    pressure.text = "${it.main.pressure} kPa"
+                }
+            }
         }
     }
 
     private fun loadSensors() {
         pBar.visibility = View.VISIBLE
         doAsync {
-            //service?.getSensors()?.let { sensors = it}
-
-            //service?.sensors?.let { sensors = it}
             service?.sensors?.let {
                 sensors = it
                 uiThread {

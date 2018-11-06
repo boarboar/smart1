@@ -20,28 +20,6 @@ import java.net.Socket
 import java.util.*
 import java.util.concurrent.Future
 
-/*
-private fun getLocalIpAddress(ctx : Context): String? {
-
-    fun ipToString(i: Int): String {
-        return (i and 0xFF).toString() + "." +
-                (i shr 8 and 0xFF) + "." +
-                (i shr 16 and 0xFF) + "." +
-                (i shr 24 and 0xFF)
-
-    }
-
-    try {
-        val wifiManager: WifiManager = ctx?.getSystemService(Context.WIFI_SERVICE) as WifiManager
-        return ipToString(wifiManager.connectionInfo.ipAddress)
-    } catch (ex: Exception) {
-        Log.e("IP Address", ex.toString())
-    }
-
-    return null
-}
-*/
-
 class MainService : Service() {
 
     companion object {
@@ -82,19 +60,20 @@ class MainService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Log.v(tag, "[ ON START COMMAND ]")
-
-        // test to lazy init here!
-        // test
-
-
         sensors = db.requestSensors()
-        //Log.v(tag, "Sens DB load total ${sensors.size}")
 
-
-        //loadSensors()
+        /*
         // TODO: exec it here and send broadcast too init UI!
+        // Try to add a long delay here and see what happens
+        val intent = Intent()
+        intent.action = BROADCAST_ACTION
+        intent.putExtra(BROADCAST_EXTRAS_OPERATION, BROADCAST_EXTRAS_OP_LOAD)
+        sendBroadcast(intent)
+        */
+
 
         executor.execute {
+            // move to Network!!!
             Log.i(tag, "Listener thread [ START ]")
             Log.d("Listener", "WiFi Address detected as: {$applicationContext.getLocalIpAddress()}")
             val server = ServerSocket(9999)

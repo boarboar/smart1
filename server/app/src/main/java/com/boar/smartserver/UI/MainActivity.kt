@@ -34,9 +34,6 @@ import java.text.SimpleDateFormat
 
 //import org.jetbrains.anko.startActivity
 
-
-
-
 class MainActivity : BaseActivity(), ToolbarManager {
 
     companion object {
@@ -85,14 +82,12 @@ class MainActivity : BaseActivity(), ToolbarManager {
                 service?.let {
                     isBound = true
                     loadSensors()
-                    //synchronize.enabled = true
                     Log.v(tag, "[ SRV BOUND ]")
                 }
             }
         }
 
     }
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -118,17 +113,14 @@ class MainActivity : BaseActivity(), ToolbarManager {
     }
 */
     override fun onResume() {
-    super.onResume()
+        super.onResume()
+        val intent = Intent(this, MainService::class.java)
+        bindService(intent, serviceConnection,  android.content.Context.BIND_AUTO_CREATE)
 
-    //initUI
-
-    val intent = Intent(this, MainService::class.java)
-    bindService(intent, serviceConnection,  android.content.Context.BIND_AUTO_CREATE)
-
-    val filter = IntentFilter()
-    filter.addAction(MainService.BROADCAST_ACTION)
-    registerReceiver(receiver, filter)
-}
+        val filter = IntentFilter()
+        filter.addAction(MainService.BROADCAST_ACTION)
+        registerReceiver(receiver, filter)
+    }
 
     override fun onPause() {
         super.onPause()
@@ -155,21 +147,6 @@ class MainActivity : BaseActivity(), ToolbarManager {
         }
 
         Timer().schedule(1000, 1000*60*15){// Weather
-            /*
-            val wservice = WeatherServiceApi.obtain()
-            val weatherResponse = wservice.getWeather("192071,Ru").execute()
-            if (weatherResponse.isSuccessful) {
-                val resp = weatherResponse.body()
-                resp?.let {
-                    Log.i(tag, "Get weather  $resp")
-                    runOnUiThread {
-                        weather_city.text = "${resp.name}"
-                        weather_now_temp.text = "${resp.main.temp}º"
-                    }
-                }
-            }
-            Log.i(tag, "Get weather OK")
-            */
             presenter.refreshWeather {
                 runOnUiThread {
                     weather_city.text = "${it.name}"
@@ -201,7 +178,6 @@ class MainActivity : BaseActivity(), ToolbarManager {
                     DetailActivity.CITY_NAME to weekForecast.city)
                     */
         }
-
         sensorList.adapter = adapter
         pBar.visibility = View.GONE
     }
@@ -212,14 +188,11 @@ class MainActivity : BaseActivity(), ToolbarManager {
         sensDlg.create().onCancel{
             Log.v(tag, "DCLOSE")
         }.onDone{
-            //Log.v(tag, "DOK ${sensDlg.sensorId.text} : ${sensDlg.sensorLoc.text}")
-            //val sensor = sensDlg.sensor
             if(!it.validate()) {
                 Toast.makeText(this, "Check data", Toast.LENGTH_LONG).show()
                 false
             } else {
                 Log.v(tag, "DOK ${it}")
-                //sensor?.let {service?.addSensor(sensor)}
                 service?.addSensor(it)
                 true
             }

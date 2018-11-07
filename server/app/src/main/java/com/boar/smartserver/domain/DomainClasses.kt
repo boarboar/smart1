@@ -62,7 +62,7 @@ data class Sensor(val id: Short, val description: String,
     val temperature : Float
         get() = if(meas!=null) meas.temp10.toFloat()/10f else 0f
     val vcc : Float
-        get() = if(meas!=null) meas.vcc1000.toFloat()/1000f else 0f
+        get() = if(meas!=null) (meas.vcc1000/10).toFloat()/100f else 0f
     val updated : Long
         get() = meas?.updated ?: 0L
 
@@ -70,7 +70,7 @@ data class Sensor(val id: Short, val description: String,
     val temperatureAsString : String
         get() = if(meas!=null) "${meas.temp10.toFloat()/10f}" else "--.-"
     val vccAsString : String
-        get() = if(meas!=null) "${meas.vcc1000.toFloat()/1000f}" else "-.--"
+        get() = if(meas!=null) "${(meas.vcc1000/10).toFloat()/100f}" else "-.--"
 
     fun validate() : Boolean = id>0 && description.isNotEmpty()
 

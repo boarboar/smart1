@@ -37,7 +37,7 @@ class MainService : Service() {
     private var executor = TaskExecutor.getInstance(2)
     private var simFuture  : Future<Unit>? = null
 
-    private val tcpserv = TcpServer(applicationContext, 9999)
+    //private val tcpserv = TcpServer(applicationContext, 9999)
 
     //private var sensors = SensorList()
 
@@ -89,7 +89,7 @@ class MainService : Service() {
             Log.i(tag, "Listener thread [ STOP ]")
             }
         */
-        tcpserv.run {
+        TcpServer(applicationContext, 9999).run {
             val idx = sensors.update(it)
             if(idx!=-1) {
                 val intent = Intent()

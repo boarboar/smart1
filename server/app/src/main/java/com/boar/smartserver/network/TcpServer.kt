@@ -3,19 +3,20 @@ package com.boar.smartserver.network
 import android.content.Context
 import android.util.Log
 import com.boar.smartserver.SmartServer.Companion.tag
+import com.boar.smartserver.extensions.getLocalIpAddress
 import com.boar.smartserver.service.TaskExecutor
 import java.net.ServerSocket
 import java.util.*
 
 class TcpServer(val ctx: Context, val port : Int) {
-    private val tag = "Main service"
+    private val tag = "TcpServ"
     private var executor = TaskExecutor.getInstance(2)
 
     fun run(handler : (String) -> Unit ) {
         val server = ServerSocket(port)
         executor.execute {
             Log.i(tag, "Listener thread [ START ]")
-            Log.d(tag, "WiFi Address detected as: {$ctx.getLocalIpAddress()}")
+            Log.d(tag, "WiFi Address detected as: ${ctx.getLocalIpAddress()}")
             Log.d("Listener", "Server running on port ${server.inetAddress.hostAddress} : ${server.localPort} (${server.inetAddress.hostName})")
 
             while (true) {

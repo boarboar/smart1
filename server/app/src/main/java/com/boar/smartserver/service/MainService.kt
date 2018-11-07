@@ -12,6 +12,7 @@ import com.boar.smartserver.db.SensorDb
 import com.boar.smartserver.domain.Sensor
 import com.boar.smartserver.domain.SensorList
 import com.boar.smartserver.extensions.getLocalIpAddress
+import com.boar.smartserver.network.TcpServer
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
 import org.jetbrains.anko.toast
@@ -35,6 +36,8 @@ class MainService : Service() {
     private var binder = getServiceBinder()
     private var executor = TaskExecutor.getInstance(2)
     private var simFuture  : Future<Unit>? = null
+
+    private val tcpserv = TcpServer(applicationContext, 9999)
 
     //private var sensors = SensorList()
 
@@ -63,15 +66,6 @@ class MainService : Service() {
         sensors = db.requestSensors()
 
         /*
-        // TODO: exec it here and send broadcast too init UI!
-        // Try to add a long delay here and see what happens
-        val intent = Intent()
-        intent.action = BROADCAST_ACTION
-        intent.putExtra(BROADCAST_EXTRAS_OPERATION, BROADCAST_EXTRAS_OP_LOAD)
-        sendBroadcast(intent)
-        */
-
-
         executor.execute {
             // move to Network!!!
             Log.i(tag, "Listener thread [ START ]")
@@ -94,6 +88,17 @@ class MainService : Service() {
             server.close()
             Log.i(tag, "Listener thread [ STOP ]")
             }
+        */
+        tcpserv.run {
+            val idx = sensors.update(it)
+            if(idx!=-1) {
+                val intent = Intent()
+                intent.action = BROADCAST_ACTION
+                intent.putExtra(BROADCAST_EXTRAS_OPERATION, BROADCAST_EXTRAS_OP_UPD)
+                intent.putExtra(BROADCAST_EXTRAS_IDX, idx)
+                sendBroadcast(intent)
+            }
+        }
 
         return Service.START_STICKY
     }
@@ -189,6 +194,7 @@ class MainService : Service() {
         simFuture?.cancel(true)
     }
 
+    /*
     fun handleClient(client: Socket) {
         val scanner = Scanner(client.inputStream)
         while (scanner.hasNextLine()) {
@@ -210,10 +216,5 @@ class MainService : Service() {
         scanner.close()
         client.close()
     }
+    */
 }
-
-/*
-
-TODO - try to send json with missing field
-
- */

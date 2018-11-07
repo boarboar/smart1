@@ -8,7 +8,13 @@ data class WeatherMain(
         @SerializedName("pressure") val pressure: Int
 )
 
+data class WeatherWeather(
+        @SerializedName("main") val descr: String,
+        @SerializedName("icon") val iconCode: String
+)
+
 data class Weather(
         @SerializedName("name") val name: String,
-        @SerializedName("main") val main: WeatherMain
+        @SerializedName("main") val main: WeatherMain,
+        @SerializedName("weather") val weather: ArrayList<WeatherWeather>
 )

@@ -8,20 +8,44 @@ import com.boar.smartserver.domain.Weather
 import com.boar.smartserver.network.WeatherServiceApi
 import kotlinx.android.synthetic.main.weather.*
 
-class MainPresenter(val view: MainActivity) {
-    private val tag = "Main presenter"
-    val wservice : WeatherServiceApi by lazy  { WeatherServiceApi.obtain() }
+class MainPresenter(/*val view: MainActivity*/) {
+
+    companion object {
+        private val tag = "Main presenter"
+        fun iconToUrl(w : Weather) = if(w.weather.size>0) "http://openweathermap.org/img/w/${w.weather[0].iconCode}.png" else ""
+        private val CITYCODE = "192071,Ru"
+        private val RETAIN_WEATHER = 300_000 // milliseconds
+    }
+
+
+    private val wservice : WeatherServiceApi by lazy  { WeatherServiceApi.obtain() }
+    private var weather : Weather? = null
+    private var updated : Long = 0
+
 
     fun refreshWeather( refreshView : (Weather)->Unit ) {
-
-        val weatherResponse = wservice.getWeather("192071,Ru").execute()
-        if (weatherResponse.isSuccessful) {
-            val resp = weatherResponse.body()
-            resp?.let {
-                Log.i(tag, "Get weather  $resp")
-                refreshView(resp)
-            }
+        if(weather !=null && System.currentTimeMillis() < updated + RETAIN_WEATHER) {
+            weather?.let {refreshView(it)}
+            return
         }
-        Log.i(tag, "Get weather OK")
+        try {
+            val weatherResponse = wservice.getWeather(CITYCODE).execute()
+            if (weatherResponse.isSuccessful) {
+                weather = weatherResponse.body()
+                weather?.let {
+                    Log.i(tag, "Get weather  $it")
+                    updated = System.currentTimeMillis()
+                    refreshView(it)
+                }
+            }
+            Log.i(tag, "Get weather OK")
+        }  catch (t: Throwable) {
+            Log.w(tag, "Json error: ${t.message}")
+        }
     }
+
+
 }
+
+
+

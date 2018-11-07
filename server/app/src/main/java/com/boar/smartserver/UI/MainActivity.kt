@@ -20,6 +20,7 @@ import com.boar.smartserver.network.WeatherServiceApi
 import com.boar.smartserver.presenter.MainPresenter
 import com.boar.smartserver.receiver.MainServiceReceiver
 import com.boar.smartserver.service.MainService
+import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.sensor_prop.*
 import kotlinx.android.synthetic.main.weather.*
@@ -37,10 +38,14 @@ import java.text.SimpleDateFormat
 class MainActivity : BaseActivity(), ToolbarManager {
 
     companion object {
-        val df_time = SimpleDateFormat("HH:mm")
-        val df_date = DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.getDefault())
-        var df_dt = DateFormat.getDateTimeInstance(
+        private val df_time = SimpleDateFormat("HH:mm")
+        private val df_date = DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.getDefault())
+        private var df_dt = DateFormat.getDateTimeInstance(
                 DateFormat.SHORT, DateFormat.SHORT, Locale.GERMAN)
+        private val picasso : Picasso by lazy {
+            Picasso.get()
+        }
+        private val presenter : MainPresenter by lazy  { MainPresenter() }
     }
 
     override val tag = "Main activity"
@@ -67,7 +72,7 @@ class MainActivity : BaseActivity(), ToolbarManager {
     private var service: MainService? = null
     var isBound = false
 
-    private val presenter : MainPresenter by lazy  { MainPresenter(this) }
+    //private val presenter : MainPresenter by lazy  { MainPresenter(this) }
 
     private val serviceConnection = object : ServiceConnection {
         override fun onServiceDisconnected(p0: ComponentName?) {
@@ -142,17 +147,23 @@ class MainActivity : BaseActivity(), ToolbarManager {
             }
         }
 
-        Timer().schedule(1000, 1000){// Time
+        Timer().schedule(100, 1000){// Time
             runOnUiThread { toolbarTitle = df_dt.format(System.currentTimeMillis()) }
         }
 
-        Timer().schedule(1000, 1000*60*15){// Weather
+        Timer().schedule(100, 1000*60*15){// Weather
             presenter.refreshWeather {
+                //val iconpng = picasso.load("http://openweathermap.org/img/w/${it.weather[0].iconCode}.png") // is it lazy?
+                val iconpng = picasso.load(MainPresenter.iconToUrl(it)) // is it lazy?
                 runOnUiThread {
                     weather_city.text = "${it.name}"
                     weather_now_temp.text = "${it.main.temp}º"
                     humidity.text = "${it.main.humidity} %"
                     pressure.text = "${it.main.pressure} kPa"
+                    iconpng.into(icon)
+
+                    //.error(R.drawable.user_image).resize(110, 110).centerCrop()
+                    //setIndicatorsEnabled(true) // to show if cached
                 }
             }
         }

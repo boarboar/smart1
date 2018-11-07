@@ -11,6 +11,7 @@ class SmartServer : Application() {
     companion object {
         val tag = "SmartServer"
         lateinit var ctx: Context
+
     }
     override fun onCreate() {
         super.onCreate()

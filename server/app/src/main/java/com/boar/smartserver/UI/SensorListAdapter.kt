@@ -55,11 +55,12 @@ class SensorListAdapter(private val service : MainService?,
             }
             */
              sensor?.apply {
-                itemView.date.text = if(updated !=0L ) convertTime(updated) else "--:--:--"
-                itemView.description.text = description
-                itemView.temperature.text = "${temperatureAsString}º"
-                itemView.vcc.text = "${vccAsString} v"
-                itemView.setOnClickListener { itemClick(this) }
+                 itemView.date.text = if(updated !=0L ) convertTime(updated) else "--:--:--"
+                 itemView.description.text = description
+                 itemView.temperature.text = "${temperatureAsString}º"
+                 itemView.vcc.text = "${vccAsString} v"
+                 itemView.status.text = if(validated) "" else "!"
+                 itemView.setOnClickListener { itemClick(this) }
             }
         }
 

@@ -17,7 +17,15 @@ class SensorList : ArrayList<Sensor>() {
     fun update(newmeas: SensorMeasurement) : Int {
         val sensorIdx = indexOfFirst {it.id == newmeas.id}
         if(sensorIdx==-1) return -1
-        set(sensorIdx, this[sensorIdx].copy(meas=newmeas))
+        if(newmeas.validated)
+            set(sensorIdx, this[sensorIdx].copy(meas=newmeas))
+        else {
+            Log.w(tag, "Bad measurement: $newmeas")
+            this[sensorIdx].meas?.let  {
+                val updmeas = it.copy(validated = false, updated = newmeas.updated)
+                set(sensorIdx, this[sensorIdx].copy(meas = updmeas))
+            }
+        }
         return sensorIdx
     }
 
@@ -29,7 +37,10 @@ class SensorList : ArrayList<Sensor>() {
             Log.w(tag, "Json error: ${t.message}")
             return -1
         }
-        return update(newmeas.copy(updated=System.currentTimeMillis()))
+
+        val valid = newmeas.temp10.toInt() != -1270
+
+        return update(newmeas.copy(updated=System.currentTimeMillis(), validated=valid))
     }
 
     fun simulate() : Int {
@@ -37,7 +48,8 @@ class SensorList : ArrayList<Sensor>() {
         val id = random.nextInt(1..3).toShort()
         val temp10 = random.nextInt(-25..35).toShort()
         val vcc1000 = random.nextInt(2540..4950).toShort()
-        return update(SensorMeasurement(id, temp10=temp10, vcc1000=vcc1000))
+        //return update(SensorMeasurement(id, temp10=temp10, vcc1000=vcc1000))
+        return update("{\"I\":$id,\"M\":64,\"P\":0,\"R\":8,\"T\":$temp10,\"V\":$vcc1000}")
     }
 
     /*
@@ -65,6 +77,8 @@ data class Sensor(val id: Short, val description: String,
         get() = if(meas!=null) (meas.vcc1000/10).toFloat()/100f else 0f
     val updated : Long
         get() = meas?.updated ?: 0L
+    val validated : Boolean
+        get() = meas?.validated ?: true
 
 
     val temperatureAsString : String
@@ -87,5 +101,6 @@ data class SensorMeasurement(
         @SerializedName("R") val resolution: Short = 0,
         @SerializedName("T") val temp10: Short,
         @SerializedName("V") val vcc1000: Short,
-        val updated: Long=System.currentTimeMillis()
+        val updated: Long=System.currentTimeMillis(),
+        val validated: Boolean = false
 )

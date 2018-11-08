@@ -6,25 +6,35 @@ import android.view.View
 import android.view.ViewGroup
 import com.boar.smartserver.R
 import com.boar.smartserver.domain.Sensor
+import com.boar.smartserver.service.MainService
 import kotlinx.android.synthetic.main.item_sensor.view.*
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
 
-class SensorListAdapter(private val sensors: List<Sensor>,
-                          private val itemClick: (Sensor) -> Unit) :
+//class SensorListAdapter(private val sensors: List<Sensor>,
+class SensorListAdapter(private val service : MainService?,
+                        private val itemClick: (Sensor) -> Unit) :
         RecyclerView.Adapter<SensorListAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_sensor, parent, false)
         return ViewHolder(view, itemClick)
     }
-
+/*
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.bindForecast(sensors[position])
     }
+     override fun getItemCount() = sensors.size
 
-    override fun getItemCount() = sensors.size
+    */
+
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        holder.bindForecast(service?.getSensor(position))
+    }
+
+    override fun getItemCount() = service?.sensorListSize ?: 0
+
 
     class ViewHolder(view: View, private val itemClick: (Sensor) -> Unit)
         : RecyclerView.ViewHolder(view) {
@@ -34,8 +44,17 @@ class SensorListAdapter(private val sensors: List<Sensor>,
             val df_date = DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.getDefault())
         }
 
-        fun bindForecast(sensor: Sensor) {
+        fun bindForecast(sensor: Sensor?) {
+            /*
             with(sensor) {
+                itemView.date.text = if(updated !=0L ) convertTime(updated) else "--:--:--"
+                itemView.description.text = description
+                itemView.temperature.text = "${temperatureAsString}º"
+                itemView.vcc.text = "${vccAsString} v"
+                itemView.setOnClickListener { itemClick(this) }
+            }
+            */
+             sensor?.apply {
                 itemView.date.text = if(updated !=0L ) convertTime(updated) else "--:--:--"
                 itemView.description.text = description
                 itemView.temperature.text = "${temperatureAsString}º"

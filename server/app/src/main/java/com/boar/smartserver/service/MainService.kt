@@ -37,7 +37,6 @@ class MainService : Service() {
     private var executor = TaskExecutor.getInstance(2)
     private var simFuture  : Future<Unit>? = null
 
-    //private val tcpserv = TcpServer(applicationContext, 9999)
 
     //private var sensors = SensorList()
 
@@ -48,7 +47,16 @@ class MainService : Service() {
     }
     */
 
-    var sensors : SensorList = SensorList()
+    //var sensors : SensorList = SensorList()
+
+    private var sensors : SensorList? = null
+
+    // TODO Synchronize
+    val sensorListSize : Int
+        get() = sensors?.size ?: 0
+
+    // TODO Synchronize
+    fun getSensor(idx : Int) : Sensor? =sensors?.getOrNull(idx)?.copy()  // shallow, be sure to nullify refs
 
     val db : SensorDb by lazy {
         SensorDb()
@@ -65,32 +73,9 @@ class MainService : Service() {
         Log.v(tag, "[ ON START COMMAND ]")
         sensors = db.requestSensors()
 
-        /*
-        executor.execute {
-            // move to Network!!!
-            Log.i(tag, "Listener thread [ START ]")
-            Log.d("Listener", "WiFi Address detected as: {$applicationContext.getLocalIpAddress()}")
-            val server = ServerSocket(9999)
-            Log.d("Listener", "Server running on port ${server.inetAddress.hostAddress} : ${server.localPort} (${server.inetAddress.hostName})")
-
-            while (true) {
-
-                val client = server.accept()
-                //println("Client conected : ${client.inetAddress.hostAddress}")
-
-                Log.d("Listener", "Client connected : ${client.inetAddress.hostAddress}")
-
-                executor.execute { handleClient(client) }
-
-                //client.close()
-            }
-
-            server.close()
-            Log.i(tag, "Listener thread [ STOP ]")
-            }
-        */
         TcpServer(applicationContext, 9999).run {
-            val idx = sensors.update(it)
+            // TODO Synchronize
+            val idx = sensors?.update(it) ?: -1
             if(idx!=-1) {
                 val intent = Intent()
                 intent.action = BROADCAST_ACTION
@@ -142,7 +127,7 @@ class MainService : Service() {
         return sensors
     }
   */
-
+    /*
     private fun loadSensors() : SensorList {
         val ss = SensorList()
         ss.add(Sensor(1, "Window"))
@@ -150,17 +135,18 @@ class MainService : Service() {
         Thread.sleep(2_000) // test
         return ss
     }
-
+    */
     fun addSensor(sensor: Sensor) {
         Log.v(tag, "[ ADD SENSOR ]")
         executor.execute {
             val (res, errmsg) = db.saveSensor(sensor)
-            if(res) {
-                sensors.add(sensor)
+            if(res) sensors?.apply {
+                // TODO Synchronize
+                add(sensor)
                 val intent = Intent()
                 intent.action = BROADCAST_ACTION
                 intent.putExtra(BROADCAST_EXTRAS_OPERATION, BROADCAST_EXTRAS_OP_ADD)
-                intent.putExtra(BROADCAST_EXTRAS_IDX, sensors.size - 1)
+                intent.putExtra(BROADCAST_EXTRAS_IDX, size - 1)
                 sendBroadcast(intent)
             }
             else {
@@ -177,7 +163,7 @@ class MainService : Service() {
         simFuture = doAsync {
             while(true) {
                 Thread.sleep(2_000)
-                val idx = sensors.simulate()
+                val idx = sensors?.simulate() ?: -1
                 if (idx!=-1) {
                     Log.v(tag, "Siimulated : idx=$idx")
                     val intent = Intent()
@@ -193,28 +179,4 @@ class MainService : Service() {
     fun stopSimulation() {
         simFuture?.cancel(true)
     }
-
-    /*
-    fun handleClient(client: Socket) {
-        val scanner = Scanner(client.inputStream)
-        while (scanner.hasNextLine()) {
-            val text = scanner.nextLine()
-
-            Log.d("Client", "Raw: $text")
-
-            val idx = sensors.update(text)
-
-            if(idx!=-1) {
-                val intent = Intent()
-                intent.action = BROADCAST_ACTION
-                intent.putExtra(BROADCAST_EXTRAS_OPERATION, BROADCAST_EXTRAS_OP_UPD)
-                intent.putExtra(BROADCAST_EXTRAS_IDX, idx)
-                sendBroadcast(intent)
-            }
-        }
-
-        scanner.close()
-        client.close()
-    }
-    */
 }

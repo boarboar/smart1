@@ -59,8 +59,7 @@ class MainActivity : BaseActivity(), ToolbarManager {
 
     private val receiver: MainServiceReceiver = MainServiceReceiver {op, idx ->
         when (op) {
-            //MainService.BROADCAST_EXTRAS_OP_ADD -> Toast.makeText(this, "ADD $idx", Toast.LENGTH_LONG).show()
-            MainService.BROADCAST_EXTRAS_OP_LOAD -> loadSensors()
+            // MainService.BROADCAST_EXTRAS_OP_LOAD -> loadSensors()
             MainService.BROADCAST_EXTRAS_OP_ADD -> sensorList.adapter?.notifyItemInserted(idx)
             MainService.BROADCAST_EXTRAS_OP_UPD -> sensorList.adapter?.notifyItemChanged(idx)
             else -> Log.v(tag, "[ BRDCST $op $idx]")
@@ -86,7 +85,8 @@ class MainActivity : BaseActivity(), ToolbarManager {
                 service = binder.getService()
                 service?.let {
                     isBound = true
-                    loadSensors()
+                    //loadSensors()
+                    updateUI()
                     Log.v(tag, "[ SRV BOUND ]")
                 }
             }
@@ -168,7 +168,7 @@ class MainActivity : BaseActivity(), ToolbarManager {
             }
         }
     }
-
+/*
     private fun loadSensors() {
         pBar.visibility = View.VISIBLE
         doAsync {
@@ -181,9 +181,11 @@ class MainActivity : BaseActivity(), ToolbarManager {
         }
         //pBar.visibility = View.GONE
     }
+*/
 
     private fun updateUI() {
-        val adapter = SensorListAdapter(sensors) {
+        // val adapter = SensorListAdapter(sensors) {
+        val adapter = SensorListAdapter(service) {
             /*
             startActivity<DetailActivity>(DetailActivity.ID to it.id,
                     DetailActivity.CITY_NAME to weekForecast.city)

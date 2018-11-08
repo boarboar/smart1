@@ -28,7 +28,7 @@
             android:id="@+id/weather_now_temp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+            android:textAppearance="@style/TextAppearance.AppCompat.Display2"
             android:textColor = "@android:color/holo_green_light"
             android:text="--º"
             />
@@ -37,8 +37,9 @@
             android:id="@+id/weather_city"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-            tools:text=""/>
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:textColor = "@android:color/holo_blue_dark"
+            tools:text="--"/>
 
     </LinearLayout>
 
@@ -53,7 +54,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor = "@android:color/holo_green_light"
-            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:textAppearance="@style/TextAppearance.AppCompat.Display1"
             tools:text="--"/>
 
         <TextView
@@ -61,7 +62,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor = "@android:color/holo_green_light"
-            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:textAppearance="@style/TextAppearance.AppCompat.Display1"
             tools:text="--"/>
 
     </LinearLayout>

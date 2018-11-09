@@ -1,5 +1,6 @@
 package com.boar.smartserver.UI
 
+import android.support.v7.graphics.drawable.DrawerArrowDrawable
 import android.support.v7.widget.Toolbar
 import com.boar.smartserver.R
 
@@ -22,14 +23,14 @@ interface ToolbarManager {
         }
     }
 
-    /*
+
     fun enableHomeAsUp(up: () -> Unit) {
         toolbar.navigationIcon = createUpDrawable()
         toolbar.setNavigationOnClickListener { up() }
     }
 
     private fun createUpDrawable() = DrawerArrowDrawable(toolbar.context).apply { progress = 1f }
-    */
+
 
     /*
     fun attachToScroll(recyclerView: RecyclerView) {

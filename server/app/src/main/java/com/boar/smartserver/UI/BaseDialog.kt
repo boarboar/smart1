@@ -17,21 +17,6 @@ abstract class BaseDialog {
     //  dialog
     protected var dialog: AlertDialog? = null
 
-    //  dialog create
-    /*
-    fun create(): AlertDialog {
-        dialog = builder
-                .setCancelable(cancelable)
-                .create()
-
-        //  very much needed for customised dialogs
-        if (isBackGroundTransparent)
-            dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-
-        return dialog!!
-    }
-    */
-
     open fun create(): BaseDialog {
         dialog = builder
                 .setCancelable(cancelable)

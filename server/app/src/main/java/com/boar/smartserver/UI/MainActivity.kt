@@ -55,13 +55,17 @@ class MainActivity : BaseActivity(), ToolbarManager {
     override fun getLayout() = R.layout.activity_main
     override fun getActivityTitle() = R.string.app_name
 
-    private var sensors = SensorList()
+    //private var sensors = SensorList()
+    private var lastUpdated = 0L
 
     private val receiver: MainServiceReceiver = MainServiceReceiver {op, idx ->
         when (op) {
             // MainService.BROADCAST_EXTRAS_OP_LOAD -> loadSensors()
             MainService.BROADCAST_EXTRAS_OP_ADD -> sensorList.adapter?.notifyItemInserted(idx)
-            MainService.BROADCAST_EXTRAS_OP_UPD -> sensorList.adapter?.notifyItemChanged(idx)
+            MainService.BROADCAST_EXTRAS_OP_UPD -> {
+                lastUpdated = System.currentTimeMillis()
+                sensorList.adapter?.notifyItemChanged(idx)
+            }
             else -> Log.v(tag, "[ BRDCST $op $idx]")
         }
     }
@@ -69,7 +73,7 @@ class MainActivity : BaseActivity(), ToolbarManager {
     //private lateinit var sensors
 
     private var service: MainService? = null
-    var isBound = false
+    private var isBound = false
 
     //private val presenter : MainPresenter by lazy  { MainPresenter(this) }
 
@@ -148,7 +152,8 @@ class MainActivity : BaseActivity(), ToolbarManager {
         }
 
         Timer().schedule(100, 1000){// Time
-            runOnUiThread { toolbarTitle = df_dt.format(System.currentTimeMillis()) }
+            val showUpdated = if(System.currentTimeMillis() < lastUpdated + 5000) "U" else ""
+            runOnUiThread { toolbarTitle = "${df_dt.format(System.currentTimeMillis())} $showUpdated" }
         }
 
         Timer().schedule(100, 1000*60*15){// Weather
@@ -186,10 +191,9 @@ class MainActivity : BaseActivity(), ToolbarManager {
     private fun updateUI() {
         // val adapter = SensorListAdapter(sensors) {
         val adapter = SensorListAdapter(service) {
-            /*
-            startActivity<DetailActivity>(DetailActivity.ID to it.id,
-                    DetailActivity.CITY_NAME to weekForecast.city)
-                    */
+            startActivity<SensorDetailActivity>(
+                    SensorDetailActivity.LOCATION to it.description
+                   )
         }
         sensorList.adapter = adapter
         pBar.visibility = View.GONE

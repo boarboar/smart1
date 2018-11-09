@@ -1,4 +1,80 @@
 <?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?attr/selectableItemBackground"
+    android:gravity="center_vertical"
+    android:layout_marginTop="10dp"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.AppCompat.Display2"
+            android:textColor = "@android:color/holo_green_light"
+            android:layout_alignParentLeft = "true"
+            android:gravity="center_vertical"
+            tools:text="Location"/>
+
+        <TextView
+            android:id="@+id/temperature"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.AppCompat.Display3"
+            android:textColor = "@android:color/holo_green_light"
+            android:layout_alignParentRight = "true"
+            android:gravity="center_vertical"
+            tools:text="--º"/>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor = "@android:color/holo_green_light"
+            android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+            android:layout_alignParentLeft = "true"
+            tools:text="--:--:--"/>
+
+        <TextView
+            android:id="@+id/status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+            android:layout_toRightOf="@+id/date"
+            android:layout_marginLeft="20dp"
+            tools:text="-"/>
+
+        <TextView
+            android:id="@+id/vcc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+            android:textColor = "@android:color/holo_green_light"
+            android:layout_alignParentRight = "true"
+            tools:text="--v"/>
+
+    </RelativeLayout>
+</LinearLayout>
+
+<!--
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
@@ -29,7 +105,7 @@
             android:layout_height="wrap_content"
             android:textColor = "@android:color/holo_green_light"
             android:textAppearance="@style/TextAppearance.AppCompat.Display1"
-            tools:text="--:--"/>
+            tools:text="-:-"/>
 
     </LinearLayout>
 
@@ -45,7 +121,7 @@
             android:layout_height="wrap_content"
             android:textAppearance="@style/TextAppearance.AppCompat.Display3"
             android:textColor = "@android:color/holo_green_light"
-            tools:text="--º"/>
+            tools:text="-º"/>
 
         <TextView
             android:id="@+id/vcc"
@@ -53,7 +129,7 @@
             android:layout_height="wrap_content"
             android:textAppearance="@style/TextAppearance.AppCompat.Display1"
             android:textColor = "@android:color/holo_green_light"
-            tools:text="--v"/>
+            tools:text="-v"/>
 
     </LinearLayout>
 
@@ -76,3 +152,4 @@
     </LinearLayout>
 
 </LinearLayout>
+-->

@@ -1,12 +1,17 @@
 package com.boar.smartserver.UI
 
+
+import android.support.v4.content.ContextCompat
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.boar.smartserver.R
+import com.boar.smartserver.SmartServer
+import com.boar.smartserver.SmartServer.Companion.ctx
 import com.boar.smartserver.domain.Sensor
 import com.boar.smartserver.service.MainService
+import com.boar.smartserver.extensions.resolveColor
 import kotlinx.android.synthetic.main.item_sensor.view.*
 import java.text.DateFormat
 import java.text.SimpleDateFormat
@@ -45,23 +50,29 @@ class SensorListAdapter(private val service : MainService?,
         }
 
         fun bindForecast(sensor: Sensor?) {
-            /*
-            with(sensor) {
-                itemView.date.text = if(updated !=0L ) convertTime(updated) else "--:--:--"
-                itemView.description.text = description
-                itemView.temperature.text = "${temperatureAsString}º"
-                itemView.vcc.text = "${vccAsString} v"
-                itemView.setOnClickListener { itemClick(this) }
-            }
-            */
              sensor?.apply {
                  itemView.date.text = if(updated !=0L ) convertTime(updated) else "--:--:--"
                  itemView.description.text = description
                  itemView.temperature.text = "${temperatureAsString}º"
                  itemView.vcc.text = "${vccAsString} v"
-                 itemView.status.text = if(validated) "" else "!"
+                 //itemView.status.text = if(validated) "" else "!"
+                 if(validated) {
+                     itemView.status.text = if(updated !=0L ) "Ok" else ""
+                     itemView.status.setTextColor(ctx.resolveColor(android.R.color.holo_green_light))
+                 } else {
+                     itemView.status.text = "Bad"
+                     itemView.status.setTextColor(ctx.resolveColor(android.R.color.holo_red_light))
+                 }
                  itemView.setOnClickListener { itemClick(this) }
             }
+            /*
+
+            textColor
+
+            in -50..0 -> android.R.color.holo_red_dark
+            in 0..15 -> android.R.color.holo_orange_dark
+            else -> android.R.color.holo_green_dark
+            */
         }
 
 

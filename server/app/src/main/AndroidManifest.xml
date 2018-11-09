@@ -33,6 +33,10 @@
             android:name=".UI.SettingsActivity"
             android:label="@string/settings" />
 
+        <activity
+            android:name=".UI.SensorDetailActivity"
+            android:label="@string/sens_detail" />
+
     </application>
 
 </manifest>

@@ -1,5 +1,141 @@
 <?xml version="1.0" encoding="utf-8"?>
 
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="?attr/selectableItemBackground"
+    android:gravity="center_vertical"
+    android:layout_marginTop="10dp"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="80dp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+            android:textColor = "@android:color/holo_green_light"
+            android:layout_alignParentLeft = "true"
+            android:text="@string/sensor_id"
+            android:layout_marginLeft="10dp"
+            android:gravity="center_vertical"
+            />
+
+        <EditText
+            android:id="@+id/sensor_id"
+            android:layout_width="80dp"
+            android:layout_marginRight="10dp"
+            android:layout_height="80dp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+            android:hint="0"
+            android:maxLines="1"
+            android:inputType="number"
+            android:layout_alignParentRight = "true"
+            android:layout_alignParentTop="true"
+            />
+    </RelativeLayout>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/sensor_loc_label"
+            android:layout_width="wrap_content"
+            android:layout_height="80dp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+            android:textColor = "@android:color/holo_green_light"
+            android:layout_alignParentLeft = "true"
+            android:text="@string/sensor_loc"
+            android:layout_marginLeft="10dp"
+            android:gravity="center_vertical"
+            />
+
+        <EditText
+            android:id="@+id/sensor_loc"
+            android:layout_width="match_parent"
+            android:layout_marginRight="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_height="80dp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+            android:inputType="text"
+            android:maxLines="1"
+            android:hint="location"
+            android:layout_toRightOf="@+id/sensor_loc_label"
+            android:layout_alignParentTop="true"
+            />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="horizontal"
+        android:paddingTop="40dp">
+        <!--
+        <ImageView
+            android:id="@+id/close_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:focusable="true"
+            android:padding="80dp"
+            app:srcCompat="@android:drawable/ic_menu_close_clear_cancel"
+            />
+
+        <ImageView
+            android:id="@+id/done_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:focusable="true"
+            android:padding="80dp"
+            app:srcCompat="@android:drawable/ic_menu_add"
+            android:layout_alignParentRight = "true"
+            />
+            -->
+
+        <Button
+            android:id="@+id/close_but"
+            android:layout_width="160dp"
+            android:layout_height="60dp"
+            android:background="@android:color/white"
+            android:clickable="true"
+            android:text="Cancel"
+            android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+            android:textColor="#5DBCD2"
+            android:padding="10dp"
+            />
+
+        <Button
+            android:id="@+id/done_but"
+            android:layout_width="160dp"
+            android:layout_height="60dp"
+            android:layout_marginLeft="5dp"
+            android:background="@android:color/white"
+            android:clickable="true"
+            android:text="Add"
+            android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+            android:textColor="#5DBCD2"
+            android:layout_alignParentRight = "true"
+            android:padding="10dp"
+            />
+
+    </RelativeLayout>
+
+</LinearLayout>
+
+
+<!--
+
 <android.support.constraint.ConstraintLayout
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
@@ -90,3 +226,5 @@
         </RelativeLayout>
 
     </android.support.constraint.ConstraintLayout>
+
+-->

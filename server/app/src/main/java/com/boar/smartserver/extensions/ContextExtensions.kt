@@ -2,6 +2,7 @@ package com.boar.smartserver.extensions
 
 import android.content.Context
 import android.net.wifi.WifiManager
+import android.support.v4.content.ContextCompat
 import android.util.Log
 
 fun Context.getLocalIpAddress(): String {
@@ -23,3 +24,5 @@ fun Context.getLocalIpAddress(): String {
 
     return ""
 }
+
+fun Context.resolveColor(color : Int) = ContextCompat.getColor(this, color)

@@ -11,6 +11,8 @@
 #define SETUP_PIN 0
 #define LED_PIN 12
 
+#define TRIES_TO_SEND 3
+
 // do not work with parasite
 
 // 5k res
@@ -60,7 +62,7 @@ void setup(void)
 
   if(isCfgValid) {
     Serial.println(F("Press button1 now to enter setup"));
-    delay(5000);  
+    delay(2000);  
     pinMode(SETUP_PIN, INPUT);  
     isSetup = false;  
     if(digitalRead(SETUP_PIN)==LOW) {
@@ -97,9 +99,12 @@ void setup(void)
   }
   
   if(doConnect()) {
-    if(!doSend(&tData)) {
-      Serial.println(F("Failed to send"));
-      blink(400, 4);
+    for(int i=0; i<TRIES_TO_SEND; i++) {
+      if(!doSend(&tData)) {
+        Serial.println(F("Failed to send"));
+        blink(400, 4);
+        if(i<TRIES_TO_SEND-1) delay(i*1000);
+      } else break;
     }
   } else {
     blink(400, 3);
@@ -194,6 +199,7 @@ bool doDiag(TempData *pData)
 
 bool doSend(TempData *pData) {
   WiFiClient client;
+  client.setTimeout(10000); //10s
   if (!client.connect(CfgDrv::Cfg.srv_addr, CfgDrv::Cfg.srv_port)) {
       Serial.println("connection failed");
       return false;

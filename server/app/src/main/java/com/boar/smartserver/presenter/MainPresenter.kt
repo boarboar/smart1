@@ -6,6 +6,7 @@ import com.boar.smartserver.R.id.weather_now_temp
 import com.boar.smartserver.UI.MainActivity
 import com.boar.smartserver.domain.Weather
 import com.boar.smartserver.network.WeatherServiceApi
+import com.boar.smartserver.service.MainService
 import kotlinx.android.synthetic.main.weather.*
 
 class MainPresenter(/*val view: MainActivity*/) {
@@ -21,6 +22,7 @@ class MainPresenter(/*val view: MainActivity*/) {
     private val wservice : WeatherServiceApi by lazy  { WeatherServiceApi.obtain() }
     private var weather : Weather? = null
     private var updated : Long = 0
+    private var service: MainService? = null
 
 
     fun refreshWeather( refreshView : (Weather)->Unit ) {
@@ -44,6 +46,15 @@ class MainPresenter(/*val view: MainActivity*/) {
         }
     }
 
+    fun attachService(srv: MainService?) { service = srv}
+    fun detachService() { service = null}
+
+    val sensorListSize : Int
+    get() {
+        return service?.sensorListSize ?: 0
+    }
+
+    fun getSensor(position : Int) = service?.getSensor(position)
 
 }
 

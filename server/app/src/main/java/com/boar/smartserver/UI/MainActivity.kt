@@ -45,7 +45,7 @@ class MainActivity : BaseActivity(), ToolbarManager {
         private val picasso : Picasso by lazy {
             Picasso.get()
         }
-        private val presenter : MainPresenter by lazy  { MainPresenter() }
+        val presenter : MainPresenter by lazy  { MainPresenter() }
     }
 
     override val tag = "Main activity"
@@ -81,6 +81,7 @@ class MainActivity : BaseActivity(), ToolbarManager {
         override fun onServiceDisconnected(p0: ComponentName?) {
             service = null
             isBound = false
+            presenter.detachService()
             Log.v(tag, "[ SRV ONBOUND ]")
             //synchronize.enabled = false
         }
@@ -89,6 +90,7 @@ class MainActivity : BaseActivity(), ToolbarManager {
                 service = binder.getService()
                 service?.let {
                     isBound = true
+                    presenter.attachService(service)
                     //loadSensors()
                     updateUI()
                     Log.v(tag, "[ SRV BOUND ]")
@@ -190,9 +192,11 @@ class MainActivity : BaseActivity(), ToolbarManager {
 
     private fun updateUI() {
         // val adapter = SensorListAdapter(sensors) {
-        val adapter = SensorListAdapter(service) {
+        //val adapter = SensorListAdapter(service) {
+        val adapter = SensorListAdapter(presenter) {
             startActivity<SensorDetailActivity>(
-                    SensorDetailActivity.LOCATION to it.description
+                    //SensorDetailActivity.LOCATION to it.description
+                    SensorDetailActivity.IDX to it
                    )
         }
         sensorList.adapter = adapter

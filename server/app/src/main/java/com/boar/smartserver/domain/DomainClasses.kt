@@ -75,6 +75,12 @@ data class Sensor(val id: Short, val description: String,
         get() = if(meas!=null) meas.temp10.toFloat()/10f else 0f
     val vcc : Float
         get() = if(meas!=null) (meas.vcc1000/10).toFloat()/100f else 0f
+    val resolution : Short
+        get() = if(meas!=null) meas.resolution else 0
+    val model : Short
+        get() = if(meas!=null) meas.model else 0
+    val parasite : Short
+        get() = if(meas!=null) meas.parasite else -1
     val updated : Long
         get() = meas?.updated ?: 0L
     val validated : Boolean
@@ -97,7 +103,7 @@ data class Sensor(val id: Short, val description: String,
 data class SensorMeasurement(
         @SerializedName("I") val id: Short,
         @SerializedName("M") val model: Short = 0,
-        @SerializedName("P") val isParasite: Short = 0,
+        @SerializedName("P") val parasite: Short = 0,
         @SerializedName("R") val resolution: Short = 0,
         @SerializedName("T") val temp10: Short,
         @SerializedName("V") val vcc1000: Short,

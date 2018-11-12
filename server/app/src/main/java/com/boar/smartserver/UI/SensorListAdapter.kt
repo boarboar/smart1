@@ -12,14 +12,17 @@ import com.boar.smartserver.SmartServer.Companion.ctx
 import com.boar.smartserver.domain.Sensor
 import com.boar.smartserver.service.MainService
 import com.boar.smartserver.extensions.resolveColor
+import com.boar.smartserver.presenter.MainPresenter
 import kotlinx.android.synthetic.main.item_sensor.view.*
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
 
 //class SensorListAdapter(private val sensors: List<Sensor>,
-class SensorListAdapter(private val service : MainService?,
-                        private val itemClick: (Sensor) -> Unit) :
+//class SensorListAdapter(private val service : MainService?,
+class SensorListAdapter(private val presenter : MainPresenter,
+                        //private val itemClick: (Sensor) -> Unit) :
+                        private val itemClick: (Int) -> Unit) :
         RecyclerView.Adapter<SensorListAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -35,13 +38,17 @@ class SensorListAdapter(private val service : MainService?,
     */
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bindForecast(service?.getSensor(position))
+        //holder.bindForecast(service?.getSensor(position))
+        //holder.bindForecast(presenter.getSensor(position))
+        holder.bindForecast(presenter, position)
     }
 
-    override fun getItemCount() = service?.sensorListSize ?: 0
+    //override fun getItemCount() = service?.sensorListSize ?: 0
+    override fun getItemCount() = presenter.sensorListSize
 
 
-    class ViewHolder(view: View, private val itemClick: (Sensor) -> Unit)
+    //class ViewHolder(view: View, private val itemClick: (Sensor) -> Unit)
+    class ViewHolder(view: View, private val itemClick: (Int) -> Unit)
         : RecyclerView.ViewHolder(view) {
 
         companion object {
@@ -49,8 +56,10 @@ class SensorListAdapter(private val service : MainService?,
             val df_date = DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.getDefault())
         }
 
-        fun bindForecast(sensor: Sensor?) {
-             sensor?.apply {
+        //fun bindForecast(sensor: Sensor?) {
+        fun bindForecast( presenter : MainPresenter, position: Int) {
+             //sensor?.apply {
+            presenter.getSensor(position)?.apply {
                  itemView.date.text = if(updated !=0L ) convertTime(updated) else "--:--:--"
                  itemView.description.text = description
                  itemView.temperature.text = "${temperatureAsString}º"
@@ -63,7 +72,8 @@ class SensorListAdapter(private val service : MainService?,
                      itemView.status.text = "Bad"
                      itemView.status.setTextColor(ctx.resolveColor(android.R.color.holo_red_light))
                  }
-                 itemView.setOnClickListener { itemClick(this) }
+                 //itemView.setOnClickListener { itemClick(this) }
+                itemView.setOnClickListener { itemClick(position) }
             }
             /*
 

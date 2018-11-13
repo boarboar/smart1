@@ -3,6 +3,8 @@
     <string name="settings">Settings</string>
     <string name="sens_detail">Details</string>
     <string name="add_sensor">Add sensor</string>
+    <string name="edit_sensor">Edit sensor</string>
+    <string name="delete_sensor">Delete sensor</string>
     <string name="sim_start">Start simulation</string>
     <string name="sim_stop">Stop simulation</string>
     <string name="wifi_ip">WiFi IP:</string>

@@ -18,7 +18,7 @@ class SensorList : ArrayList<Sensor>() {
         val sensorIdx = indexOfFirst {it.id == newmeas.id}
         if(sensorIdx==-1) return -1
         if(newmeas.validated)
-            set(sensorIdx, this[sensorIdx].copy(meas=newmeas))
+            set(sensorIdx, this[sensorIdx].copy(meas=newmeas, lastValidMeasTime = System.currentTimeMillis()))
         else {
             Log.w(tag, "Bad measurement: $newmeas")
             this[sensorIdx].meas?.let  {
@@ -68,6 +68,7 @@ data class Sensor(val id: Short, val description: String,
 */
 
 data class Sensor(val id: Short, val description: String,
+                  val lastValidMeasTime: Long = 0,
                   val meas: SensorMeasurement? = null
         //, val measList
 ) {

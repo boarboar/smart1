@@ -15,8 +15,8 @@ interface ToolbarManager {
             toolbar.title = value
         }
 
-    fun initToolbar(handle: (Int) -> Unit) {
-        toolbar.inflateMenu(R.menu.menu_main)
+    fun initToolbar(menuId : Int, handle: (Int) -> Unit) {
+        toolbar.inflateMenu(menuId)
         toolbar.setOnMenuItemClickListener {
             handle(it.itemId)
             true

@@ -22,9 +22,10 @@ class SensorDetailActivity() : AppCompatActivity(), ToolbarManager {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sensor_details)
-        initToolbar() {
+        initToolbar(R.menu.menu_sensor) {
             when (it) {
-                // todo
+                R.id.action_edit -> toast("TODO edit")
+                R.id.action_delete -> toast("TODO delete")
                 else -> toast("Unknown option")
             }
         }
@@ -33,14 +34,14 @@ class SensorDetailActivity() : AppCompatActivity(), ToolbarManager {
         if(idx!=-1) {
             presenter.getSensor(idx)?.apply {
                 toolbarTitle = description ?: "None"
-                //date.text = if(updated !=0L ) convertTime(updated) else "--:--:--"
                 sensor_id.text = id.toString()
                 sensor_temperature.text = "${temperatureAsString}º"
                 sensor_vcc.text = "${vccAsString} v"
                 sensor_res.text = "${resolution}"
                 sensor_model.text = "${model}"
                 sensor_par.text = "${parasite}"
-
+                sensor_last_updated.text = if(updated !=0L ) DateUtils.convertTime(updated) else "--:--:--"
+                sensor_last_valid.text = if(lastValidMeasTime !=0L ) DateUtils.convertTime(lastValidMeasTime) else "--:--:--"
 
                 /*
                 sensor_date.text = updated.toString()

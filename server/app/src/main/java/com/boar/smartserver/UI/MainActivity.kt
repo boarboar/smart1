@@ -38,10 +38,12 @@ import java.text.SimpleDateFormat
 class MainActivity : BaseActivity(), ToolbarManager {
 
     companion object {
+        /*
         private val df_time = SimpleDateFormat("HH:mm")
         private val df_date = DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.getDefault())
         private var df_dt = DateFormat.getDateTimeInstance(
                 DateFormat.SHORT, DateFormat.SHORT, Locale.GERMAN)
+                */
         private val picasso : Picasso by lazy {
             Picasso.get()
         }
@@ -143,7 +145,7 @@ class MainActivity : BaseActivity(), ToolbarManager {
         sensorList.layoutManager = LinearLayoutManager(this)
         sensorList.setHasFixedSize(true)   // all items of the same size (?)
 
-        initToolbar {
+        initToolbar(R.menu.menu_main) {
             when (it) {
                 R.id.action_settings -> startActivity<SettingsActivity>()
                 R.id.action_add -> showSensorPropUI()
@@ -155,7 +157,7 @@ class MainActivity : BaseActivity(), ToolbarManager {
 
         Timer().schedule(100, 1000){// Time
             val showUpdated = if(System.currentTimeMillis() < lastUpdated + 5000) "U" else ""
-            runOnUiThread { toolbarTitle = "${df_dt.format(System.currentTimeMillis())} $showUpdated" }
+            runOnUiThread { toolbarTitle = "${DateUtils.convertDateTime(System.currentTimeMillis())} $showUpdated" }
         }
 
         Timer().schedule(100, 1000*60*15){// Weather

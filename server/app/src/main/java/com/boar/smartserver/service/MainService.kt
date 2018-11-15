@@ -58,6 +58,8 @@ class MainService : Service() {
     // TODO Synchronize
     fun getSensor(idx : Int) : Sensor? =sensors?.getOrNull(idx)?.copy()  // shallow, be sure to nullify refs
 
+    fun isLoaded() = sensors !=null
+
     val db : SensorDb by lazy {
         SensorDb()
     }
@@ -72,6 +74,10 @@ class MainService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Log.v(tag, "[ ON START COMMAND ]")
         sensors = db.requestSensors()
+        val intent = Intent()
+        intent.action = BROADCAST_ACTION
+        intent.putExtra(BROADCAST_EXTRAS_OPERATION, BROADCAST_EXTRAS_OP_LOAD)
+        sendBroadcast(intent)
 
         TcpServer(applicationContext, 9999).run {
             // TODO Synchronize

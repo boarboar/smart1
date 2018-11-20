@@ -1,9 +1,7 @@
 package com.boar.smartserver.service
 
 import android.app.Service
-import android.content.Context
 import android.content.Intent
-import android.net.wifi.WifiManager
 import android.os.Binder
 import android.os.IBinder
 import android.util.Log
@@ -11,15 +9,13 @@ import android.widget.Toast
 import com.boar.smartserver.db.SensorDb
 import com.boar.smartserver.domain.Sensor
 import com.boar.smartserver.domain.SensorList
-import com.boar.smartserver.extensions.getLocalIpAddress
 import com.boar.smartserver.network.TcpServer
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
-import org.jetbrains.anko.toast
-import java.net.ServerSocket
-import java.net.Socket
-import java.util.*
 import java.util.concurrent.Future
+import java.util.concurrent.locks.Lock
+import java.util.concurrent.locks.ReentrantLock
+import kotlin.concurrent.withLock
 
 class MainService : Service() {
 
@@ -36,6 +32,7 @@ class MainService : Service() {
     private var binder = getServiceBinder()
     private var executor = TaskExecutor.getInstance(2)
     private var simFuture  : Future<Unit>? = null
+    private val lock : Lock =  ReentrantLock()
 
 
     //private var sensors = SensorList()
@@ -51,12 +48,10 @@ class MainService : Service() {
 
     private var sensors : SensorList? = null
 
-    // TODO Synchronize
     val sensorListSize : Int
-        get() = sensors?.size ?: 0
+        get() = lock.withLock { sensors?.size ?: 0 }
 
-    // TODO Synchronize
-    fun getSensor(idx : Int) : Sensor? =sensors?.getOrNull(idx)?.copy()  // shallow, be sure to nullify refs
+    fun getSensor(idx : Int) : Sensor? = lock.withLock { sensors?.getOrNull(idx)?.copy() }  // shallow, be sure to nullify refs
 
     fun isLoaded() = sensors !=null
 
@@ -80,8 +75,7 @@ class MainService : Service() {
         sendBroadcast(intent)
 
         TcpServer(applicationContext, 9999).run {
-            // TODO Synchronize
-            val idx = sensors?.update(it) ?: -1
+            val idx = lock.withLock { sensors?.update(it) ?: -1 }
             if(idx!=-1) {
                 val intent = Intent()
                 intent.action = BROADCAST_ACTION
@@ -147,8 +141,8 @@ class MainService : Service() {
         executor.execute {
             val (res, errmsg) = db.saveSensor(sensor)
             if(res) sensors?.apply {
-                // TODO Synchronize
-                add(sensor)
+
+                lock.withLock { add(sensor) }
                 val intent = Intent()
                 intent.action = BROADCAST_ACTION
                 intent.putExtra(BROADCAST_EXTRAS_OPERATION, BROADCAST_EXTRAS_OP_ADD)

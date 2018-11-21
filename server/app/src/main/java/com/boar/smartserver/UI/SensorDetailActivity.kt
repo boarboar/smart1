@@ -23,6 +23,8 @@ class SensorDetailActivity() : BaseActivity(), ToolbarManager {
         val IDX = "DetailActivity:index"
     }
 
+    var currentIdx = -1
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         //setContentView(R.layout.activity_sensor_details)
@@ -40,7 +42,7 @@ class SensorDetailActivity() : BaseActivity(), ToolbarManager {
     override fun onResume() {
         super.onResume()
         presenter.attachReceiver()
-                .onSensorUpdate { showSensor(it) }
+                .onSensorUpdate { if(it==currentIdx) showSensor(it) }
     }
 
     override fun onPause() {
@@ -60,14 +62,10 @@ class SensorDetailActivity() : BaseActivity(), ToolbarManager {
                 sensor_par.text = "${parasite}"
                 sensor_last_updated.text = if (updated != 0L) DateUtils.convertTime(updated) else "--:--:--"
                 sensor_last_valid.text = if (lastValidMeasTime != 0L) DateUtils.convertTime(lastValidMeasTime) else "--:--:--"
-
                 /*
-                sensor_date.text = updated.toString()
-
-
                 sensor_status.text = if(validated) "Good" else "Bad"
                 */
-
+                currentIdx = idx
             }
         }
     }

@@ -155,6 +155,26 @@ class MainService : Service() {
                 }
             }
         }
+    }
+
+    fun editSensor(position: Int, sensor: Sensor) {
+        Log.v(tag, "[ EDIT SENSOR ]")
+        executor.execute {
+            val (res, errmsg) = db.updateSensor(sensor)
+            if(res) sensors?.apply {
+                lock.withLock { edit(position, sensor) }
+                val intent = Intent()
+                intent.action = BROADCAST_ACTION
+                intent.putExtra(BROADCAST_EXTRAS_OPERATION, BROADCAST_EXTRAS_OP_UPD)
+                intent.putExtra(BROADCAST_EXTRAS_IDX, position)
+                sendBroadcast(intent)
+            }
+            else {
+                runOnUiThread {
+                    Toast.makeText(this, "DB Err : $errmsg", Toast.LENGTH_LONG).show()
+                }
+            }
+        }
 
     }
 

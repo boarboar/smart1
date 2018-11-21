@@ -130,8 +130,15 @@ class MainActivity : BaseActivity(), ToolbarManager {
     }
 
     fun updateUI() {
-
         Log.v(tag, "UPDATE VIEW ${isLoaded} ... ${presenter.isDataLoaded}")
+        if(isLoaded && presenter.isDataLoaded) {
+            if(presenter.sensorRefreshIdx !=-1) {
+                sensorList.adapter?.notifyItemChanged(presenter.sensorRefreshIdx)
+                presenter.sensorRefreshIdx =-1
+            }
+            return
+        }
+
         if(!isLoaded && presenter.isDataLoaded) {
 
             val adapter = SensorListAdapter(presenter) {
@@ -149,7 +156,6 @@ class MainActivity : BaseActivity(), ToolbarManager {
 
     private fun showSensorPropUI() {
         val sensDlg = SensorPropDialog(this, Sensor(77, "New"))
-
         sensDlg.create().onCancel{
             Log.v(tag, "DCLOSE")
         }.onDone{
@@ -158,7 +164,6 @@ class MainActivity : BaseActivity(), ToolbarManager {
                 false
             } else {
                 Log.v(tag, "DOK ${it}")
-                //service?.addSensor(it)
                 presenter.addSensor(it)
                 true
             }

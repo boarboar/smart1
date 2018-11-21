@@ -122,7 +122,7 @@
             android:layout_marginLeft="5dp"
             android:background="@android:color/white"
             android:clickable="true"
-            android:text="Add"
+            android:text="Save"
             android:textAppearance="@style/TextAppearance.AppCompat.Display1"
             android:textColor="#5DBCD2"
             android:layout_alignParentRight = "true"

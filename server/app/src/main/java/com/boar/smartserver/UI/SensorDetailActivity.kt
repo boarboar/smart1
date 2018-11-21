@@ -3,8 +3,11 @@ package com.boar.smartserver.UI
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
+import android.util.Log
 import android.view.View
+import android.widget.Toast
 import com.boar.smartserver.R
+import com.boar.smartserver.domain.Sensor
 import com.boar.smartserver.presenter.MainPresenter
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_sensor_details.*
@@ -30,7 +33,7 @@ class SensorDetailActivity() : BaseActivity(), ToolbarManager {
         //setContentView(R.layout.activity_sensor_details)
         initToolbar(R.menu.menu_sensor) {
             when (it) {
-                R.id.action_edit -> toast("TODO edit")
+                R.id.action_edit -> showSensorPropUI()
                 R.id.action_delete -> toast("TODO delete")
                 else -> toast("Unknown option")
             }
@@ -69,4 +72,25 @@ class SensorDetailActivity() : BaseActivity(), ToolbarManager {
             }
         }
     }
+
+    private fun showSensorPropUI() {
+        if(currentIdx!=-1) {
+            presenter.getSensor(currentIdx)?.apply {
+                val sensDlg = SensorPropDialog(this@SensorDetailActivity, this)
+                sensDlg.create().onCancel {
+                    Log.v(tag, "DCLOSE")
+                }.onDone {
+                    if (!it.validate()) {
+                        Toast.makeText(this@SensorDetailActivity, "Check data", Toast.LENGTH_LONG).show()
+                        false
+                    } else {
+                        Log.v(tag, "DOK ${it}")
+                        presenter.editSensor(currentIdx, it)
+                        true
+                    }
+                }.show()
+            }
+        }
+    }
+
 }

@@ -14,6 +14,16 @@ class SensorList : ArrayList<Sensor>() {
     private val gson = Gson()
     private val tag = "Sensor list"
 
+    fun edit(pos: Int, newsens: Sensor) : Int {
+        val sensorIdx = indexOfFirst {it.id == newsens.id}
+        if(sensorIdx==-1 || pos!=sensorIdx) {
+            Log.w(tag, "Bad ID: $newsens.id")
+            return -1
+        }
+        set(sensorIdx, newsens)
+        return sensorIdx
+    }
+
     fun update(newmeas: SensorMeasurement) : Int {
         val sensorIdx = indexOfFirst {it.id == newmeas.id}
         if(sensorIdx==-1) return -1

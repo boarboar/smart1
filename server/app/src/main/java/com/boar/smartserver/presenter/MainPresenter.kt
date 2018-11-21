@@ -39,6 +39,7 @@ class MainPresenter() {
     }
 
     var lastUpdated = 0L
+    var sensorRefreshIdx = -1
 
     private val wservice : WeatherServiceApi by lazy  { WeatherServiceApi.obtain() }
     private var weather : Weather? = null
@@ -98,9 +99,19 @@ class MainPresenter() {
     }
 
     fun getSensor(position : Int) = service?.getSensor(position)
-
     fun addSensor(sensor : Sensor) = service?.addSensor(sensor)
-
+    fun editSensor(position : Int, sensor : Sensor) {
+        service?.editSensor(position, sensor)
+        sensorRefreshIdx = position
+    }
+    /*
+    val sensorNeedToUpdate : Int
+        get() {
+            val ret = sensorRefreshIdx
+            sensorRefreshIdx = -1
+            return ret
+        }
+    */
 }
 
 

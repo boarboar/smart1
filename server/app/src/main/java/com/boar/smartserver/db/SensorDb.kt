@@ -90,5 +90,25 @@ class SensorDb(private val dbHelper: DbHelper = DbHelper.instance
         return Pair(result, msg)
     }
 
+    fun deleteSensor(sensor : Sensor) : Pair<Boolean, String> {
+        var result : Boolean = false
+        var msg = ""
+        dbHelper.use {
+            try {
+                delete(SensorTable.NAME, "${SensorTable.ID} = {sensorID}","sensorID" to  sensor.id)
+                result = true
+            }
+
+            catch (t: SQLiteConstraintException) {
+                msg = t.message ?: "Unknown DB error"
+                Log.w(tag, "Constraint error: $msg")
+            }
+            catch (t: Throwable) {
+                msg = t.message ?: "Unknown DB error"
+                Log.w(tag, "DB error: $msg")
+            }
+        }
+        return Pair(result, msg)
+    }
 
 }

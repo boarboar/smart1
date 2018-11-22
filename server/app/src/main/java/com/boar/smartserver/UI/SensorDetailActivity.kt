@@ -1,6 +1,7 @@
 package com.boar.smartserver.UI
 
 import android.os.Bundle
+import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.util.Log
@@ -33,8 +34,8 @@ class SensorDetailActivity() : BaseActivity(), ToolbarManager {
         //setContentView(R.layout.activity_sensor_details)
         initToolbar(R.menu.menu_sensor) {
             when (it) {
-                R.id.action_edit -> showSensorPropUI()
-                R.id.action_delete -> toast("TODO delete")
+                R.id.action_edit -> editSensor()
+                R.id.action_delete -> deleteSensor()
                 else -> toast("Unknown option")
             }
         }
@@ -45,7 +46,8 @@ class SensorDetailActivity() : BaseActivity(), ToolbarManager {
     override fun onResume() {
         super.onResume()
         presenter.attachReceiver()
-                .onSensorUpdate { if(it==currentIdx) showSensor(it) }
+                .onSensorUpdate { if (it == currentIdx) showSensor(it) }
+                .onSensorDelete { onBackPressed() }
     }
 
     override fun onPause() {
@@ -54,7 +56,7 @@ class SensorDetailActivity() : BaseActivity(), ToolbarManager {
     }
 
     private fun showSensor(idx: Int) {
-        if(idx!=-1) {
+        if (idx != -1) {
             presenter.getSensor(idx)?.apply {
                 toolbarTitle = description ?: "None"
                 sensor_id.text = id.toString()
@@ -73,10 +75,10 @@ class SensorDetailActivity() : BaseActivity(), ToolbarManager {
         }
     }
 
-    private fun showSensorPropUI() {
-        if(currentIdx!=-1) {
+    private fun editSensor() {
+        if (currentIdx != -1) {
             presenter.getSensor(currentIdx)?.apply {
-                val sensDlg = SensorPropDialog(this@SensorDetailActivity, this)
+                val sensDlg = SensorPropDialog(this@SensorDetailActivity, this, isEdit = true)
                 sensDlg.create().onCancel {
                     Log.v(tag, "DCLOSE")
                 }.onDone {
@@ -89,6 +91,24 @@ class SensorDetailActivity() : BaseActivity(), ToolbarManager {
                         true
                     }
                 }.show()
+            }
+        }
+    }
+
+    private fun deleteSensor() {
+        if (currentIdx != -1) {
+            presenter.getSensor(currentIdx)?.apply {
+                val builder = AlertDialog.Builder(this@SensorDetailActivity)
+                        .setTitle(this.description)
+                        .setMessage(R.string.sensor_del_msg)
+                        .setPositiveButton("YES") { dialog, which ->
+                            presenter.deleteSensor(currentIdx)
+                            //onBackPressed()
+                        }
+                builder.setNegativeButton("No") { dialog, which ->
+                }
+                val dialog: AlertDialog = builder.create()
+                dialog.show()
             }
         }
     }

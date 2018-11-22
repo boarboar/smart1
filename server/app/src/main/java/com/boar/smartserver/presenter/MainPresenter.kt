@@ -20,9 +20,7 @@ class MainPresenter() {
         fun iconToUrl(w : Weather) = if(w.weather.size>0) "http://openweathermap.org/img/w/${w.weather[0].iconCode}.png" else ""
         private val CITYCODE = "192071,Ru"
         private val RETAIN_WEATHER = 300_000 // milliseconds
-
         val instance = MainPresenter()
-
     }
 
 
@@ -30,6 +28,7 @@ class MainPresenter() {
         when (op) {
             MainService.BROADCAST_EXTRAS_OP_LOAD -> dataLoadHandler?.invoke()
             MainService.BROADCAST_EXTRAS_OP_ADD -> sensorAddHandler?.invoke(idx)
+            MainService.BROADCAST_EXTRAS_OP_DEL -> sensorDeleteHandler?.invoke(idx)
             MainService.BROADCAST_EXTRAS_OP_UPD -> {
                 lastUpdated = System.currentTimeMillis()
                 sensorUpdateHandler?.invoke(idx)
@@ -40,6 +39,7 @@ class MainPresenter() {
 
     var lastUpdated = 0L
     var sensorRefreshIdx = -1
+    var sensorOp : String = ""
 
     private val wservice : WeatherServiceApi by lazy  { WeatherServiceApi.obtain() }
     private var weather : Weather? = null
@@ -103,6 +103,12 @@ class MainPresenter() {
     fun editSensor(position : Int, sensor : Sensor) {
         service?.editSensor(position, sensor)
         sensorRefreshIdx = position
+        sensorOp = MainService.BROADCAST_EXTRAS_OP_UPD
+    }
+    fun deleteSensor(position : Int) {
+        service?.deleteSensor(position)
+        sensorRefreshIdx = position
+        sensorOp = MainService.BROADCAST_EXTRAS_OP_DEL
     }
     /*
     val sensorNeedToUpdate : Int

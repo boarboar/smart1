@@ -133,7 +133,11 @@ class MainActivity : BaseActivity(), ToolbarManager {
         Log.v(tag, "UPDATE VIEW ${isLoaded} ... ${presenter.isDataLoaded}")
         if(isLoaded && presenter.isDataLoaded) {
             if(presenter.sensorRefreshIdx !=-1) {
-                sensorList.adapter?.notifyItemChanged(presenter.sensorRefreshIdx)
+                when(presenter.sensorOp) {
+                    MainService.BROADCAST_EXTRAS_OP_UPD -> sensorList.adapter?.notifyItemChanged(presenter.sensorRefreshIdx)
+                    MainService.BROADCAST_EXTRAS_OP_DEL -> sensorList.adapter?.notifyItemRemoved(presenter.sensorRefreshIdx)
+                    else -> Log.v(tag, "something else...")
+                }
                 presenter.sensorRefreshIdx =-1
             }
             return

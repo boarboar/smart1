@@ -11,7 +11,7 @@ import android.widget.ImageView
 import com.boar.smartserver.R
 import com.boar.smartserver.domain.Sensor
 
-class SensorPropDialog(context: Context, var sensor: Sensor?) : BaseDialog() {
+class SensorPropDialog(context: Context, var sensor: Sensor?, val isEdit:Boolean = false) : BaseDialog() {
 
     //  dialog view
     override val dialogView: View by lazy {
@@ -45,6 +45,7 @@ class SensorPropDialog(context: Context, var sensor: Sensor?) : BaseDialog() {
         super.create()
         sensorId.setText(sensor?.id.toString())
         sensorLoc.setText(sensor?.description)
+        if(isEdit) sensorId.isEnabled = false
         return this
     }
 

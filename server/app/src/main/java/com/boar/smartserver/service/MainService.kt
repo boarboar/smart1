@@ -22,9 +22,13 @@ class MainService : Service() {
     companion object {
         val BROADCAST_ACTION = "com.boar.smartserver.service"
         val BROADCAST_EXTRAS_OPERATION = "operation"
+
+        // enum ?
         val BROADCAST_EXTRAS_OP_LOAD = "load"
         val BROADCAST_EXTRAS_OP_ADD = "add"
         val BROADCAST_EXTRAS_OP_UPD = "update"
+        val BROADCAST_EXTRAS_OP_DEL = "del"
+
         val BROADCAST_EXTRAS_IDX = "param_idx"
     }
 
@@ -175,7 +179,27 @@ class MainService : Service() {
                 }
             }
         }
+    }
 
+    fun deleteSensor(position: Int) {
+        Log.v(tag, "[ DEL SENSOR ]")
+        val sensor :Sensor = lock.withLock { sensors?.getOrNull(position)?.copy() } ?: return
+        executor.execute {
+            val (res, errmsg) = db.deleteSensor(sensor)
+            if(res) sensors?.apply {
+                lock.withLock { removeAt(position) }
+                val intent = Intent()
+                intent.action = BROADCAST_ACTION
+                intent.putExtra(BROADCAST_EXTRAS_OPERATION, BROADCAST_EXTRAS_OP_DEL)
+                intent.putExtra(BROADCAST_EXTRAS_IDX, position)
+                sendBroadcast(intent)
+            }
+            else {
+                runOnUiThread {
+                    Toast.makeText(this, "DB Err : $errmsg", Toast.LENGTH_LONG).show()
+                }
+            }
+        }
     }
 
     fun runSimulation() {

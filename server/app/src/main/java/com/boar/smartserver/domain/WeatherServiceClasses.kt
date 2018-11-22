@@ -13,8 +13,15 @@ data class WeatherWeather(
         @SerializedName("icon") val iconCode: String
 )
 
+data class WeatherWind(
+        @SerializedName("speed") val speed: Int,
+        @SerializedName("deg") val deg: Int
+)
+
+
 data class Weather(
         @SerializedName("name") val name: String,
         @SerializedName("main") val main: WeatherMain,
+        @SerializedName("wind") val wind: WeatherWind,
         @SerializedName("weather") val weather: ArrayList<WeatherWeather>
 )

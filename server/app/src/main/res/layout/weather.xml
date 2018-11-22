@@ -6,94 +6,100 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/colorPrimaryLight"
-    android:gravity="center_vertical"
-    android:orientation="horizontal"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
     android:padding="@dimen/spacing_xlarge">
 
-    <ImageView
-        android:id="@+id/icon"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        tools:src="@mipmap/ic_launcher"/>
-
     <LinearLayout
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/spacing_xlarge"
-        android:layout_marginRight="@dimen/spacing_xlarge"
-        android:layout_weight="1"
-        android:orientation="vertical">
+        android:background="@color/colorPrimaryLight"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="@dimen/spacing_xlarge">
 
-        <TextView
-            android:id="@+id/weather_now_temp"
+        <ImageView
+            android:id="@+id/icon"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            tools:src="@mipmap/ic_launcher"/>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/spacing_xlarge"
+            android:layout_marginRight="@dimen/spacing_xlarge"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/weather_now_temp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.AppCompat.Display2"
+                android:textColor = "@android:color/holo_green_light"
+                android:text="--º"
+                />
+
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="@style/TextAppearance.AppCompat.Display2"
-            android:textColor = "@android:color/holo_green_light"
-            android:text="--º"
-            />
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:layout_marginLeft="@dimen/spacing_xlarge"
+            android:layout_marginRight="@dimen/spacing_xlarge"
+            >
 
-        <TextView
-            android:id="@+id/weather_city"
-            android:layout_width="match_parent"
+            <TextView
+                android:id="@+id/pressure"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor = "@android:color/holo_green_light"
+                android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                tools:text="--"/>
+
+            <TextView
+                android:id="@+id/humidity"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor = "@android:color/holo_green_light"
+                android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                tools:text="--"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-            android:textColor = "@android:color/holo_blue_dark"
-            tools:text="--"/>
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/wind"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor = "@android:color/holo_green_light"
+                android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                tools:text="--"/>
+
+            <TextView
+                android:id="@+id/wind_dir"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor = "@android:color/holo_green_light"
+                android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                tools:text="--"/>
+
+        </LinearLayout>
 
     </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
-        android:orientation="vertical">
-
-        <TextView
-            android:id="@+id/pressure"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor = "@android:color/holo_green_light"
-            android:textAppearance="@style/TextAppearance.AppCompat.Display1"
-            tools:text="--"/>
-
-        <TextView
-            android:id="@+id/humidity"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor = "@android:color/holo_green_light"
-            android:textAppearance="@style/TextAppearance.AppCompat.Display1"
-            tools:text="--"/>
-
-    </LinearLayout>
-
-</LinearLayout>
-
-
-<!--
-<LinearLayout android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:gravity="center_vertical"
-    android:orientation="horizontal"
-    xmlns:android="http://schemas.android.com/apk/res/android">
 
     <TextView
         android:id="@+id/weather_city"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAppearance="@style/TextAppearance.AppCompat.Display1"
-        android:textColor = "@android:color/holo_green_light"
-        android:text="-"
-        />
-
-    <TextView
-        android:id="@+id/weather_now_temp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="@style/TextAppearance.AppCompat.Display2"
-        android:textColor = "@android:color/holo_green_light"
-        android:text="-"
-        />
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textColor = "@android:color/holo_blue_dark"
+        tools:text="--"/>
 
 </LinearLayout>
--->

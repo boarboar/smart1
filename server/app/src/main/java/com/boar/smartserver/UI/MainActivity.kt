@@ -18,6 +18,7 @@ import com.boar.smartserver.service.MainService
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.weather.*
+import kotlinx.android.synthetic.main.weather.view.*
 import org.jetbrains.anko.*
 import java.util.*
 import kotlin.concurrent.schedule
@@ -119,7 +120,9 @@ class MainActivity : BaseActivity(), ToolbarManager {
                     weather_city.text = "${it.name}"
                     weather_now_temp.text = "${it.main.temp}º"
                     humidity.text = "${it.main.humidity} %"
-                    pressure.text = "${it.main.pressure} kPa"
+                    pressure.text = "${it.main.pressure} hPa"
+                    wind.text = "${it.wind.speed} m/s"
+                    wind_dir.text = "${it.wind.deg}"
                     iconpng.into(icon)
 
                     //.error(R.drawable.user_image).resize(110, 110).centerCrop()

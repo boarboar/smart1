@@ -120,8 +120,8 @@ class MainActivity : BaseActivity(), ToolbarManager {
                     weather_city.text = "${it.name}"
                     weather_now_temp.text = "${it.main.temp}º"
                     humidity.text = "${it.main.humidity} %"
-                    pressure.text = "${it.main.pressure} hPa"
-                    wind.text = "${it.wind.speed} m/s"
+                    pressure.text = "${it.main.pressure_mm} мм"
+                    wind.text = "${it.wind.speed} м/с"
                     wind_dir.text = "${it.wind.deg}"
                     iconpng.into(icon)
 

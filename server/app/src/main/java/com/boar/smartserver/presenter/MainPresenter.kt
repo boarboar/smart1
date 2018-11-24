@@ -18,7 +18,8 @@ class MainPresenter() {
     companion object {
         private val tag = "Main presenter"
         fun iconToUrl(w : Weather) = if(w.weather.size>0) "http://openweathermap.org/img/w/${w.weather[0].iconCode}.png" else ""
-        private val CITYCODE = "192071,Ru"
+        //private val CITYCODE = "192071,Ru"
+        private val CITYCODE = "193312,Ru"
         private val RETAIN_WEATHER = 300_000 // milliseconds
         val instance = MainPresenter()
     }

@@ -122,7 +122,7 @@ class MainActivity : BaseActivity(), ToolbarManager {
                     humidity.text = "${it.main.humidity} %"
                     pressure.text = "${it.main.pressure_mm} мм"
                     wind.text = "${it.wind.speed} м/с"
-                    wind_dir.text = "${it.wind.deg}"
+                    wind_dir.text = it.wind.dir
                     iconpng.into(icon)
 
                     //.error(R.drawable.user_image).resize(110, 110).centerCrop()

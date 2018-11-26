@@ -4,12 +4,16 @@ import com.google.gson.annotations.SerializedName
 
 
 data class WeatherMain(
-        @SerializedName("temp") val temp: Int,
-        @SerializedName("humidity") val humidity: Int,
-        @SerializedName("pressure") val pressure: Int
+        @SerializedName("temp") val temp_f: Float,
+        @SerializedName("humidity") val humidity_f: Float,
+        @SerializedName("pressure") val pressure_f: Float
 ) {
     val pressure_mm : Int
-        get() = pressure * 75 / 100
+        get() = (pressure_f * 75 / 100).toInt()
+    val humidity : Int
+        get() = (humidity_f).toInt()
+    val temp : Int
+        get() = (temp_f*10).toInt()/10
 }
 
 data class WeatherWeather(
@@ -26,8 +30,8 @@ In general, wind directions are measured in units from 0° to 360°, but can alt
  */
 
 data class WeatherWind(
-        @SerializedName("speed") val speed: Int,
-        @SerializedName("deg") val deg: Int
+        @SerializedName("speed") val speed_f: Float,
+        @SerializedName("deg") val deg: Float
 ){
     val dir : String
         get() = when(deg) {
@@ -39,12 +43,19 @@ data class WeatherWind(
             in 248..292 -> "С-З"
             else -> "С"
         }
+    val speed : Int
+        get() = (speed_f).toInt()
 }
 
-
 data class Weather(
+        @SerializedName("cod") val cod: Int,
         @SerializedName("name") val name: String,
         @SerializedName("main") val main: WeatherMain,
         @SerializedName("wind") val wind: WeatherWind,
         @SerializedName("weather") val weather: ArrayList<WeatherWeather>
+)
+
+
+data class WeatherForecast(
+        @SerializedName("cod") val cod: Int
 )

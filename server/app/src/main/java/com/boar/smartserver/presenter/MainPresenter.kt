@@ -8,6 +8,7 @@ import com.boar.smartserver.SmartServer
 import com.boar.smartserver.UI.MainActivity
 import com.boar.smartserver.domain.Sensor
 import com.boar.smartserver.domain.Weather
+import com.boar.smartserver.domain.WeatherForecast
 import com.boar.smartserver.network.WeatherServiceApi
 import com.boar.smartserver.receiver.MainServiceReceiver
 import com.boar.smartserver.service.MainService
@@ -44,6 +45,7 @@ class MainPresenter() {
 
     private val wservice : WeatherServiceApi by lazy  { WeatherServiceApi.obtain() }
     private var weather : Weather? = null
+    private var weatherForecast : WeatherForecast? = null
     private var updated : Long = 0
     private var service: MainService? = null
 
@@ -64,10 +66,23 @@ class MainPresenter() {
                 weather?.let {
                     Log.i(tag, "Get weather  $it")
                     updated = System.currentTimeMillis()
-                    refreshView(it)
+                    if(it.cod==200)
+                        refreshView(it)
                 }
             }
             Log.i(tag, "Get weather OK")
+            val weatherForceastResponse = wservice.getWeatherForecast(CITYCODE).execute()
+            if (weatherForceastResponse.isSuccessful) {
+                weatherForecast = weatherForceastResponse.body()
+                weatherForecast?.let {
+                    Log.i(tag, "Get weather  $it")
+                    //updated = System.currentTimeMillis()
+                    if(it.cod==200)
+                        //refreshView(it)
+                        Log.i(tag, "Get weather forecast valid")
+                }
+            }
+            Log.i(tag, "Get weather forecast OK")
         }  catch (t: Throwable) {
             Log.w(tag, "Json error: ${t.message}")
         }

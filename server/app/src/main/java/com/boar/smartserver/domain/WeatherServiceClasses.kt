@@ -56,6 +56,17 @@ data class Weather(
 )
 
 
+data class WeatherForecastCity(
+        @SerializedName("name") val name: String,
+        @SerializedName("country") val country: String
+)
+
+data class WeatherForecastItem(
+        @SerializedName("dt") val dt: Long
+)
+
 data class WeatherForecast(
-        @SerializedName("cod") val cod: Int
+        @SerializedName("cod") val cod: Int,
+        @SerializedName("city") val city: WeatherForecastCity,
+        @SerializedName("list") val forecast: ArrayList<WeatherForecastItem>
 )

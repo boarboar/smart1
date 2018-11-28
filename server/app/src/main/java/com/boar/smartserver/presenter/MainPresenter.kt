@@ -45,8 +45,9 @@ class MainPresenter() {
 
     private val wservice : WeatherServiceApi by lazy  { WeatherServiceApi.obtain() }
     private var weather : Weather? = null
-    private var weatherForecast : WeatherForecast? = null
     private var updated : Long = 0
+    private var weatherForecast : WeatherForecast? = null
+    private var updatedForecast : Long = 0
     private var service: MainService? = null
 
     private var sensorAddHandler : ((Int)->Unit) ? = null
@@ -71,6 +72,17 @@ class MainPresenter() {
                 }
             }
             Log.i(tag, "Get weather OK")
+        }  catch (t: Throwable) {
+            Log.w(tag, "Json error: ${t.message}")
+        }
+    }
+
+    fun refreshWeatherForecast( refreshView : (WeatherForecast)->Unit ) {
+        if(weatherForecast !=null && System.currentTimeMillis() < updatedForecast + RETAIN_WEATHER) {
+            weatherForecast?.let {refreshView(it)}
+            return
+        }
+        try {
             val weatherForceastResponse = wservice.getWeatherForecast(CITYCODE).execute()
             if (weatherForceastResponse.isSuccessful) {
                 weatherForecast = weatherForceastResponse.body()
@@ -78,8 +90,8 @@ class MainPresenter() {
                     Log.i(tag, "Get weather forecast $it")
                     //updated = System.currentTimeMillis()
                     if(it.cod==200)
-                        //refreshView(it)
-                        Log.i(tag, "Get weather forecast valid")
+                        refreshView(it)
+                    Log.i(tag, "Get weather forecast valid")
                 }
             }
             Log.i(tag, "Get weather forecast OK")

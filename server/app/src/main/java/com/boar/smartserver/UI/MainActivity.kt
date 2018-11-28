@@ -124,9 +124,24 @@ class MainActivity : BaseActivity(), ToolbarManager {
                     wind.text = "${it.wind.speed} м/с"
                     wind_dir.text = it.wind.dir
                     iconpng.into(icon)
-
+                    sunrise.text = "${getString(R.string.sunrise)} ${DateUtils.convertTimeShort(it.sys.sunrise*1000)}"
+                    sunset.text = "${getString(R.string.sunset)} ${DateUtils.convertTimeShort(it.sys.sunset*1000)}"
                     //.error(R.drawable.user_image).resize(110, 110).centerCrop()
                     //setIndicatorsEnabled(true) // to show if cached
+                }
+            }
+            presenter.refreshWeatherForecast {
+                runOnUiThread {
+                    var pos = 0
+                    val fieldsTemp = arrayOf(for_0_temp, for_1_temp, for_2_temp)
+                    val fieldsTime = arrayOf(for_0_time, for_1_time, for_2_time)
+                    it.forecast.take(3).forEach {
+                        val tms = it.dt * 1000
+                        Log.v(tag, " ${tms} - ${DateUtils.convertTimeShort(tms)} - ${it.main.temp}")
+                        fieldsTime[pos].text = DateUtils.convertTimeShort(tms)
+                        fieldsTemp[pos].text = "${it.main.temp}º"
+                        pos++
+                    }
                 }
             }
         }

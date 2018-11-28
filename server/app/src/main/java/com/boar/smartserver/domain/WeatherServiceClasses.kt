@@ -47,11 +47,17 @@ data class WeatherWind(
         get() = (speed_f).toInt()
 }
 
+data class WeatherSys(
+        @SerializedName("sunrise") val sunrise: Long,
+        @SerializedName("sunset") val sunset: Long
+)
+
 data class Weather(
         @SerializedName("cod") val cod: Int,
         @SerializedName("name") val name: String,
         @SerializedName("main") val main: WeatherMain,
         @SerializedName("wind") val wind: WeatherWind,
+        @SerializedName("sys") val sys: WeatherSys,
         @SerializedName("weather") val weather: ArrayList<WeatherWeather>
 )
 
@@ -62,7 +68,10 @@ data class WeatherForecastCity(
 )
 
 data class WeatherForecastItem(
-        @SerializedName("dt") val dt: Long
+        @SerializedName("dt") val dt: Long,
+        @SerializedName("main") val main: WeatherMain,
+        @SerializedName("wind") val wind: WeatherWind
+        //@SerializedName("weather") val weather: ArrayList<WeatherWeather>
 )
 
 data class WeatherForecast(

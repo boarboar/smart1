@@ -11,4 +11,6 @@
     <string name="sensor_id">ID:</string>
     <string name="sensor_loc">Location:</string>
     <string name="sensor_del_msg">"Do you want to delete sensor?"</string>
+    <string name="sunrise">Восход:</string>
+    <string name="sunset">Закат:</string>
 </resources>

@@ -36,7 +36,7 @@ data class WeatherWind(
     val dir : String
         get() = when(deg) {
             in 23..67 -> "С-В"
-            in 68..112 -> "И"
+            in 68..112 -> "В"
             in 113..157 -> "Ю-В"
             in 158..202 -> "Ю"
             in 203..247 -> "Ю-З"

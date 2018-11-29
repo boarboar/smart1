@@ -38,7 +38,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="--º"
-                android:textAppearance="@style/TextAppearance.AppCompat.Display2"
+                android:textAppearance="@style/TextAppearance.AppCompat.Display3"
                 android:textColor="@android:color/holo_green_light" />
 
             <LinearLayout
@@ -52,15 +52,15 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor = "@android:color/holo_blue_dark"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                    tools:text="--"/>
+                    android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+                    tools:text="--º"/>
                 <TextView
                     android:id="@+id/for_0_time"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor = "@android:color/holo_blue_dark"
                     android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                    tools:text="--"/>
+                    tools:text="--:--"/>
             </LinearLayout>
             <LinearLayout
                     android:layout_width="wrap_content"
@@ -73,16 +73,15 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor = "@android:color/holo_blue_dark"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                    tools:text="--"/>
-
+                    android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+                    tools:text="--º"/>
                 <TextView
                     android:id="@+id/for_1_time"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor = "@android:color/holo_blue_dark"
                     android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                    tools:text="--"/>
+                    tools:text="--:--"/>
             </LinearLayout>
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -95,8 +94,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor = "@android:color/holo_blue_dark"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                    tools:text="--"/>
+                    android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+                    tools:text="--º"/>
 
                 <TextView
                     android:id="@+id/for_2_time"
@@ -104,7 +103,7 @@
                     android:layout_height="wrap_content"
                     android:textColor = "@android:color/holo_blue_dark"
                     android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                    tools:text="--"/>
+                    tools:text="--:--"/>
             </LinearLayout>
         </LinearLayout>
 

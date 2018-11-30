@@ -12,8 +12,8 @@ data class WeatherMain(
         get() = (pressure_f * 75 / 100).toInt()
     val humidity : Int
         get() = (humidity_f).toInt()
-    val temp : Int
-        get() = (temp_f*10).toInt()/10
+    val temp : Float
+        get() = (temp_f*10).toInt()/10.0F
 }
 
 data class WeatherWeather(

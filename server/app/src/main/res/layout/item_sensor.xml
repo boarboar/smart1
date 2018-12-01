@@ -35,8 +35,20 @@
             android:textAppearance="@style/TextAppearance.AppCompat.Display3"
             android:textColor = "@android:color/holo_green_light"
             android:layout_alignParentRight = "true"
+            android:layout_marginRight="32dp"
             android:gravity="center_vertical"
-            tools:text="--º"/>
+            tools:text="---.-º"/>
+
+        <TextView
+            android:id="@+id/temp_grad"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+            android:textColor = "@android:color/holo_green_light"
+            android:layout_alignParentRight = "true"
+            android:layout_marginRight="0dp"
+            android:gravity="center_vertical"
+            tools:text="--"/>
 
     </RelativeLayout>
 
@@ -71,6 +83,7 @@
             android:textAppearance="@style/TextAppearance.AppCompat.Display1"
             android:textColor = "@android:color/holo_green_light"
             android:layout_alignParentRight = "true"
+            android:layout_marginRight="32dp"
             tools:text="--v"/>
 
     </RelativeLayout>

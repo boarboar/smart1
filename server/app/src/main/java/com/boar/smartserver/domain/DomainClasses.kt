@@ -27,8 +27,11 @@ class SensorList : ArrayList<Sensor>() {
     fun update(newmeas: SensorMeasurement) : Int {
         val sensorIdx = indexOfFirst {it.id == newmeas.id}
         if(sensorIdx==-1) return -1
-        if(newmeas.validated)
-            set(sensorIdx, this[sensorIdx].copy(meas=newmeas, lastValidMeasTime = System.currentTimeMillis()))
+        if(newmeas.validated) {
+            val meas_prev_v = this[sensorIdx].meas
+            set(sensorIdx, this[sensorIdx].copy(meas = newmeas, meas_prev=meas_prev_v,
+                    lastValidMeasTime = System.currentTimeMillis()))
+        }
         else {
             Log.w(tag, "Bad measurement: $newmeas")
             this[sensorIdx].meas?.let  {
@@ -79,7 +82,8 @@ data class Sensor(val id: Short, val description: String,
 
 data class Sensor(val id: Short, val description: String,
                   val lastValidMeasTime: Long = 0,
-                  val meas: SensorMeasurement? = null
+                  val meas: SensorMeasurement? = null,
+                  val meas_prev: SensorMeasurement? = null
         //, val measList
 ) {
     val temperature : Float
@@ -96,7 +100,8 @@ data class Sensor(val id: Short, val description: String,
         get() = meas?.updated ?: 0L
     val validated : Boolean
         get() = meas?.validated ?: true
-
+    val temp_grad : Int
+        get() = if(meas!=null && meas_prev!=null) (meas.temp10 - meas_prev.temp10) else 0
 
     val temperatureAsString : String
         get() = if(meas!=null) "${meas.temp10.toFloat()/10f}" else "--.-"

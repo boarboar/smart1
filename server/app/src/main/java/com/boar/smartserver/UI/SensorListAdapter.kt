@@ -43,6 +43,12 @@ class SensorListAdapter(private val presenter : MainPresenter,
                      itemView.status.text = "Bad"
                      itemView.status.setTextColor(ctx.resolveColor(android.R.color.holo_red_light))
                  }
+                 itemView.temp_grad.text = when {
+                     temp_grad > 0 -> "U"
+                     temp_grad < 0 -> "D"
+                     else -> ""
+                 }
+
                  itemView.setOnClickListener { itemClick(position) }
             }
             /*

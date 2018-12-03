@@ -11,8 +11,31 @@ fun Random.nextInt(range: IntRange): Int {
 
 class SensorList : ArrayList<Sensor>() {
 
+    companion object {
+        private val tag = "Sensor list"
+
+        fun simulate() : String {
+            val random = Random()
+            val id = random.nextInt(1..3).toShort()
+            val temp10 = random.nextInt(-25..35).toShort()
+            val vcc1000 = random.nextInt(2540..4950).toShort()
+
+            return "{\"I\":$id,\"M\":64,\"P\":0,\"R\":8,\"T\":$temp10,\"V\":$vcc1000}"
+        }
+    }
+
     private val gson = Gson()
-    private val tag = "Sensor list"
+
+    fun measFromJson(text: String) : SensorMeasurement? {
+        try {
+            val newmeas = gson.fromJson(text, SensorMeasurement::class.java)
+            val valid = newmeas.temp10.toInt() != -1270
+            return newmeas.copy(updated=System.currentTimeMillis(), validated=valid)
+        } catch (t: Throwable) {
+            Log.w(tag, "Json error: ${t.message}")
+            return null
+        }
+    }
 
     fun edit(pos: Int, newsens: Sensor) : Int {
         val sensorIdx = indexOfFirst {it.id == newsens.id}
@@ -33,7 +56,7 @@ class SensorList : ArrayList<Sensor>() {
                     lastValidMeasTime = System.currentTimeMillis()))
         }
         else {
-            Log.w(tag, "Bad measurement: $newmeas")
+            //Log.w(tag, "Bad measurement: $newmeas")
             this[sensorIdx].meas?.let  {
                 val updmeas = it.copy(validated = false, updated = newmeas.updated)
                 set(sensorIdx, this[sensorIdx].copy(meas = updmeas))
@@ -42,7 +65,9 @@ class SensorList : ArrayList<Sensor>() {
         return sensorIdx
     }
 
+    /*
     fun update(text: String) : Int {
+
         lateinit var newmeas : SensorMeasurement
         try {
             newmeas = gson.fromJson(text, SensorMeasurement::class.java)
@@ -54,16 +79,20 @@ class SensorList : ArrayList<Sensor>() {
         val valid = newmeas.temp10.toInt() != -1270
 
         return update(newmeas.copy(updated=System.currentTimeMillis(), validated=valid))
-    }
 
+    }
+*/
+
+    /*
     fun simulate() : Int {
         val random = Random()
         val id = random.nextInt(1..3).toShort()
         val temp10 = random.nextInt(-25..35).toShort()
         val vcc1000 = random.nextInt(2540..4950).toShort()
-        //return update(SensorMeasurement(id, temp10=temp10, vcc1000=vcc1000))
+
         return update("{\"I\":$id,\"M\":64,\"P\":0,\"R\":8,\"T\":$temp10,\"V\":$vcc1000}")
     }
+    */
 
     /*
     simulate

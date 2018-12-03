@@ -9,6 +9,7 @@ import android.widget.Toast
 import com.boar.smartserver.db.SensorDb
 import com.boar.smartserver.domain.Sensor
 import com.boar.smartserver.domain.SensorList
+import com.boar.smartserver.domain.SensorMeasurement
 import com.boar.smartserver.network.TcpServer
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
@@ -37,18 +38,6 @@ class MainService : Service() {
     private var executor = TaskExecutor.getInstance(2)
     private var simFuture  : Future<Unit>? = null
     private val lock : Lock =  ReentrantLock()
-
-
-    //private var sensors = SensorList()
-
-    //val sensors = SensorList()
-    /*
-    val sensors : SensorList by lazy {
-        loadSensors()
-    }
-    */
-
-    //var sensors : SensorList = SensorList()
 
     private var sensors : SensorList? = null
 
@@ -79,13 +68,16 @@ class MainService : Service() {
         sendBroadcast(intent)
 
         TcpServer(applicationContext, 9999).run {
-            val idx = lock.withLock { sensors?.update(it) ?: -1 }
-            if(idx!=-1) {
-                val intent = Intent()
-                intent.action = BROADCAST_ACTION
-                intent.putExtra(BROADCAST_EXTRAS_OPERATION, BROADCAST_EXTRAS_OP_UPD)
-                intent.putExtra(BROADCAST_EXTRAS_IDX, idx)
-                sendBroadcast(intent)
+            val meas =  sensors?.measFromJson(it)
+            if(meas != null) {
+                val idx = lock.withLock { sensors?.update(meas) ?: -1 }
+                if (idx != -1) {
+                    val intent = Intent()
+                    intent.action = BROADCAST_ACTION
+                    intent.putExtra(BROADCAST_EXTRAS_OPERATION, BROADCAST_EXTRAS_OP_UPD)
+                    intent.putExtra(BROADCAST_EXTRAS_IDX, idx)
+                    sendBroadcast(intent)
+                }
             }
         }
 
@@ -207,16 +199,19 @@ class MainService : Service() {
         simFuture = doAsync {
             while(true) {
                 Thread.sleep(2_000)
-                val idx = sensors?.simulate() ?: -1
-                if (idx!=-1) {
-                    Log.v(tag, "Siimulated : idx=$idx")
-                    val intent = Intent()
-                    intent.action = BROADCAST_ACTION
-                    intent.putExtra(BROADCAST_EXTRAS_OPERATION, BROADCAST_EXTRAS_OP_UPD)
-                    intent.putExtra(BROADCAST_EXTRAS_IDX, idx)
-                    sendBroadcast(intent)
-                }
-            }
+                //val idx = sensors?.simulate() ?: -1
+                val msg =  SensorList.simulate()
+                val meas =  sensors?.measFromJson(msg)
+                if(meas != null) {
+                    val idx = lock.withLock { sensors?.update(meas) ?: -1 }
+                    if (idx != -1) {
+                        val intent = Intent()
+                        intent.action = BROADCAST_ACTION
+                        intent.putExtra(BROADCAST_EXTRAS_OPERATION, BROADCAST_EXTRAS_OP_UPD)
+                        intent.putExtra(BROADCAST_EXTRAS_IDX, idx)
+                        sendBroadcast(intent)
+                    }
+                }           }
         }
     }
 

@@ -40,12 +40,14 @@ class SensorListAdapter(private val presenter : MainPresenter,
                      itemView.status.text = if(updated !=0L ) "Ok" else ""
                      itemView.status.setTextColor(ctx.resolveColor(android.R.color.holo_green_light))
                  } else {
-                     itemView.status.text = "Bad"
+                     itemView.status.text = "\u2717"
                      itemView.status.setTextColor(ctx.resolveColor(android.R.color.holo_red_light))
                  }
                  itemView.temp_grad.text = when {
-                     temp_grad > 0 -> "U"
-                     temp_grad < 0 -> "D"
+                     //temp_grad > 0 -> "\u2197"
+                     //temp_grad < 0 -> "\u2198"
+                     temp_grad > 0 -> "\u21D7"
+                     temp_grad < 0 -> "\u21D8"
                      else -> ""
                  }
 

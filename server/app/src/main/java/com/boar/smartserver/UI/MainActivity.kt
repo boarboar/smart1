@@ -108,7 +108,7 @@ class MainActivity : BaseActivity(), ToolbarManager {
         }
 
         Timer().schedule(100, 1000){// Time
-            val showUpdated = if(System.currentTimeMillis() < presenter.lastUpdated + 5000) "U" else ""
+            val showUpdated = if(System.currentTimeMillis() < presenter.lastUpdated + 5000) "\u21BB" else ""
             runOnUiThread { toolbarTitle = "${DateUtils.convertDateTime(System.currentTimeMillis())} $showUpdated" }
         }
 

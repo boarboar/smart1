@@ -67,6 +67,7 @@ class SensorDetailActivity() : BaseActivity(), ToolbarManager {
                 sensor_par.text = "${parasite}"
                 sensor_last_updated.text = if (updated != 0L) DateUtils.convertTime(updated) else "--:--:--"
                 sensor_last_valid.text = if (lastValidMeasTime != 0L) DateUtils.convertTime(lastValidMeasTime) else "--:--:--"
+                sensor_msg.text = msg
                 /*
                 sensor_status.text = if(validated) "Good" else "Bad"
                 */

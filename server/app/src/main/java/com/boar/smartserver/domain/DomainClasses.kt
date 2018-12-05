@@ -30,7 +30,7 @@ class SensorList : ArrayList<Sensor>() {
         try {
             val newmeas = gson.fromJson(text, SensorMeasurement::class.java)
             val valid = newmeas.temp10.toInt() != -1270
-            return newmeas.copy(updated=System.currentTimeMillis(), validated=valid)
+            return newmeas.copy(updated=System.currentTimeMillis(), validated=valid, msg = text)
         } catch (t: Throwable) {
             Log.w(tag, "Json error: ${t.message}")
             return null
@@ -137,6 +137,10 @@ data class Sensor(val id: Short, val description: String,
     val vccAsString : String
         get() = if(meas!=null) "${(meas.vcc1000/10).toFloat()/100f}" else "-.--"
 
+    val msg : String
+        get() = meas?.msg ?: "none"
+
+
     fun validate() : Boolean = id>0 && description.isNotEmpty()
 
 }
@@ -153,5 +157,6 @@ data class SensorMeasurement(
         @SerializedName("T") val temp10: Short,
         @SerializedName("V") val vcc1000: Short,
         val updated: Long=System.currentTimeMillis(),
-        val validated: Boolean = false
+        val validated: Boolean = false,
+        val msg: String = ""
 )

@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="?attr/actionBarSize"
-        android:padding="@dimen/spacing_xlarge"
+        android:padding="@dimen/spacing_medium"
         android:background="?attr/colorPrimary"
         android:orientation="vertical"
         >
@@ -215,6 +215,32 @@
                 android:gravity="center_vertical"
                 tools:text="--"/>
         </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+                android:textColor = "@android:color/holo_green_light"
+                android:layout_alignParentLeft = "true"
+                android:gravity="center_vertical"
+                android:text="Msg:"/>
+
+            <TextView
+                android:id="@+id/sensor_msg"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+                android:textColor = "@android:color/holo_green_light"
+                android:layout_alignParentRight = "true"
+                android:gravity="center_vertical"
+                tools:text="--"/>
+        </RelativeLayout>
+
 
     </LinearLayout>
 

@@ -37,7 +37,7 @@ class SensorListAdapter(private val presenter : MainPresenter,
                  itemView.temperature.text = "${temperatureAsString}º"
                  itemView.vcc.text = "${vccAsString} v"
                  if(validated) {
-                     itemView.status.text = if(updated !=0L ) "Ok" else ""
+                     itemView.status.text = if(updated !=0L ) "\u2713" else ""
                      itemView.status.setTextColor(ctx.resolveColor(android.R.color.holo_green_light))
                  } else {
                      itemView.status.text = "\u2717"

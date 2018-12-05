@@ -2,6 +2,7 @@
     <string name="app_name">SmartServer</string>
     <string name="settings">Settings</string>
     <string name="sens_detail">Details</string>
+    <string name="sens_pager">Sensor</string>
     <string name="add_sensor">Add sensor</string>
     <string name="edit_sensor">Edit sensor</string>
     <string name="delete_sensor">Delete sensor</string>

@@ -44,7 +44,7 @@ class MainActivity : BaseActivity(), ToolbarManager {
 
 
     override fun onServiceConnected() {
-        updateUI()
+        updateUI(force=true)
         Log.v(tag, "[ ON SERVICE CONNECTED ]")
     }
 
@@ -147,7 +147,7 @@ class MainActivity : BaseActivity(), ToolbarManager {
         }
     }
 
-    fun updateUI() {
+    fun updateUI(force : Boolean=false) {
         Log.v(tag, "UPDATE VIEW ${isLoaded} ... ${presenter.isDataLoaded}")
         if(isLoaded && presenter.isDataLoaded) {
             if(presenter.sensorRefreshIdx !=-1) {
@@ -161,12 +161,11 @@ class MainActivity : BaseActivity(), ToolbarManager {
             return
         }
 
-        if(!isLoaded && presenter.isDataLoaded) {
+        if((!isLoaded || force) && presenter.isDataLoaded) {
 
             val adapter = SensorListAdapter(presenter) {
-                startActivity<SensorDetailActivity>(
-                        SensorDetailActivity.IDX to it
-                )
+                //startActivity<SensorDetailActivity>(SensorDetailActivity.IDX to it)
+                startActivity<SensorPagerActivity>(SensorPagerActivity.IDX to it)
             }
             sensorList.adapter = adapter
             isLoaded = true

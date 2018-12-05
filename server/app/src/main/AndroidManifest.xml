@@ -37,6 +37,10 @@
             android:name=".UI.SensorDetailActivity"
             android:label="@string/sens_detail" />
 
+        <activity
+            android:name=".UI.SensorPagerActivity"
+            android:label="@string/sens_pager" />
+
     </application>
 
 </manifest>

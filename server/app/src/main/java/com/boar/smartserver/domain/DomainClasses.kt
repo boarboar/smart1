@@ -20,7 +20,7 @@ class SensorList : ArrayList<Sensor>() {
             val temp10 = random.nextInt(-25..35).toShort()
             val vcc1000 = random.nextInt(2540..4950).toShort()
 
-            return "{\"I\":$id,\"M\":64,\"P\":0,\"R\":8,\"T\":$temp10,\"V\":$vcc1000}"
+            return "{\"I\":$id,\"M\":64,\"P\":0,\"R\":8,\"T\":$temp10,\"V\":$vcc1000,\"Y\":37}"
         }
     }
 

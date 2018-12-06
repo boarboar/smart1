@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginLeft="@dimen/spacing_xlarge"
+    android:layout_marginRight="@dimen/spacing_xlarge"
+    android:background="?attr/selectableItemBackground"
+    android:gravity="center_vertical"
+    android:orientation="horizontal">
+
+    <TextView
+        android:id="@+id/timestamp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor = "@android:color/holo_green_light"
+        android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+        android:layout_alignParentLeft = "true"
+        android:layout_marginLeft="@dimen/spacing_xlarge"
+        tools:text="--.--.-- --:--:--"/>
+    <TextView
+        android:id="@+id/msg"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor = "@android:color/holo_green_light"
+        android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+        android:layout_alignParentRight = "true"
+        android:layout_marginRight="@dimen/spacing_xlarge"
+        tools:text="--"/>
+
+</RelativeLayout>

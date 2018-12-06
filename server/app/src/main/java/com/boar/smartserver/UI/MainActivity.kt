@@ -133,9 +133,9 @@ class MainActivity : BaseActivity(), ToolbarManager {
             presenter.refreshWeatherForecast {
                 runOnUiThread {
                     var pos = 0
-                    val fieldsTemp = arrayOf(for_0_temp, for_1_temp, for_2_temp)
-                    val fieldsTime = arrayOf(for_0_time, for_1_time, for_2_time)
-                    it.forecast.take(3).forEach {
+                    val fieldsTemp = arrayOf(for_0_temp, for_1_temp, for_2_temp, for_3_temp)
+                    val fieldsTime = arrayOf(for_0_time, for_1_time, for_2_time, for_3_time)
+                    it.forecast.take(4).forEach {
                         val tms = it.dt * 1000
                         Log.v(tag, " ${tms} - ${DateUtils.convertTimeShort(tms)} - ${it.main.temp}")
                         fieldsTime[pos].text = DateUtils.convertTimeShort(tms)
@@ -167,6 +167,8 @@ class MainActivity : BaseActivity(), ToolbarManager {
                 //startActivity<SensorDetailActivity>(SensorDetailActivity.IDX to it)
                 startActivity<SensorPagerActivity>(SensorPagerActivity.IDX to it)
             }
+            val layout = LinearLayoutManager(this)
+            sensorList.layoutManager = layout
             sensorList.adapter = adapter
             isLoaded = true
             Log.v(tag, "UPDATE VIEW DONE ")

@@ -29,6 +29,8 @@ struct TempData {
   uint8_t res;
   uint8_t isParasite;
   int16_t t10;
+  uint16_t vcc;
+  uint8_t magic;
 } tData = {0};
 
 ADC_MODE(ADC_VCC);
@@ -43,7 +45,7 @@ void setup(void)
 
   pinMode(LED_PIN, OUTPUT);
 
-  blink(200, 1);
+  blink(100, 1);
 
   // start serial port
 
@@ -92,6 +94,8 @@ void setup(void)
   tData.id = CfgDrv::Cfg.id;
   doDiag(&tData);  
   tData.t10 = doMeasure(); 
+  tData.vcc = ESP.getVcc();
+  tData.magic = 37;
 
   if(tData.t10==-1270) {
     Serial.println(F("Bad temp!"));
@@ -114,7 +118,7 @@ void setup(void)
   Serial.print(CfgDrv::Cfg.sleep_min);
   Serial.print(F(" min"));
 
-  blink(200, 1);
+  blink(100, 1);
 
   ESP.deepSleep(60000000L*CfgDrv::Cfg.sleep_min);
 
@@ -165,10 +169,7 @@ int16_t doMeasure()
   float t=sensors.getTempCByIndex(0);
   Serial.print("Temperature is: ");
   Serial.println(t);    
-  //DEVICE_DISCONNECTED_C;
-  //DEVICE_DISCONNECTED_RAW
   //#define DEVICE_DISCONNECTED_C -127
-  //#define DEVICE_DISCONNECTED_RAW -7040
   
   return (int16_t)(t*10);
 }
@@ -212,14 +213,16 @@ bool doSend(TempData *pData) {
 
 
   char bufout[BUF_SZ];
-  StaticJsonBuffer<400> jsonBufferOut;
+  StaticJsonBuffer<448> jsonBufferOut;
   JsonObject& rootOut = jsonBufferOut.createObject();
   rootOut["I"] = pData->id;
   rootOut["M"] = pData->make;
   rootOut["P"] = pData->isParasite;
   rootOut["R"] = pData->res;
   rootOut["T"] = pData->t10;
-  rootOut["V"]=ESP.getVcc();
+  rootOut["V"] = pData->vcc;
+  rootOut["Y"] = pData->magic;
+
   rootOut.printTo(bufout, BUF_SZ-1);
   client.print(bufout);
   

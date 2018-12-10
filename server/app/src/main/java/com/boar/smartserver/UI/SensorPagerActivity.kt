@@ -59,11 +59,12 @@ class SensorPagerActivity() : BaseActivity(), ToolbarManager {
 
     private fun showSensor(idx: Int) {
         if (idx != -1) {
+            val page = viewpager.currentItem
             presenter.getSensor(idx)?.apply {
                 toolbarTitle = description ?: "None"
                 currentIdx = idx
-                viewpager.adapter = SensorPagerAdapter(supportFragmentManager,
-                        intent.getIntExtra(IDX, -1))
+                viewpager.adapter = SensorPagerAdapter(supportFragmentManager, idx)
+                viewpager.currentItem = page
                 sliding_tabs.setupWithViewPager(viewpager)
             }
         }

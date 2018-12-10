@@ -160,3 +160,6 @@ data class SensorMeasurement(
         val validated: Boolean = false,
         val msg: String = ""
 )
+
+
+data class ServiceLog(val message: String, val id: Long = 0, val timestamp: Long = System.currentTimeMillis())

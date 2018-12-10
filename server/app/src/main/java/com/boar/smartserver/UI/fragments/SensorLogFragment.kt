@@ -80,14 +80,16 @@ class SensorLogListAdapter(private val presenter : MainPresenter,
     //override fun getItemCount() = presenter.sensorListSize
 
     override fun getItemCount() : Int {
-      return 16
+      return presenter.logListSize
     }
 
     class ViewHolder(view: View, private val itemClick: (Int) -> Unit)
         : RecyclerView.ViewHolder(view) {
         fun bindLog( presenter : MainPresenter, position: Int) {
-            itemView.timestamp.text = DateUtils.convertDateTime(System.currentTimeMillis())
-            itemView.msg.text ="{\"I\":1,\"M\":64,\"P\":0,\"R\":8,\"T\":35,\"V\":3700,\"Y\":37}"
+            presenter.getServiceLog(position)?.apply {
+                itemView.timestamp.text = DateUtils.convertDateTime(timestamp)
+                itemView.msg.text = message
+            }
         }
 
     }

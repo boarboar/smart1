@@ -138,6 +138,14 @@ class MainPresenter() {
         sensorRefreshIdx = position
         sensorOp = MainService.BROADCAST_EXTRAS_OP_DEL
     }
+
+    val logListSize : Int
+        get() {
+            return service?.logListSize ?: 0
+        }
+
+    fun getServiceLog(position : Int) = service?.getServiceLog(position)
+
     /*
     val sensorNeedToUpdate : Int
         get() {

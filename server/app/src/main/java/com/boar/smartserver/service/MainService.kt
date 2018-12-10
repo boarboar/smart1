@@ -10,6 +10,7 @@ import com.boar.smartserver.db.SensorDb
 import com.boar.smartserver.domain.Sensor
 import com.boar.smartserver.domain.SensorList
 import com.boar.smartserver.domain.SensorMeasurement
+import com.boar.smartserver.domain.ServiceLog
 import com.boar.smartserver.network.TcpServer
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
@@ -21,6 +22,8 @@ import kotlin.concurrent.withLock
 class MainService : Service() {
 
     companion object {
+        val TCP_PORT = 9999
+
         val BROADCAST_ACTION = "com.boar.smartserver.service"
         val BROADCAST_EXTRAS_OPERATION = "operation"
 
@@ -40,11 +43,17 @@ class MainService : Service() {
     private val lock : Lock =  ReentrantLock()
 
     private var sensors : SensorList? = null
+    private var logsdb : MutableList<ServiceLog>? = null
 
     val sensorListSize : Int
         get() = lock.withLock { sensors?.size ?: 0 }
 
     fun getSensor(idx : Int) : Sensor? = lock.withLock { sensors?.getOrNull(idx)?.copy() }  // shallow, be sure to nullify refs
+
+    val logListSize : Int
+        get() = lock.withLock { logsdb?.size ?: 0 }
+
+    fun getServiceLog(idx : Int) : ServiceLog? = lock.withLock { logsdb?.getOrNull(idx)?.copy() }  // shallow, be sure to nullify refs
 
     fun isLoaded() = sensors !=null
 
@@ -61,13 +70,18 @@ class MainService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Log.v(tag, "[ ON START COMMAND ]")
+
         sensors = db.requestSensors()
+        logsdb = db.requestLog()
+
+        logEventDb("SRV START")
         val intent = Intent()
         intent.action = BROADCAST_ACTION
         intent.putExtra(BROADCAST_EXTRAS_OPERATION, BROADCAST_EXTRAS_OP_LOAD)
         sendBroadcast(intent)
 
-        TcpServer(applicationContext, 9999).run {
+        TcpServer(applicationContext, TCP_PORT, this).run {
+            logEventDb(it)
             val meas =  sensors?.measFromJson(it)
             if(meas != null) {
                 val idx = lock.withLock { sensors?.update(meas) ?: -1 }
@@ -194,11 +208,19 @@ class MainService : Service() {
         }
     }
 
+    fun logEventDb(msg : String) {
+        val event = ServiceLog(msg)
+        val (res, errmsg) = db.saveLog(event)
+        if(res) {
+            lock.withLock { logsdb?.add(event) }
+        }
+    }
+
     fun runSimulation() {
         Log.v(tag, "Start simulation")
         simFuture = doAsync {
             while(true) {
-                Thread.sleep(2_000)
+                Thread.sleep(5_000)
                 //val idx = sensors?.simulate() ?: -1
                 val msg =  SensorList.simulate()
                 val meas =  sensors?.measFromJson(msg)

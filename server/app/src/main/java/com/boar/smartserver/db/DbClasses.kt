@@ -2,6 +2,7 @@ package com.boar.smartserver.db
 
 import java.util.HashMap
 
+/*
 class MapDbSensor(val map: MutableMap<String, Any?>) {
     var _id: Long by map
     var description: String by map
@@ -12,3 +13,4 @@ class MapDbSensor(val map: MutableMap<String, Any?>) {
         this.description = description
     }
 }
+        */

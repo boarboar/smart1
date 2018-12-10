@@ -107,7 +107,7 @@ void setup(void)
       if(!doSend(&tData)) {
         Serial.println(F("Failed to send"));
         blink(400, 4);
-        if(i<TRIES_TO_SEND-1) delay(i*1000);
+        if(i<TRIES_TO_SEND-1) delay(1000+i*1000);
       } else break;
     }
   } else {

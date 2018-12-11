@@ -17,7 +17,7 @@ class SensorList : ArrayList<Sensor>() {
         fun simulate() : String {
             val random = Random()
             val id = random.nextInt(1..3).toShort()
-            val temp10 = random.nextInt(-25..35).toShort()
+            val temp10 = random.nextInt(-1200..1200).toShort()
             val vcc1000 = random.nextInt(2540..4950).toShort()
 
             return "{\"I\":$id,\"M\":64,\"P\":0,\"R\":8,\"T\":$temp10,\"V\":$vcc1000,\"Y\":37}"
@@ -29,7 +29,8 @@ class SensorList : ArrayList<Sensor>() {
     fun measFromJson(text: String) : SensorMeasurement? {
         try {
             val newmeas = gson.fromJson(text, SensorMeasurement::class.java)
-            val valid = newmeas.temp10.toInt() != -1270
+            //val valid = newmeas.temp10.toInt() != -1270
+            val valid = newmeas.temp10 > -500 && newmeas.temp10 < 500  // -50..50
             return newmeas.copy(updated=System.currentTimeMillis(), validated=valid, msg = text)
         } catch (t: Throwable) {
             Log.w(tag, "Json error: ${t.message}")

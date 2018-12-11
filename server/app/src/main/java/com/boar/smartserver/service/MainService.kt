@@ -24,6 +24,14 @@ class MainService : Service() {
     companion object {
         val TCP_PORT = 9999
 
+        val SIMULATION_TIMEOUT = 10_000L
+
+        val LOG_KEEP_REC_MAX = 128
+        val LOG_CLEAN_TIMEOUT = 900_000L // every 15 min
+
+        //val LOG_KEEP_REC_MAX = 8
+        //val LOG_CLEAN_TIMEOUT = 60_000L // every 5 min
+
         val BROADCAST_ACTION = "com.boar.smartserver.service"
         val BROADCAST_EXTRAS_OPERATION = "operation"
 
@@ -40,10 +48,11 @@ class MainService : Service() {
     private var binder = getServiceBinder()
     private var executor = TaskExecutor.getInstance(2)
     private var simFuture  : Future<Unit>? = null
+    private var logCleanerFuture  : Future<Unit>? = null
     private val lock : Lock =  ReentrantLock()
 
     private var sensors : SensorList? = null
-    private var logsdb : MutableList<ServiceLog>? = null
+    private var logsdb : MutableList<ServiceLog>? = null  // DESC order
 
     val sensorListSize : Int
         get() = lock.withLock { sensors?.size ?: 0 }
@@ -72,7 +81,7 @@ class MainService : Service() {
         Log.v(tag, "[ ON START COMMAND ]")
 
         sensors = db.requestSensors()
-        logsdb = db.requestLog()
+        logsdb = db.requestLog(LOG_KEEP_REC_MAX)
 
         logEventDb("SRV START")
         val intent = Intent()
@@ -94,6 +103,8 @@ class MainService : Service() {
                 }
             }
         }
+
+        startLogCleaner()
 
         return Service.START_STICKY
     }
@@ -212,17 +223,32 @@ class MainService : Service() {
         val event = ServiceLog(msg)
         val (res, errmsg) = db.saveLog(event)
         if(res) {
-            lock.withLock { logsdb?.add(event) }
+            lock.withLock { logsdb?.add(0, event) } // DESC order
         }
     }
+
+    fun startLogCleaner() {
+        Log.v(tag, "Start log cleaner daemmon")
+        logCleanerFuture = doAsync {
+            while(true) {
+                Thread.sleep(MainService.LOG_CLEAN_TIMEOUT)
+                Log.v(tag, "Do Log clean")
+                if(db.cleanLog(LOG_KEEP_REC_MAX)>0) {
+                    lock.withLock { logsdb = logsdb?.take(LOG_KEEP_REC_MAX)?.toMutableList()} //
+                }
+            }
+        }
+    }
+
 
     fun runSimulation() {
         Log.v(tag, "Start simulation")
         simFuture = doAsync {
             while(true) {
-                Thread.sleep(5_000)
+                Thread.sleep(MainService.SIMULATION_TIMEOUT)
                 //val idx = sensors?.simulate() ?: -1
                 val msg =  SensorList.simulate()
+                logEventDb(msg)
                 val meas =  sensors?.measFromJson(msg)
                 if(meas != null) {
                     val idx = lock.withLock { sensors?.update(meas) ?: -1 }
@@ -233,7 +259,8 @@ class MainService : Service() {
                         intent.putExtra(BROADCAST_EXTRAS_IDX, idx)
                         sendBroadcast(intent)
                     }
-                }           }
+                }
+            }
         }
     }
 

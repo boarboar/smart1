@@ -20,7 +20,9 @@ class SensorDb(private val dbHelper: DbHelper = DbHelper.instance
         private val parserLog = rowParser { id: Long, timestamp: Long, msg: String ->
             ServiceLog(msg, id, timestamp)
         }
-
+        private val parserLogMinMax = rowParser { idmax: Long, idmin: Long ->
+            Pair<Long, Long>(idmax, idmin)
+        }
     }
 
     /*
@@ -37,7 +39,8 @@ class SensorDb(private val dbHelper: DbHelper = DbHelper.instance
         dbHelper.use {
             // what if error ?
             try {
-                sensors = select(SensorTable.NAME, SensorTable.ID, SensorTable.DESCRIPTION).parseList(parserSensor)
+                sensors = select(SensorTable.NAME, SensorTable.ID, SensorTable.DESCRIPTION)
+                        .parseList(parserSensor)
             }
             catch (t: Throwable) {
                 val msg = t.message ?: "Unknown DB error"
@@ -137,12 +140,14 @@ class SensorDb(private val dbHelper: DbHelper = DbHelper.instance
         return Pair(result, errmsg)
     }
 
-    fun requestLog() : MutableList<ServiceLog> {
+    fun requestLog(maxLogRec : Int) : MutableList<ServiceLog> {
         lateinit var logs : MutableList<ServiceLog>
         dbHelper.use {
             // what if error ?
             try {
-                logs = select(LogTable.NAME, LogTable.ID, LogTable.TIMESTAMP, LogTable.MSG).parseList(parserLog).toMutableList()
+                logs = select(LogTable.NAME, LogTable.ID, LogTable.TIMESTAMP, LogTable.MSG)
+                        .orderBy(LogTable.ID, SqlOrderDirection.DESC).limit(maxLogRec)
+                        .parseList(parserLog).toMutableList()
             }
             catch (t: Throwable) {
                 val msg = t.message ?: "Unknown DB error"
@@ -151,5 +156,29 @@ class SensorDb(private val dbHelper: DbHelper = DbHelper.instance
             }
         }
         return logs
+    }
+
+    fun cleanLog(maxLogRec : Int) : Int {
+        var cln = 0
+        dbHelper.use {
+            try {
+                val (lmax, lmin) = select(LogTable.NAME, "max(${LogTable.ID})", "min(${LogTable.ID})")
+                        .parseSingle(parserLogMinMax)
+                Log.w(tag, "Logstat: $lmax, $lmin")
+
+                if(lmax - lmin > maxLogRec) {
+                    val truncid = lmax - maxLogRec
+                    cln = (truncid - lmin).toInt()
+                    delete(LogTable.NAME, "${LogTable.ID} < {truncID}","truncID" to  truncid)
+                }
+                else {}
+
+            }
+            catch (t: Throwable) {
+                val msg = t.message ?: "Unknown DB error"
+                Log.w(tag, "DB error: $msg")
+            }
+        }
+        return cln
     }
 }

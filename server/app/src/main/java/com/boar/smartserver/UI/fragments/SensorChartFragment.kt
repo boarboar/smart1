@@ -7,7 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.boar.smartserver.R
 import com.boar.smartserver.UI.DateUtils
-import kotlinx.android.synthetic.main.activity_sensor_details.view.*
+import kotlinx.android.synthetic.main.fragment_sensor_chart.view.*
 
 class SensorChartFragment : SensorBaseFragment() {
 

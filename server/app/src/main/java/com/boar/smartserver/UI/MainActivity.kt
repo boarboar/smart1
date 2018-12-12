@@ -44,7 +44,7 @@ class MainActivity : BaseActivity(), ToolbarManager {
 
 
     override fun onServiceConnected() {
-        updateUI(force=true)
+        updateUI(true)
         Log.v(tag, "[ ON SERVICE CONNECTED ]")
     }
 
@@ -99,7 +99,8 @@ class MainActivity : BaseActivity(), ToolbarManager {
 
         initToolbar(R.menu.menu_main) {
             when (it) {
-                R.id.action_settings -> startActivity<SettingsActivity>()
+                //R.id.action_settings -> startActivity<SettingsActivity>()
+                R.id.action_settings -> startActivity<SystemPagerActivity>()
                 R.id.action_add -> showSensorPropUI()
                 R.id.action_sim_start -> service?.runSimulation()
                 R.id.action_sim_stop -> service?.stopSimulation()
@@ -150,18 +151,20 @@ class MainActivity : BaseActivity(), ToolbarManager {
     fun updateUI(force : Boolean=false) {
         Log.v(tag, "UPDATE VIEW ${isLoaded} ... ${presenter.isDataLoaded}")
         if(isLoaded && presenter.isDataLoaded) {
-            if(presenter.sensorRefreshIdx !=-1) {
+            if(presenter.sensorRefreshIdx.isNotEmpty()) {
                 when(presenter.sensorOp) {
-                    MainService.BROADCAST_EXTRAS_OP_UPD -> sensorList.adapter?.notifyItemChanged(presenter.sensorRefreshIdx)
-                    MainService.BROADCAST_EXTRAS_OP_DEL -> sensorList.adapter?.notifyItemRemoved(presenter.sensorRefreshIdx)
+                    MainService.BROADCAST_EXTRAS_OP_UPD ->
+                        presenter.sensorRefreshIdx.forEach{sensorList.adapter?.notifyItemChanged(it) }
+                    MainService.BROADCAST_EXTRAS_OP_DEL ->
+                        presenter.sensorRefreshIdx.forEach{sensorList.adapter?.notifyItemRemoved(it) }
                     else -> Log.v(tag, "something else...")
                 }
-                presenter.sensorRefreshIdx =-1
+                presenter.sensorRefreshIdx.clear()
             }
             return
         }
 
-        if((!isLoaded || force) && presenter.isDataLoaded) {
+        if((isLoaded || force)  && presenter.isDataLoaded) {
 
             val adapter = SensorListAdapter(presenter) {
                 //startActivity<SensorDetailActivity>(SensorDetailActivity.IDX to it)
@@ -174,7 +177,6 @@ class MainActivity : BaseActivity(), ToolbarManager {
             Log.v(tag, "UPDATE VIEW DONE ")
             pBar.visibility = View.GONE
         }
-
     }
 
     private fun showSensorPropUI() {

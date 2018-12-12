@@ -13,25 +13,35 @@ class DbHelper(ctx: Context = SmartServer.ctx) : ManagedSQLiteOpenHelper(ctx,
     companion object {
         private const val tag = "DB HLP"
         val DB_NAME = "smartserver.db"
-        val DB_VERSION = 2
+        val DB_VERSION = 3
         val instance by lazy { DbHelper() }
     }
 
     override fun onCreate(db: SQLiteDatabase) {
         Log.v(tag, "[ ON DB CREATE ]")
-        /*
+
         db.createTable(SensorTable.NAME, true,
                 SensorTable.ID to INTEGER + PRIMARY_KEY,
                 SensorTable.DESCRIPTION to TEXT
                 )
-                */
+
         db.createTable(LogTable.NAME, true,
                 LogTable.ID to INTEGER + PRIMARY_KEY + AUTOINCREMENT,
                 LogTable.TIMESTAMP to INTEGER,
                 LogTable.MSG to TEXT
         )
-
+        db.createTable(SensorHistoryTable.NAME, true,
+                SensorHistoryTable.ID to INTEGER + PRIMARY_KEY + AUTOINCREMENT,
+                SensorHistoryTable.SENSOR_ID to INTEGER ,
+                SensorHistoryTable.TIMESTAMP to INTEGER,
+                SensorHistoryTable.TEMPERATURE to INTEGER,
+                SensorHistoryTable.VCC to INTEGER
+        )
+        db.createIndex(SensorHistoryTable.SENSOR_ID, SensorHistoryTable.NAME,
+                false, true, SensorHistoryTable.SENSOR_ID)
     }
+
+
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
 
@@ -39,6 +49,8 @@ class DbHelper(ctx: Context = SmartServer.ctx) : ManagedSQLiteOpenHelper(ctx,
 
         //db.dropTable(SensorTable.NAME, true)
         //db.dropTable(LogTable.NAME, true)
+        //db.dropTable(SensorHistoryTable.NAME, true)
+
         onCreate(db)
     }
 }

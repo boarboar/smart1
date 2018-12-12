@@ -12,3 +12,12 @@ object LogTable {
     val TIMESTAMP = "timestamp"
     val MSG = "msg"
 }
+
+object SensorHistoryTable {
+    val NAME = "SensorHistory"
+    val ID = "_id"
+    val TIMESTAMP = "timestamp"
+    val SENSOR_ID = "sensor_id"
+    val TEMPERATURE = "t"
+    val VCC = "v"
+}

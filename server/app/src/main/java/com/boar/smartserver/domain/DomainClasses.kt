@@ -16,9 +16,11 @@ class SensorList : ArrayList<Sensor>() {
 
         fun simulate() : String {
             val random = Random()
-            val id = random.nextInt(1..3).toShort()
-            val temp10 = random.nextInt(-1200..1200).toShort()
-            val vcc1000 = random.nextInt(2540..4950).toShort()
+            val maybeerror = random.nextBoolean()
+            val id = random.nextInt(1..3)
+            val temp10 = if(maybeerror) random.nextInt(-1200..1200)
+                else random.nextInt(-400..400)
+            val vcc1000 = random.nextInt(2540..4950)
 
             return "{\"I\":$id,\"M\":64,\"P\":0,\"R\":8,\"T\":$temp10,\"V\":$vcc1000,\"Y\":37}"
         }
@@ -65,50 +67,8 @@ class SensorList : ArrayList<Sensor>() {
         }
         return sensorIdx
     }
-
-    /*
-    fun update(text: String) : Int {
-
-        lateinit var newmeas : SensorMeasurement
-        try {
-            newmeas = gson.fromJson(text, SensorMeasurement::class.java)
-        } catch (t: Throwable) {
-            Log.w(tag, "Json error: ${t.message}")
-            return -1
-        }
-
-        val valid = newmeas.temp10.toInt() != -1270
-
-        return update(newmeas.copy(updated=System.currentTimeMillis(), validated=valid))
-
-    }
-*/
-
-    /*
-    fun simulate() : Int {
-        val random = Random()
-        val id = random.nextInt(1..3).toShort()
-        val temp10 = random.nextInt(-25..35).toShort()
-        val vcc1000 = random.nextInt(2540..4950).toShort()
-
-        return update("{\"I\":$id,\"M\":64,\"P\":0,\"R\":8,\"T\":$temp10,\"V\":$vcc1000}")
-    }
-    */
-
-    /*
-    simulate
-    SensorMeasurement(id=1, temp10=215, vcc100=312)
-    SensorMeasurement(id=2, temp10=225, vcc100=299)
-    */
 }
 
-
-/*
-data class Sensor(val id: Short, val description: String,
-                  val updated: Long,  val temperature: Float, val vcc: Float
-                  //, val measList
-                  )
-*/
 
 data class Sensor(val id: Short, val description: String,
                   val lastValidMeasTime: Long = 0,
@@ -146,7 +106,6 @@ data class Sensor(val id: Short, val description: String,
 
 }
 
-//b?.length ?: -1
 
 // '{"I":"1","M":64,"P":0,"R":8,"T":210,"V":310}'
 
@@ -162,5 +121,8 @@ data class SensorMeasurement(
         val msg: String = ""
 )
 
+data class SensorHistory(val sensorId: Int, val temp10: Int, val vcc1000: Int,
+                         val id: Long = 0, val timestamp: Long = System.currentTimeMillis())
 
 data class ServiceLog(val message: String, val id: Long = 0, val timestamp: Long = System.currentTimeMillis())
+

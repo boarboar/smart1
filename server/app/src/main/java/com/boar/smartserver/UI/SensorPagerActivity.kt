@@ -2,17 +2,11 @@ package com.boar.smartserver.UI
 
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
-import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.util.Log
-import android.view.View
 import android.widget.Toast
 import com.boar.smartserver.R
 import com.boar.smartserver.UI.fragments.SensorPagerAdapter
-import com.boar.smartserver.domain.Sensor
-import com.boar.smartserver.presenter.MainPresenter
-import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.activity_sensor_details.*
 import kotlinx.android.synthetic.main.activity_sensor_pager.*
 import org.jetbrains.anko.find
 import org.jetbrains.anko.toast

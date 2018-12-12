@@ -34,12 +34,13 @@
             android:label="@string/settings" />
 
         <activity
-            android:name=".UI.SensorDetailActivity"
-            android:label="@string/sens_detail" />
-
-        <activity
             android:name=".UI.SensorPagerActivity"
             android:label="@string/sens_pager" />
+
+        <activity
+            android:name=".UI.SystemPagerActivity"
+            android:label="@string/sens_pager" />
+
 
     </application>
 

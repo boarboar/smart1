@@ -34,14 +34,16 @@ class MainPresenter() {
             MainService.BROADCAST_EXTRAS_OP_UPD -> {
                 lastUpdated = System.currentTimeMillis()
                 sensorUpdateHandler?.invoke(idx)
+                sensorRefreshIdx.add(idx) // !!!
             }
             else -> Log.v(tag, "[ BRDCST $op $idx]")
         }
     }
 
     var lastUpdated = 0L
-    var sensorRefreshIdx = -1
     var sensorOp : String = ""
+
+    val sensorRefreshIdx = mutableListOf<Int>()
 
     private val wservice : WeatherServiceApi by lazy  { WeatherServiceApi.obtain() }
     private var weather : Weather? = null
@@ -130,13 +132,13 @@ class MainPresenter() {
     fun addSensor(sensor : Sensor) = service?.addSensor(sensor)
     fun editSensor(position : Int, sensor : Sensor) {
         service?.editSensor(position, sensor)
-        sensorRefreshIdx = position
         sensorOp = MainService.BROADCAST_EXTRAS_OP_UPD
+        sensorRefreshIdx.add(position)
     }
     fun deleteSensor(position : Int) {
         service?.deleteSensor(position)
-        sensorRefreshIdx = position
         sensorOp = MainService.BROADCAST_EXTRAS_OP_DEL
+        sensorRefreshIdx.add(position)
     }
 
     val logListSize : Int

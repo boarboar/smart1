@@ -3,6 +3,7 @@ package com.boar.smartserver.db
 import android.database.sqlite.SQLiteConstraintException
 import android.util.Log
 import com.boar.smartserver.domain.Sensor
+import com.boar.smartserver.domain.SensorHistory
 import com.boar.smartserver.domain.SensorList
 import com.boar.smartserver.domain.ServiceLog
 import org.jetbrains.anko.db.*
@@ -20,8 +21,12 @@ class SensorDb(private val dbHelper: DbHelper = DbHelper.instance
         private val parserLog = rowParser { id: Long, timestamp: Long, msg: String ->
             ServiceLog(msg, id, timestamp)
         }
+        private val parserSensorHistory = rowParser { id: Long, timestamp: Long,
+                                                      sensorId : Int, t : Int, v: Int ->
+            SensorHistory(sensorId, t, v, id, timestamp)
+        }
         private val parserLogMinMax = rowParser { idmax: Long, idmin: Long ->
-            Pair<Long, Long>(idmax, idmin)
+            Pair(idmax, idmin)
         }
     }
 
@@ -181,4 +186,77 @@ class SensorDb(private val dbHelper: DbHelper = DbHelper.instance
         }
         return cln
     }
+
+    fun saveSensorHist(hist : SensorHistory) : Pair<Boolean, String> {
+        var result = false
+        var errmsg = ""
+        dbHelper.use {
+            try {
+                insertOrThrow(SensorHistoryTable.NAME,
+                        SensorHistoryTable.TIMESTAMP to  hist.timestamp,
+                        SensorHistoryTable.SENSOR_ID to hist.sensorId,
+                        SensorHistoryTable.TEMPERATURE to hist.temp10,
+                        SensorHistoryTable.VCC to hist.vcc1000)
+                result = true
+            }
+
+            catch (t: SQLiteConstraintException) {
+                errmsg = t.message ?: "Unknown DB error"
+                Log.w(tag, "Constraint error: $errmsg")
+            }
+            catch (t: Throwable) {
+                errmsg = t.message ?: "Unknown DB error"
+                Log.w(tag, "DB error: $errmsg")
+            }
+        }
+        return Pair(result, errmsg)
+    }
+
+    fun requestSensorHist(sensorId: Int, maxLogRec : Int) : MutableList<SensorHistory> {
+        lateinit var hist : MutableList<SensorHistory>
+        dbHelper.use {
+            // what if error ?
+            try {
+                hist = select(SensorHistoryTable.NAME, SensorHistoryTable.ID,
+                        SensorHistoryTable.TIMESTAMP, SensorHistoryTable.SENSOR_ID,
+                        SensorHistoryTable.TEMPERATURE, SensorHistoryTable.VCC
+                        )
+                        .orderBy(LogTable.ID, SqlOrderDirection.DESC).limit(maxLogRec)
+                        .parseList(parserSensorHistory).toMutableList()
+            }
+            catch (t: Throwable) {
+                val msg = t.message ?: "Unknown DB error"
+                Log.w(tag, "DB error: $msg")
+                hist = mutableListOf()
+            }
+        }
+        return hist
+    }
+
+    fun cleanSensorHist(maxLogRec : Int) : Int {
+        var cln = 0
+        dbHelper.use {
+            try {
+                val (lmax, lmin) = select(SensorHistoryTable.NAME
+                        , "max(${SensorHistoryTable.ID})", "min(${SensorHistoryTable.ID})")
+                        .parseSingle(parserLogMinMax)
+                Log.w(tag, "Histtat: $lmax, $lmin")
+
+                if(lmax - lmin > maxLogRec) {
+                    val truncid = lmax - maxLogRec
+                    cln = (truncid - lmin).toInt()
+                    delete(SensorHistoryTable.NAME,
+                            "${SensorHistoryTable.ID} < {truncID}","truncID" to  truncid)
+                }
+                else {}
+
+            }
+            catch (t: Throwable) {
+                val msg = t.message ?: "Unknown DB error"
+                Log.w(tag, "DB error: $msg")
+            }
+        }
+        return cln
+    }
+
 }

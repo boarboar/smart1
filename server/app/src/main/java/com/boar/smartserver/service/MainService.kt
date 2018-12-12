@@ -26,6 +26,7 @@ class MainService : Service() {
 
         val SIMULATION_TIMEOUT = 10_000L
 
+        val HIST_KEEP_REC_MAX = 1_344 // ca 1 week for 2 sensors
         val LOG_KEEP_REC_MAX = 128
         val LOG_CLEAN_TIMEOUT = 900_000L // every 15 min
 
@@ -54,6 +55,12 @@ class MainService : Service() {
     private var sensors : SensorList? = null
     private var logsdb : MutableList<ServiceLog>? = null  // DESC order
 
+    /*
+    private val logsdb : MutableList<ServiceLog> by lazy {
+        db.requestLog(LOG_KEEP_REC_MAX)
+    }
+    */
+
     val sensorListSize : Int
         get() = lock.withLock { sensors?.size ?: 0 }
 
@@ -81,7 +88,7 @@ class MainService : Service() {
         Log.v(tag, "[ ON START COMMAND ]")
 
         sensors = db.requestSensors()
-        logsdb = db.requestLog(LOG_KEEP_REC_MAX)
+        logsdb = db.requestLog(LOG_KEEP_REC_MAX) // TODO - lazy!
 
         logEventDb("SRV START")
         val intent = Intent()
@@ -142,21 +149,7 @@ class MainService : Service() {
     inner class MainServiceBinder : Binder() {
         fun getService(): MainService = this@MainService
     }
-/*
-    fun getSensors() : SensorList {
-        Thread.sleep(2_000)
-        return sensors
-    }
-  */
-    /*
-    private fun loadSensors() : SensorList {
-        val ss = SensorList()
-        ss.add(Sensor(1, "Window"))
-        ss.add(Sensor(2, "Balcony"))
-        Thread.sleep(2_000) // test
-        return ss
-    }
-    */
+
     fun addSensor(sensor: Sensor) {
         Log.v(tag, "[ ADD SENSOR ]")
         executor.execute {
@@ -232,9 +225,12 @@ class MainService : Service() {
         logCleanerFuture = doAsync {
             while(true) {
                 Thread.sleep(MainService.LOG_CLEAN_TIMEOUT)
-                Log.v(tag, "Do Log clean")
+                Log.v(tag, "Do Log/Hist clean")
                 if(db.cleanLog(LOG_KEEP_REC_MAX)>0) {
                     lock.withLock { logsdb = logsdb?.take(LOG_KEEP_REC_MAX)?.toMutableList()} //
+                }
+                if(db.cleanSensorHist(HIST_KEEP_REC_MAX)>0) {
+                    // do smth...
                 }
             }
         }

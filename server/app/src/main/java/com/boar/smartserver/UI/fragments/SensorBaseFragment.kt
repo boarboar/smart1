@@ -11,9 +11,9 @@ abstract class SensorBaseFragment : Fragment() {
 
     companion object {
         val ARG_SENSOR_ID = "param_idx"
-        fun newInstance(fragment: SensorBaseFragment, page: Int):  SensorBaseFragment {
+        fun newInstance(fragment: SensorBaseFragment, idx: Int = -1):  SensorBaseFragment {
             val args = Bundle()
-            args.putInt(ARG_SENSOR_ID, page)
+            args.putInt(ARG_SENSOR_ID, idx)
             fragment.setArguments(args)
             return fragment
         }

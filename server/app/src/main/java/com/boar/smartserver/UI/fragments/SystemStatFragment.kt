@@ -8,7 +8,8 @@ import android.view.ViewGroup
 import com.boar.smartserver.R
 import com.boar.smartserver.SmartServer.Companion.ctx
 import com.boar.smartserver.extensions.getLocalIpAddress
-import kotlinx.android.synthetic.main.activity_settings.view.*
+import kotlinx.android.synthetic.main.fragment_system_stat.view.*
+
 
 class SystemStatFragment : SensorBaseFragment() {
 
@@ -18,9 +19,12 @@ class SystemStatFragment : SensorBaseFragment() {
             inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
 
-        val view = inflater?.inflate(R.layout.activity_settings, container, false)
+        val view = inflater?.inflate(R.layout.fragment_system_stat, container, false)
 
         view.wifi_ip.text = ctx.getLocalIpAddress()
+        view.sensor_cnt.text = "${presenter.sensorListSize}"
+        view.log_cnt.text = "${presenter.logListSize}"
+        view.sensor_hist_cnt.text = "${presenter.sensorHistSize}"
 
         return view
     }

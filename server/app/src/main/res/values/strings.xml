@@ -14,4 +14,7 @@
     <string name="sensor_del_msg">"Do you want to delete sensor?"</string>
     <string name="sunrise">Восход:</string>
     <string name="sunset">Закат:</string>
+    <string name="sensor_cnt">Сенсоров:</string>
+    <string name="log_cnt">Логов:</string>
+    <string name="sensor_hist_cnt">Историй:</string>
 </resources>

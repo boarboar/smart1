@@ -260,4 +260,18 @@ class SensorDb(private val dbHelper: DbHelper = DbHelper.instance
         return cln
     }
 
+    fun getSensorHistSize() : Int {
+        var cnt = 0
+        dbHelper.use {
+            try {
+                cnt = select(SensorHistoryTable.NAME, "count()")
+                        .parseSingle(IntParser)
+            }
+            catch (t: Throwable) {
+                val msg = t.message ?: "Unknown DB error"
+                Log.w(tag, "DB error: $msg")
+            }
+        }
+        return cnt
+    }
 }

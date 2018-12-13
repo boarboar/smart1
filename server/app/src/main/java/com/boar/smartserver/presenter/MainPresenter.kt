@@ -143,9 +143,12 @@ class MainPresenter() {
     }
 
     val logListSize : Int
-        get() {
-            return service?.logListSize ?: 0
-        }
+        get() = service?.logListSize ?: 0
+
+
+    val sensorHistSize : Int
+        get() = service?.sensorHistSize ?: 0
+
 
     fun getServiceLog(position : Int) = service?.getServiceLog(position)
 

@@ -67,6 +67,9 @@ class MainService : Service() {
     val logListSize : Int
         get() = lock.withLock { logsdb?.size ?: 0 }
 
+    val sensorHistSize : Int
+        get() = db.getSensorHistSize()
+
     fun getServiceLog(idx : Int) : ServiceLog? = lock.withLock { logsdb?.getOrNull(idx)?.copy() }  // shallow, be sure to nullify refs
 
     fun isLoaded() = sensors !=null

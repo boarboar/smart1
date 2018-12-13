@@ -122,7 +122,13 @@ data class SensorMeasurement(
 )
 
 data class SensorHistory(val sensorId: Int, val temp10: Int, val vcc1000: Int,
-                         val id: Long = 0, val timestamp: Long = System.currentTimeMillis())
+                         val id: Long = 0, val timestamp: Long = System.currentTimeMillis()) {
+    val temperature: Float
+        get() = temp10.toFloat() / 10f
+    val vcc : Float
+        get() = (vcc1000/10).toFloat()/100f
+}
 
 data class ServiceLog(val message: String, val id: Long = 0, val timestamp: Long = System.currentTimeMillis())
+
 

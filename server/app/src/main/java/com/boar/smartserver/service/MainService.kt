@@ -2,15 +2,13 @@ package com.boar.smartserver.service
 
 import android.app.Service
 import android.content.Intent
+import android.hardware.SensorAdditionalInfo
 import android.os.Binder
 import android.os.IBinder
 import android.util.Log
 import android.widget.Toast
 import com.boar.smartserver.db.SensorDb
-import com.boar.smartserver.domain.Sensor
-import com.boar.smartserver.domain.SensorList
-import com.boar.smartserver.domain.SensorMeasurement
-import com.boar.smartserver.domain.ServiceLog
+import com.boar.smartserver.domain.*
 import com.boar.smartserver.network.TcpServer
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
@@ -96,20 +94,7 @@ class MainService : Service() {
         intent.putExtra(BROADCAST_EXTRAS_OPERATION, BROADCAST_EXTRAS_OP_LOAD)
         sendBroadcast(intent)
 
-        TcpServer(applicationContext, TCP_PORT, this).run {
-            logEventDb(it)
-            val meas =  sensors?.measFromJson(it)
-            if(meas != null) {
-                val idx = lock.withLock { sensors?.update(meas) ?: -1 }
-                if (idx != -1) {
-                    val intent = Intent()
-                    intent.action = BROADCAST_ACTION
-                    intent.putExtra(BROADCAST_EXTRAS_OPERATION, BROADCAST_EXTRAS_OP_UPD)
-                    intent.putExtra(BROADCAST_EXTRAS_IDX, idx)
-                    sendBroadcast(intent)
-                }
-            }
-        }
+        TcpServer(applicationContext, TCP_PORT, this).run {processMessage(it)}
 
         startLogCleaner()
 
@@ -212,10 +197,34 @@ class MainService : Service() {
         }
     }
 
+    fun processMessage(msg : String) {
+        logEventDb(msg)
+        val meas = sensors?.measFromJson(msg)
+        if (meas != null) {
+            val idx = lock.withLock { sensors?.update(meas) ?: -1 }
+            if (idx != -1) {
+                if (meas.validated) saveToHist(meas)
+
+                val intent = Intent()
+                intent.action = BROADCAST_ACTION
+                intent.putExtra(BROADCAST_EXTRAS_OPERATION, BROADCAST_EXTRAS_OP_UPD)
+                intent.putExtra(BROADCAST_EXTRAS_IDX, idx)
+                sendBroadcast(intent)
+            }
+        }
+    }
+
+    fun saveToHist(meas : SensorMeasurement) {
+        if(meas.validated) {
+            val hist = SensorHistory(meas.id.toInt(), meas.temp10.toInt(), meas.vcc1000.toInt())
+            db.saveSensorHist(hist)
+        }
+    }
+
     fun logEventDb(msg : String) {
         val event = ServiceLog(msg)
         val (res, errmsg) = db.saveLog(event)
-        if(res) {
+        if (res) {
             lock.withLock { logsdb?.add(0, event) } // DESC order
         }
     }
@@ -236,26 +245,21 @@ class MainService : Service() {
         }
     }
 
+    fun getSensorHistory(sensorId : Int, size: Int = 128) : List<SensorHistory> {
+        // temporarily...
+        // make cache for sensorId
+        // add paging / periods...
+        return db.requestSensorHist(sensorId, size)
+    }
+
 
     fun runSimulation() {
         Log.v(tag, "Start simulation")
         simFuture = doAsync {
             while(true) {
                 Thread.sleep(MainService.SIMULATION_TIMEOUT)
-                //val idx = sensors?.simulate() ?: -1
                 val msg =  SensorList.simulate()
-                logEventDb(msg)
-                val meas =  sensors?.measFromJson(msg)
-                if(meas != null) {
-                    val idx = lock.withLock { sensors?.update(meas) ?: -1 }
-                    if (idx != -1) {
-                        val intent = Intent()
-                        intent.action = BROADCAST_ACTION
-                        intent.putExtra(BROADCAST_EXTRAS_OPERATION, BROADCAST_EXTRAS_OP_UPD)
-                        intent.putExtra(BROADCAST_EXTRAS_IDX, idx)
-                        sendBroadcast(intent)
-                    }
-                }
+                processMessage(msg)
             }
         }
     }

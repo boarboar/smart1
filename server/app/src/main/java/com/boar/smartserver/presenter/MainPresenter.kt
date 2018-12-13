@@ -7,6 +7,7 @@ import com.boar.smartserver.R.id.weather_now_temp
 import com.boar.smartserver.SmartServer
 import com.boar.smartserver.UI.MainActivity
 import com.boar.smartserver.domain.Sensor
+import com.boar.smartserver.domain.SensorHistory
 import com.boar.smartserver.domain.Weather
 import com.boar.smartserver.domain.WeatherForecast
 import com.boar.smartserver.network.WeatherServiceApi
@@ -147,6 +148,14 @@ class MainPresenter() {
         }
 
     fun getServiceLog(position : Int) = service?.getServiceLog(position)
+
+    fun getSensorHistory(sensorId : Int, size: Int = 128) : List<SensorHistory> {
+        // temporarily...
+        // make cache for sensorId
+        // add paging / periods...
+        return service?.getSensorHistory(sensorId, size) ?: listOf()
+    }
+
 
     /*
     val sensorNeedToUpdate : Int

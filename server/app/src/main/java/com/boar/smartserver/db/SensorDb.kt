@@ -212,8 +212,8 @@ class SensorDb(private val dbHelper: DbHelper = DbHelper.instance
         return Pair(result, errmsg)
     }
 
-    fun requestSensorHist(sensorId: Int, maxLogRec : Int) : MutableList<SensorHistory> {
-        lateinit var hist : MutableList<SensorHistory>
+    fun requestSensorHist(sensorId: Int, maxLogRec : Int) : List<SensorHistory> {
+        lateinit var hist : List<SensorHistory>
         dbHelper.use {
             // what if error ?
             try {
@@ -221,13 +221,14 @@ class SensorDb(private val dbHelper: DbHelper = DbHelper.instance
                         SensorHistoryTable.TIMESTAMP, SensorHistoryTable.SENSOR_ID,
                         SensorHistoryTable.TEMPERATURE, SensorHistoryTable.VCC
                         )
+                        .whereArgs("${SensorHistoryTable.SENSOR_ID} = {sensorID}","sensorID" to  sensorId)
                         .orderBy(LogTable.ID, SqlOrderDirection.DESC).limit(maxLogRec)
-                        .parseList(parserSensorHistory).toMutableList()
+                        .parseList(parserSensorHistory)
             }
             catch (t: Throwable) {
                 val msg = t.message ?: "Unknown DB error"
                 Log.w(tag, "DB error: $msg")
-                hist = mutableListOf()
+                hist = listOf()
             }
         }
         return hist

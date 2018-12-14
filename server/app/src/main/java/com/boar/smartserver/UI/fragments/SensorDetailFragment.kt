@@ -1,6 +1,7 @@
 package com.boar.smartserver.UI.fragments
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,7 +16,7 @@ class SensorDetailFragment : SensorBaseFragment() {
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
-
+        Log.v(ftag, "[ ON VIEW CREATED ]")
         val view = inflater?.inflate(R.layout.fragment_sensor_details, container, false)
         if (idx != -1) {
             presenter.getSensor(idx)?.apply {

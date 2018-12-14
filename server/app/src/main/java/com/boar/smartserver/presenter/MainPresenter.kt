@@ -33,6 +33,8 @@ class MainPresenter() {
             MainService.BROADCAST_EXTRAS_OP_ADD -> sensorAddHandler?.invoke(idx)
             MainService.BROADCAST_EXTRAS_OP_DEL -> sensorDeleteHandler?.invoke(idx)
             MainService.BROADCAST_EXTRAS_OP_UPD -> {
+                val id = service?.getSensor(idx)?.id ?: -1
+                sensorHistCache.invalidate(id.toInt())
                 lastUpdated = System.currentTimeMillis()
                 sensorUpdateHandler?.invoke(idx)
                 sensorRefreshIdx.add(idx) // !!!
@@ -40,6 +42,8 @@ class MainPresenter() {
             else -> Log.v(tag, "[ BRDCST $op $idx]")
         }
     }
+
+    private val sensorHistCache = SensorHistoryCache()
 
     var lastUpdated = 0L
     var sensorOp : String = ""
@@ -156,18 +160,35 @@ class MainPresenter() {
         // temporarily...
         // make cache for sensorId
         // add paging / periods...
-        return service?.getSensorHistory(sensorId, size) ?: listOf()
+        //return service?.getSensorHistory(sensorId, size) ?: listOf()
+        return sensorHistCache.getHistory(service, sensorId, size)
     }
 
 
-    /*
-    val sensorNeedToUpdate : Int
-        get() {
-            val ret = sensorRefreshIdx
-            sensorRefreshIdx = -1
-            return ret
+    class SensorHistoryCache() {
+        private var sensorId : Int = -1
+        private var size: Int = -1
+        private var hist : List<SensorHistory>? = null
+
+        fun getHistory(service: MainService?, sensorId : Int, size: Int = 128) : List<SensorHistory> {
+            if(hist == null || this.sensorId!=sensorId || this.size !=size) {
+                Log.i(tag, "Reread sensor cache for $sensorId")
+                this.sensorId=sensorId
+                this.size=size
+                hist = service?.getSensorHistory(sensorId, size)
+            }
+            return hist ?: listOf()
         }
-    */
+        fun invalidate(sensorId : Int) {
+            if(this.sensorId==sensorId) {
+                Log.i(tag, "Invalidated sensor cache for $sensorId")
+                hist = null
+                this.sensorId=-1
+                this.size=-1
+            }
+        }
+    }
+
 }
 
 

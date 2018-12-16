@@ -7,6 +7,7 @@ import com.boar.smartserver.extensions.getLocalIpAddress
 import com.boar.smartserver.service.MainService
 import com.boar.smartserver.service.TaskExecutor
 import java.net.ServerSocket
+import java.net.Socket
 import java.util.*
 
 class TcpServer(val ctx: Context, val port : Int, val srv: MainService) {
@@ -22,9 +23,24 @@ class TcpServer(val ctx: Context, val port : Int, val srv: MainService) {
 
             while (true) {
 
-                val client = server.accept()
-                Log.d("Listener", "Client connected : ${client.inetAddress.hostAddress}")
+                //val client = server.accept()
 
+                lateinit var client : Socket
+
+                try {
+                    client = server.accept()
+                }
+                catch (t: Throwable) {
+                    val msg = t.message ?: "Unknown TCP error"
+                    Log.w(tag, "TCP error: $msg")
+                    srv.logEventDb(msg)
+                    continue
+                }
+                finally {
+                    ;
+                }
+
+                Log.d("Listener", "Client connected : ${client.inetAddress.hostAddress}")
                 srv.logEventDb("connected : ${client.inetAddress.hostAddress}")
 
                 executor.execute {

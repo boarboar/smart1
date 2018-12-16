@@ -13,9 +13,10 @@ import java.util.*
 class TcpServer(val ctx: Context, val port : Int, val srv: MainService) {
     private val tag = "TcpServ"
     private var executor = TaskExecutor.getInstance(2)
+    lateinit var server : ServerSocket
 
     fun run(handler : (String) -> Unit ) {
-        val server = ServerSocket(port)
+        server = ServerSocket(port)
         executor.execute {
             Log.i(tag, "Listener thread [ START ]")
             Log.d(tag, "WiFi Address detected as: ${ctx.getLocalIpAddress()}")
@@ -44,6 +45,7 @@ class TcpServer(val ctx: Context, val port : Int, val srv: MainService) {
                 srv.logEventDb("connected : ${client.inetAddress.hostAddress}")
 
                 executor.execute {
+                    srv.logEventDb("exec IN : ${client.inetAddress.hostAddress}")
                     try {
                         val scanner = Scanner(client.inputStream)
                         val builder = StringBuilder()
@@ -62,6 +64,7 @@ class TcpServer(val ctx: Context, val port : Int, val srv: MainService) {
                     finally {
                         client.close()
                     }
+                    srv.logEventDb("exec OUT : ${client.inetAddress.hostAddress}")
                 }
 
                 //client.close()
@@ -69,7 +72,19 @@ class TcpServer(val ctx: Context, val port : Int, val srv: MainService) {
 
             server.close()
             Log.i(tag, "Listener thread [ STOP ]")
-        }
 
+            srv.logEventDb("Listener thread [ STOP ]")
+        }
+    }
+
+    fun stop() {
+        try {
+            server.close()
+        }
+        catch (t: Throwable) {
+            val msg = t.message ?: "Unknown TCP error"
+            Log.w(tag, "TCP error: $msg")
+            srv.logEventDb(msg)
+        }
     }
 }

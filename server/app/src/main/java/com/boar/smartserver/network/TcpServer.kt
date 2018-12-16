@@ -25,6 +25,8 @@ class TcpServer(val ctx: Context, val port : Int, val srv: MainService) {
                 val client = server.accept()
                 Log.d("Listener", "Client connected : ${client.inetAddress.hostAddress}")
 
+                srv.logEventDb("connected : ${client.inetAddress.hostAddress}")
+
                 executor.execute {
                     try {
                         val scanner = Scanner(client.inputStream)

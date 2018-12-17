@@ -110,6 +110,7 @@ class MainPresenter() {
     fun attachService(srv: MainService?) { service = srv}
     fun detachService() { service = null}
 
+    //run restartTcpService() {service?.restartTcpService()}
 
     fun detachReceiver() : Unit {}
     fun attachReceiver() = apply {

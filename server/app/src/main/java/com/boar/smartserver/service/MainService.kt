@@ -53,6 +53,8 @@ class MainService : Service() {
     private var sensors : SensorList? = null
     private var logsdb : MutableList<ServiceLog>? = null  // DESC order
 
+    lateinit private var tcpServer : TcpServer
+
     /*
     private val logsdb : MutableList<ServiceLog> by lazy {
         db.requestLog(LOG_KEEP_REC_MAX)
@@ -97,7 +99,8 @@ class MainService : Service() {
         intent.putExtra(BROADCAST_EXTRAS_OPERATION, BROADCAST_EXTRAS_OP_LOAD)
         sendBroadcast(intent)
 
-        TcpServer(applicationContext, TCP_PORT, this).run {processMessage(it)}
+        tcpServer = TcpServer(applicationContext, TCP_PORT, this)
+        tcpServer.run {processMessage(it)}
 
         startLogCleaner()
 
@@ -136,6 +139,13 @@ class MainService : Service() {
 
     inner class MainServiceBinder : Binder() {
         fun getService(): MainService = this@MainService
+    }
+
+    fun restartTcpService() {
+        executor.execute {
+            tcpServer.stop()
+            tcpServer.run { processMessage(it) }
+        }
     }
 
     fun addSensor(sensor: Sensor) {

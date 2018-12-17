@@ -8,6 +8,7 @@
     <string name="delete_sensor">Delete sensor</string>
     <string name="sim_start">Start simulation</string>
     <string name="sim_stop">Stop simulation</string>
+    <string name="tcp_restart">Restart TCP Server</string>
     <string name="wifi_ip">WiFi IP:</string>
     <string name="sensor_id">ID:</string>
     <string name="sensor_loc">Location:</string>

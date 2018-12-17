@@ -25,4 +25,9 @@
         android:orderInCategory="103"
         android:title="@string/sim_stop"
         app:showAsAction="never"/>
+    <item
+        android:id="@+id/action_tcp_restart"
+        android:orderInCategory="103"
+        android:title="@string/tcp_restart"
+        app:showAsAction="never"/>
 </menu>

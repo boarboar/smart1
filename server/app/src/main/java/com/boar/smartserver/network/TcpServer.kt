@@ -6,14 +6,18 @@ import com.boar.smartserver.SmartServer.Companion.tag
 import com.boar.smartserver.extensions.getLocalIpAddress
 import com.boar.smartserver.service.MainService
 import com.boar.smartserver.service.TaskExecutor
+import java.io.InterruptedIOException
 import java.net.ServerSocket
 import java.net.Socket
+import java.net.SocketException
 import java.util.*
 
 class TcpServer(val ctx: Context, val port : Int, val srv: MainService) {
     private val tag = "TcpServ"
     private var executor = TaskExecutor.getInstance(2)
-    lateinit var server : ServerSocket
+    private lateinit var server : ServerSocket
+    private var isRunning = false
+
 
     fun run(handler : (String) -> Unit ) {
         server = ServerSocket(port)
@@ -21,6 +25,10 @@ class TcpServer(val ctx: Context, val port : Int, val srv: MainService) {
             Log.i(tag, "Listener thread [ START ]")
             Log.d(tag, "WiFi Address detected as: ${ctx.getLocalIpAddress()}")
             Log.d("Listener", "Server running on port ${server.inetAddress.hostAddress} : ${server.localPort} (${server.inetAddress.hostName})")
+
+            srv.logEventDb("Listener thread [ START ] on port ${server.inetAddress.hostAddress} : ${server.localPort}")
+
+            isRunning = true
 
             while (true) {
 
@@ -31,9 +39,19 @@ class TcpServer(val ctx: Context, val port : Int, val srv: MainService) {
                 try {
                     client = server.accept()
                 }
+                catch (t: InterruptedIOException) {
+                    Log.w(tag, "TCP error: InterruptedIOException")
+                    srv.logEventDb("accept: InterruptedIOException")
+                    break
+                }
+                catch (t: SocketException) {
+                    Log.w(tag, "TCP error: SocketException")
+                    srv.logEventDb("accept: SocketException")
+                    break
+                }
                 catch (t: Throwable) {
                     val msg = t.message ?: "Unknown TCP error"
-                    Log.w(tag, "TCP error: $msg")
+                    Log.w(tag, "accept:: TCP error: $msg")
                     srv.logEventDb(msg)
                     continue
                 }
@@ -58,7 +76,7 @@ class TcpServer(val ctx: Context, val port : Int, val srv: MainService) {
                     }
                     catch (t: Throwable) {
                         val msg = t.message ?: "Unknown TCP error"
-                        Log.w(tag, "TCP error: $msg")
+                        Log.w(tag, "read:: TCP error: $msg")
                         srv.logEventDb(msg)
                     }
                     finally {
@@ -71,6 +89,8 @@ class TcpServer(val ctx: Context, val port : Int, val srv: MainService) {
             }
 
             server.close()
+            isRunning = false
+
             Log.i(tag, "Listener thread [ STOP ]")
 
             srv.logEventDb("Listener thread [ STOP ]")
@@ -79,12 +99,16 @@ class TcpServer(val ctx: Context, val port : Int, val srv: MainService) {
 
     fun stop() {
         try {
-            server.close()
+            if(this::server.isInitialized)
+                server.close()
+            while(!server.isClosed) {} // wait
+            while(isRunning) {} // wait
         }
         catch (t: Throwable) {
             val msg = t.message ?: "Unknown TCP error"
-            Log.w(tag, "TCP error: $msg")
+            Log.w(tag, "Stop:: TCP error: $msg")
             srv.logEventDb(msg)
         }
+        Log.w(tag, "Stop:: done")
     }
 }

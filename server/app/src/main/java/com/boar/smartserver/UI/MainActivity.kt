@@ -104,6 +104,7 @@ class MainActivity : BaseActivity(), ToolbarManager {
                 R.id.action_add -> showSensorPropUI()
                 R.id.action_sim_start -> service?.runSimulation()
                 R.id.action_sim_stop -> service?.stopSimulation()
+                R.id.action_tcp_restart -> service?.restartTcpService()
                 else -> toast("Unknown option")
             }
         }

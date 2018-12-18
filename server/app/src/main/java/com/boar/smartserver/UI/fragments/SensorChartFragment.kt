@@ -14,7 +14,7 @@ import kotlinx.android.synthetic.main.fragment_sensor_chart.view.*
 class SensorChartFragment : SensorBaseFragment() {
 
     override val ftag = "Chart frag"
-    var sensHist : List<SensorHistory> = listOf()
+    //var sensHist : List<SensorHistory> = listOf()
 
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -24,7 +24,8 @@ class SensorChartFragment : SensorBaseFragment() {
         if (idx != -1) {
             presenter.getSensor(idx)?.apply {
                 view.sensor_id.text = id.toString()
-                sensHist = presenter.getSensorHistory(id.toInt())
+                //sensHist = presenter.getSensorHistory(id.toInt())
+                view.draw_view.sensHist = presenter.getSensorHistory(id.toInt())
             }
         }
         return view

@@ -84,8 +84,6 @@ class TcpServer(val ctx: Context, val port : Int, val srv: MainService) {
                     }
                     srv.logEventDb("exec OUT : ${client.inetAddress.hostAddress}")
                 }
-
-                //client.close()
             }
 
             server.close()

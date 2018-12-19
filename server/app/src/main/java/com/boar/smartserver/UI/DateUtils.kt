@@ -3,6 +3,7 @@ package com.boar.smartserver.UI
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
+import org.threeten.bp.*
 
 class DateUtils {
     companion object {
@@ -23,6 +24,19 @@ class DateUtils {
         fun convertDate(date: Long): String {
             return df_date.format(date)
         }
+
+        fun millsToLocalDateTime(millis: Long): LocalDateTime {
+            val instant = Instant.ofEpochMilli(millis)
+            return instant.atZone(ZoneId.systemDefault()).toLocalDateTime()
+        }
+
+
+        fun localDateTimeToMillis(ldt: LocalDateTime): Long {
+            val zdt = ldt.atZone(ZoneId.systemDefault())
+            val instant = zdt.toInstant()
+            return instant.toEpochMilli()
+        }
+
     }
 
 }

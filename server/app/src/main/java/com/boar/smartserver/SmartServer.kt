@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import com.boar.smartserver.service.MainService
+import com.jakewharton.threetenabp.AndroidThreeTen
 
 class SmartServer : Application() {
 
@@ -15,6 +16,7 @@ class SmartServer : Application() {
     }
     override fun onCreate() {
         super.onCreate()
+        AndroidThreeTen.init(this)
         ctx = applicationContext
         startService()
         Log.v(tag, "[ ON CREATE ]")

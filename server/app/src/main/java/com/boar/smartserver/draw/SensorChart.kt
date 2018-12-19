@@ -12,7 +12,13 @@ import com.boar.smartserver.R
 import com.boar.smartserver.UI.DateUtils.Companion.convertDateTime
 import com.boar.smartserver.domain.SensorHistory
 import android.graphics.DashPathEffect
+import android.util.Log
+import com.boar.smartserver.UI.DateUtils.Companion.localDateTimeToMillis
+import com.boar.smartserver.UI.DateUtils.Companion.millsToLocalDateTime
+import kotlinx.android.synthetic.main.item_sensor_hist.view.*
+import org.threeten.bp.LocalDateTime
 
+import java.util.*
 
 
 class DrawView(context: Context, attrs: AttributeSet) : View(context, attrs) {
@@ -31,8 +37,10 @@ class DrawView(context: Context, attrs: AttributeSet) : View(context, attrs) {
         prepare()
     }
 
+    var anythingToDisplay = false
     var timeMax : Long = 0
     var timeMin : Long = 0
+    var timeStart : Long = 0
     var tempMax : Int = 0
     var tempMin : Int = 0
     private var paint = Paint()
@@ -80,8 +88,7 @@ class DrawView(context: Context, attrs: AttributeSet) : View(context, attrs) {
         canvas.drawLine(left, top, left, h-bot, paint)
         canvas.drawLine(w, top, w, h-bot, paint)
 
-        //canvas.drawLine(0F, 0F, w, h, paint)
-        //canvas.drawLine(w, 0F, 0F, h, paint)
+        if(!anythingToDisplay) return
 
         val nsteps =  (tempMax - tempMin)/TEMP_STEP_10
         if(nsteps==0) return // TODO
@@ -100,30 +107,78 @@ class DrawView(context: Context, attrs: AttributeSet) : View(context, attrs) {
             y += dy
         }
 
-        canvas.drawText("${convertDateTime(timeMin)} .. $${convertDateTime(timeMax)}   $tempMin .. $tempMax", 0F, h/2, paintText)
+        val ncols = 24
+        var x = left
+        val dx = (w-left)/ncols
+        for(col in 0..ncols) {
+            if(col !=0 && col !=ncols)
+                canvas.drawLine(x, top, x, h-bot, paint)
+            canvas.drawText("$col", x, h,  paintText)
+            x+=dx
+        }
+
+        canvas.drawText("${convertDateTime(timeMin)} .. $${convertDateTime(timeMax)} at ${convertDateTime(timeStart)}", left, h/2, paintText)
+        canvas.drawText("$tempMin .. $tempMax" , left, h/2 + dy, paintText)
+
+        /*
+        var i = sensHist.indexOfFirst { it.timestamp > timeStart }
+        if(i==-1) return
+
+        while(i<sensHist.size) {
+            val e = sensHist[i]
+            Log.d("Chart", "$i ${convertDateTime(e.timestamp)}")
+            i++
+        }
+        */
+
+        // timestamp DESC !!!!
+        sensHist.forEach {
+            if(it.timestamp > timeStart) {
+                Log.d("Chart", "${convertDateTime(it.timestamp)}")
+            }
+        }
 
     }
 
     fun prepare() {
+
+        anythingToDisplay = false
+        // calculate time window
+
+        // for 1 day so far
+
+        val time24hrs = System.currentTimeMillis() - 23L * 3600 * 1000
+        var dateStart = millsToLocalDateTime(time24hrs)
+        dateStart = LocalDateTime.of(dateStart.year, dateStart.month, dateStart.dayOfMonth, dateStart.hour, 0)
+        timeStart = localDateTimeToMillis(dateStart)
+
+
         timeMax = System.currentTimeMillis() - 30L * 24 * 3600 * 1000
         timeMin = System.currentTimeMillis() + 30L * 24 * 3600 * 1000
         tempMax = -273
         tempMin = 273
+        var count = 0
 
         sensHist.forEach {
-            if(it.timestamp > timeMax) timeMax=it.timestamp
-            if(it.timestamp < timeMin) timeMin=it.timestamp
-            if(it.temp10 > tempMax) tempMax=it.temp10
-            if(it.temp10 < tempMin) tempMin=it.temp10
+            if(it.timestamp > timeStart) { // should be in window
+                if (it.timestamp > timeMax) timeMax = it.timestamp
+                if (it.timestamp < timeMin) timeMin = it.timestamp
+                if (it.temp10 > tempMax) tempMax = it.temp10
+                if (it.temp10 < tempMin) tempMin = it.temp10
+                count ++
+            }
         }
 
+        if(count<2)
+            return
+
+        anythingToDisplay = true
         var tmr = (tempMax/TEMP_STEP_10)  // rounded to 5 grad
         if(tmr * TEMP_STEP_10 < tempMax) tmr++
         tempMax = tmr*TEMP_STEP_10
         tmr = (tempMin/TEMP_STEP_10)  // rounded to 5 grad
         if(tmr * TEMP_STEP_10 > tempMin) tmr--
         tempMin = tmr*TEMP_STEP_10
-
 
     }
 }

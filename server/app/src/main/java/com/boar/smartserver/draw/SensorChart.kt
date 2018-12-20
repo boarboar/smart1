@@ -1,9 +1,7 @@
 package com.boar.smartserver.draw
 
 import android.content.Context
-import android.graphics.Canvas
-import android.graphics.Paint
-import android.graphics.Typeface
+import android.graphics.*
 import android.support.v4.content.ContextCompat
 import android.support.v4.content.res.ResourcesCompat
 import android.util.AttributeSet
@@ -11,7 +9,6 @@ import android.view.View
 import com.boar.smartserver.R
 import com.boar.smartserver.UI.DateUtils.Companion.convertDateTime
 import com.boar.smartserver.domain.SensorHistory
-import android.graphics.DashPathEffect
 import android.util.Log
 import com.boar.smartserver.UI.DateUtils.Companion.localDateTimeToMillis
 import com.boar.smartserver.UI.DateUtils.Companion.millsToLocalDateTime
@@ -91,7 +88,9 @@ class DrawView(context: Context, attrs: AttributeSet) : View(context, attrs) {
         if(!anythingToDisplay) return
 
         val nsteps =  (tempMax - tempMin)/TEMP_STEP_10
-        if(nsteps==0) return // TODO
+        if(nsteps==0) return // TODO  - horizontal line!
+
+
         val dy = (h-top-bot)/nsteps
         var y = top
         var t = tempMax
@@ -131,13 +130,35 @@ class DrawView(context: Context, attrs: AttributeSet) : View(context, attrs) {
         }
         */
 
-        // timestamp DESC !!!!
+        // NOTE - timestamp DESC (right to left) !!!!
+
+        paint.strokeWidth = 4f
+
+        val chartw = w-left
+        val charth = h -top - bot
+        val chartw_l = 24*3600
+        val charth_l = tempMax-tempMin
+        val scale_x = chartw/chartw_l
+        val scale_y = charth/charth_l
+
+        val path = Path()
+        var cnt = 0
+
         sensHist.forEach {
             if(it.timestamp > timeStart) {
-                Log.d("Chart", "${convertDateTime(it.timestamp)}")
+                val sec_off = (it.timestamp - timeStart)/1000
+                val x = sec_off*scale_x
+                val deg_off = it.temp10 - tempMin
+                val y = h-bot-deg_off*scale_y
+                if(cnt==0) path.moveTo(x, y)
+                else path.lineTo(x, y)
+
+                cnt++
+                //Log.d("Chart", "$x $y")
             }
         }
 
+        canvas.drawPath(path, paint)
     }
 
     fun prepare() {
@@ -147,10 +168,13 @@ class DrawView(context: Context, attrs: AttributeSet) : View(context, attrs) {
 
         // for 1 day so far
 
-        val time24hrs = System.currentTimeMillis() - 23L * 3600 * 1000
+        val time24hrs = System.currentTimeMillis() - 24L * 3600 * 1000
         var dateStart = millsToLocalDateTime(time24hrs)
         dateStart = LocalDateTime.of(dateStart.year, dateStart.month, dateStart.dayOfMonth, dateStart.hour, 0)
         timeStart = localDateTimeToMillis(dateStart)
+
+        Log.d("Chart", "Now ${convertDateTime(System.currentTimeMillis())}")
+        Log.d("Chart", "Start ${convertDateTime(timeStart)}")
 
 
         timeMax = System.currentTimeMillis() - 30L * 24 * 3600 * 1000

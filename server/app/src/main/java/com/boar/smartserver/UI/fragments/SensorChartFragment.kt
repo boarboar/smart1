@@ -23,7 +23,7 @@ class SensorChartFragment : SensorBaseFragment() {
         val view = inflater?.inflate(R.layout.fragment_sensor_chart, container, false)
         if (idx != -1) {
             presenter.getSensor(idx)?.apply {
-                view.sensor_id.text = id.toString()
+                //view.sensor_id.text = id.toString()
                 //sensHist = presenter.getSensorHistory(id.toInt())
                 view.draw_view.sensHist = presenter.getSensorHistory(id.toInt())
             }

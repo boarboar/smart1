@@ -13,25 +13,80 @@
         android:layout_weight="1"
         android:orientation="horizontal"
         android:id="@+id/legend"
+        android:layout_margin="@dimen/spacing_xlarge"
         >
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="@style/TextAppearance.AppCompat.Display1"
-            android:textColor = "@android:color/holo_green_light"
-            android:layout_alignParentLeft = "true"
-            android:gravity="center_vertical"
-            android:text="CHART ID:"/>
 
-        <TextView
-            android:id="@+id/sensor_id"
+        <RadioGroup
+            android:id="@+id/radioGroupType"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="@style/TextAppearance.AppCompat.Display1"
-            android:textColor = "@android:color/holo_green_light"
+            android:layout_alignParentLeft = "true"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/radio_tenp"
+                android:layout_weight="1"
+                android:text="@string/temp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/spacing_xlarge"
+                android:textColor = "@android:color/holo_green_light"
+                android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+                />
+
+            <RadioButton
+                android:id="@+id/radio_vcc"
+                android:layout_weight="1"
+                android:text="@string/vcc"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/spacing_xlarge"
+                android:textColor = "@android:color/holo_green_light"
+                android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+                />
+
+        </RadioGroup>
+
+        <RadioGroup
+            android:id="@+id/radioGroupIntrv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_alignParentRight = "true"
-            android:gravity="center_vertical"
-            tools:text="000"/>
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/radio_day"
+                android:layout_weight="1"
+                android:text="@string/intrv_day"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/spacing_xlarge"
+                android:textColor = "@android:color/holo_green_light"
+                android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+                />
+            <RadioButton
+                android:id="@+id/radio_week"
+                android:layout_weight="1"
+                android:text="@string/intrv_week"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/spacing_xlarge"
+                android:textColor = "@android:color/holo_green_light"
+                android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+                />
+            <RadioButton
+                android:id="@+id/radio_month"
+                android:layout_weight="1"
+                android:text="@string/intrv_month"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/spacing_xlarge"
+                android:textColor = "@android:color/holo_green_light"
+                android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+                />
+
+        </RadioGroup>
+
     </RelativeLayout>
 
     <com.boar.smartserver.draw.DrawView

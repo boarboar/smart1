@@ -18,4 +18,9 @@
     <string name="sensor_cnt">Сенсоров:</string>
     <string name="log_cnt">Логов:</string>
     <string name="sensor_hist_cnt">Историй:</string>
+    <string name="temp">Темп</string>
+    <string name="vcc">Vcc</string>
+    <string name="intrv_day">День</string>
+    <string name="intrv_week">Неделя</string>
+    <string name="intrv_month">Месяц</string>
 </resources>

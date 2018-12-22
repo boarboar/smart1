@@ -71,6 +71,7 @@ class TcpServer(val ctx: Context, val port : Int, val srv: MainService) {
                             builder.append(scanner.nextLine())
                         }
                         Log.d("Client", "Raw: $builder")
+                        srv.logEventDb("Raw: $builder")
                         handler(builder.toString())
                         scanner.close()
                     }

@@ -30,18 +30,25 @@ class SensorListAdapter(private val presenter : MainPresenter,
 
     class ViewHolder(view: View, private val itemClick: (Int) -> Unit)
         : RecyclerView.ViewHolder(view) {
+        companion object {
+            val color_ok = ctx.resolveColor(android.R.color.holo_green_light)
+            val color_bad = ctx.resolveColor(android.R.color.holo_red_light)
+        }
         fun bindForecast( presenter : MainPresenter, position: Int) {
             presenter.getSensor(position)?.apply {
                  itemView.date.text = if(updated !=0L ) DateUtils.convertTime(updated) else "--:--:--"
+                 itemView.date.setTextColor(if(updated !=0L && outdated) color_bad else color_ok)
                  itemView.description.text = description
                  itemView.temperature.text = "${temperatureAsString}º"
                  itemView.vcc.text = "${vccAsString} v"
-                 if(validated) {
+                 if(validated && !outdated) {
                      itemView.status.text = if(updated !=0L ) "\u2713" else ""
-                     itemView.status.setTextColor(ctx.resolveColor(android.R.color.holo_green_light))
+                     //itemView.status.setTextColor(ctx.resolveColor(android.R.color.holo_green_light))
+                     itemView.status.setTextColor(color_ok)
                  } else {
                      itemView.status.text = "\u2717"
-                     itemView.status.setTextColor(ctx.resolveColor(android.R.color.holo_red_light))
+                     //itemView.status.setTextColor(ctx.resolveColor(android.R.color.holo_red_light))
+                     itemView.status.setTextColor(color_bad)
                  }
                  itemView.temp_grad.text = when {
                      //temp_grad > 0 -> "\u2197"

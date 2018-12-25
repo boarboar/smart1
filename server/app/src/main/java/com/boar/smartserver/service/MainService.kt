@@ -26,7 +26,7 @@ class MainService : Service() {
 
         val HIST_KEEP_REC_MAX = 1_344 // ca 1 week for 2 sensors
         val LOG_KEEP_REC_MAX = 128
-        val LOG_CLEAN_TIMEOUT = 900_000L // every 15 min
+        val BACKGROUND_TASK_TIMEOUT = 900_000L // every 15 min
 
         //val LOG_KEEP_REC_MAX = 8
         //val LOG_CLEAN_TIMEOUT = 60_000L // every 5 min
@@ -47,7 +47,7 @@ class MainService : Service() {
     private var binder = getServiceBinder()
     private var executor = TaskExecutor.getInstance(2)
     private var simFuture  : Future<Unit>? = null
-    private var logCleanerFuture  : Future<Unit>? = null
+    private var bgTaskFuture  : Future<Unit>? = null
     private val lock : Lock =  ReentrantLock()
 
     private var sensors : SensorList? = null
@@ -102,7 +102,7 @@ class MainService : Service() {
         tcpServer = TcpServer(applicationContext, TCP_PORT, this)
         tcpServer.run {processMessage(it)}
 
-        startLogCleaner()
+        startBgTask()
 
         return Service.START_STICKY
     }
@@ -242,17 +242,27 @@ class MainService : Service() {
         }
     }
 
-    fun startLogCleaner() {
+    fun startBgTask() {
         Log.v(tag, "Start log cleaner daemmon")
-        logCleanerFuture = doAsync {
+        bgTaskFuture = doAsync {
             while(true) {
-                Thread.sleep(MainService.LOG_CLEAN_TIMEOUT)
+                Thread.sleep(MainService.BACKGROUND_TASK_TIMEOUT)
                 Log.v(tag, "Do Log/Hist clean")
                 if(db.cleanLog(LOG_KEEP_REC_MAX)>0) {
                     lock.withLock { logsdb = logsdb?.take(LOG_KEEP_REC_MAX)?.toMutableList()} //
                 }
                 if(db.cleanSensorHist(HIST_KEEP_REC_MAX)>0) {
                     // do smth...
+                }
+
+                val idxs = lock.withLock { sensors?.checkForOutdated()}
+                idxs?.forEach {
+                    Log.v(tag, "OUTDATED $it")
+                    val intent = Intent()
+                    intent.action = BROADCAST_ACTION
+                    intent.putExtra(BROADCAST_EXTRAS_OPERATION, BROADCAST_EXTRAS_OP_UPD)
+                    intent.putExtra(BROADCAST_EXTRAS_IDX, it)
+                    sendBroadcast(intent)
                 }
             }
         }

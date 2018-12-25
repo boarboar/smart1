@@ -13,6 +13,8 @@ class SensorList : ArrayList<Sensor>() {
 
     companion object {
         private val tag = "Sensor list"
+        private val MEAS_OBOLETE_PERIOD = 1000L * 60L * 46L // 46 min
+        //private val MEAS_OBOLETE_PERIOD = 1000L * 60L  // for test
 
         fun simulate() : String {
             val random = Random()
@@ -61,7 +63,7 @@ class SensorList : ArrayList<Sensor>() {
                     lastValidMeasTime = System.currentTimeMillis()))
                     */
             set(sensorIdx, this[sensorIdx].copy(meas = newmeas,
-                    lastValidMeasTime = System.currentTimeMillis()))
+                    lastValidMeasTime = System.currentTimeMillis(), outdated=false))
 
             this[sensorIdx].pushHist()
 
@@ -75,14 +77,25 @@ class SensorList : ArrayList<Sensor>() {
         }
         return sensorIdx
     }
+
+    fun checkForOutdated() : ArrayList<Int> {
+        var idxs = arrayListOf<Int>()
+        forEachIndexed { idx, it ->
+            if(!it.outdated && (it.lastValidMeasTime < System.currentTimeMillis()-MEAS_OBOLETE_PERIOD)) {
+                it.outdated = true
+                idxs.add(idx)
+            }
+        }
+        return idxs
+    }
 }
 
 
 data class Sensor(val id: Short, val description: String,
                   val lastValidMeasTime: Long = 0,
-                  val meas: SensorMeasurement? = null
-                  //, val meas_prev: SensorMeasurement? = null
-                  ,val hist : ArrayList<Int> = arrayListOf<Int>()
+                  val meas: SensorMeasurement? = null,
+                  val hist : ArrayList<Int> = arrayListOf<Int>(),
+                  var outdated : Boolean = false
 
 ) {
     val temperature : Float

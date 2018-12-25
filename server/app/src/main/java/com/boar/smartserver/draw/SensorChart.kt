@@ -27,7 +27,7 @@ class DrawView(context: Context, attrs: AttributeSet) : View(context, attrs) {
     }
 
     companion object {
-        val TEMP_STEP_10 = 50 // 5 deg
+        //val TEMP_STEP_10 = 50 // 5 deg
         val VCC_STEP_1000 = 500 // 0.5v
         val LEFT_BORD = 50 //
         val FONT_SZ = 20
@@ -37,18 +37,26 @@ class DrawView(context: Context, attrs: AttributeSet) : View(context, attrs) {
     }
 
     var sensHist : List<SensorHistory> = listOf()
+        /*
     set (value) {
         field = value
         prepare()
     }
+*/
 
     var disp : DispType = DispType.TEMPERATURE
+        set (value) {
+            field = value
+            prepare()
+        }
+
     var anythingToDisplay = false
     var timeMax : Long = 0
     var timeMin : Long = 0
     var timeStart : Long = 0
     var valMax : Int = 0
     var valMin : Int = 0
+    var valStep : Int = 1
     private var paint = Paint()
     private var paintText = Paint()
     private var paintTextSmall = Paint()
@@ -70,7 +78,7 @@ class DrawView(context: Context, attrs: AttributeSet) : View(context, attrs) {
             style = Paint.Style.STROKE
             strokeJoin = Paint.Join.ROUND
             strokeCap = Paint.Cap.ROUND
-            strokeWidth = 2f
+            strokeWidth = 4f
             isAntiAlias = true
         }
         paintText.apply {
@@ -105,7 +113,7 @@ class DrawView(context: Context, attrs: AttributeSet) : View(context, attrs) {
 
         if(!anythingToDisplay) return
 
-        val nsteps =  (valMax - valMin)/TEMP_STEP_10
+        val nsteps =  (valMax - valMin)/valStep
         if(nsteps==0) return // TODO  - horizontal line!
 
 
@@ -117,12 +125,15 @@ class DrawView(context: Context, attrs: AttributeSet) : View(context, attrs) {
         //paint.strokeWidth = 1f
 
         for(row in 0..nsteps) {  // =1
-            canvas.drawText(if (t>0) "+${t/10}" else if (t<0) "${t/10}" else " 0", 0F, y+td, paintText)
+            if(disp==DispType.TEMPERATURE)
+                canvas.drawText(if (t>0) "+${t/10}" else if (t<0) "${t/10}" else " 0", 0F, y+td, paintText)
+            else
+                canvas.drawText("${(t/10).toFloat()/100F}", 0F, y+td, paintText)
             if(row !=0 && row !=nsteps) {
                 paint.strokeWidth = if(t==0) 4F else 1F
                 canvas.drawLine(left, y, w, y, paint)
             }
-            t -= TEMP_STEP_10
+            t -= valStep
             y += dy
         }
 
@@ -130,6 +141,9 @@ class DrawView(context: Context, attrs: AttributeSet) : View(context, attrs) {
         var x = left
         val dx = (w-left)/ncols
         var time = timeStart
+
+        paint.strokeWidth = 1f
+
         for(col in 0..ncols) {
             if(col !=0 && col !=ncols)
                 canvas.drawLine(x, top, x, h-bot, paint)
@@ -170,7 +184,8 @@ class DrawView(context: Context, attrs: AttributeSet) : View(context, attrs) {
             if(it.timestamp > timeStart) {
                 val sec_off = (it.timestamp - timeStart)/1000
                 val x = left+sec_off*scale_x
-                val deg_off = it.temp10 - valMin
+                //val deg_off = it.temp10 - valMin
+                val deg_off = (if(disp==DispType.TEMPERATURE) it.temp10 else it.vcc1000) - valMin
                 val y = h-bot-deg_off*scale_y
                 if(cnt==0) path.moveTo(x, y)
                 else path.lineTo(x, y)
@@ -201,16 +216,21 @@ class DrawView(context: Context, attrs: AttributeSet) : View(context, attrs) {
 
         timeMax = System.currentTimeMillis() - 30L * 24 * 3600 * 1000
         timeMin = System.currentTimeMillis() + 30L * 24 * 3600 * 1000
-        valMax = -273
-        valMin = 273
+        valMin = Int.MAX_VALUE
+        valMax = Int.MIN_VALUE
         var count = 0
 
         sensHist.forEach {
             if(it.timestamp > timeStart) { // should be in window
                 if (it.timestamp > timeMax) timeMax = it.timestamp
                 if (it.timestamp < timeMin) timeMin = it.timestamp
-                if (it.temp10 > valMax) valMax = it.temp10
-                if (it.temp10 < valMin) valMin = it.temp10
+                if(disp==DispType.TEMPERATURE) {
+                    if (it.temp10 > valMax) valMax = it.temp10
+                    if (it.temp10 < valMin) valMin = it.temp10
+                } else {
+                    if (it.vcc1000 > valMax) valMax = it.vcc1000
+                    if (it.vcc1000 < valMin) valMin = it.vcc1000
+                }
                 count ++
             }
         }
@@ -219,12 +239,35 @@ class DrawView(context: Context, attrs: AttributeSet) : View(context, attrs) {
             return
 
         anythingToDisplay = true
-        var tmr = (valMax/TEMP_STEP_10)  // rounded to 5 grad
-        if(tmr * TEMP_STEP_10 < valMax) tmr++
-        valMax = tmr*TEMP_STEP_10
-        tmr = (valMin/TEMP_STEP_10)  // rounded to 5 grad
-        if(tmr * TEMP_STEP_10 > valMin) tmr--
-        valMin = tmr*TEMP_STEP_10
+
+        if(disp==DispType.TEMPERATURE) {
+
+            if (valMax < 0 && valMin < 0) {
+                valMax = 0
+            } else if (valMax > 0 && valMin > 0) {
+                valMin = 0
+            } else if (valMax == 0 && valMin == 0) {
+                valMax = 5
+                valMin = -5
+            }
+
+            valStep = when {
+                valMax - valMin <= 5 -> 10
+                valMax - valMin <= 10 -> 20
+                else -> 50
+            }
+        } else {
+            valMin = 0
+            valMax = 5000
+            valStep = 500
+        }
+
+        var tmr = (valMax/valStep)  // rounded to 5 grad
+        if(tmr * valStep < valMax) tmr++
+        valMax = tmr*valStep
+        tmr = (valMin/valStep)  // rounded to 5 grad
+        if(tmr * valStep > valMin) tmr--
+        valMin = tmr*valStep
 
     }
 }

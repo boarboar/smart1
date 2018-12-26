@@ -10,6 +10,7 @@ import com.boar.smartserver.R
 import com.boar.smartserver.UI.DateUtils.Companion.convertDateTime
 import com.boar.smartserver.domain.SensorHistory
 import android.util.Log
+import com.boar.smartserver.UI.DateUtils.Companion.convertDateDOnly
 import com.boar.smartserver.UI.DateUtils.Companion.convertTimeHOnly
 import com.boar.smartserver.UI.DateUtils.Companion.convertTimeShort
 import com.boar.smartserver.UI.DateUtils.Companion.localDateTimeToMillis
@@ -26,9 +27,13 @@ class DrawView(context: Context, attrs: AttributeSet) : View(context, attrs) {
         TEMPERATURE, VCC
     }
 
+    enum class DispPeriod {
+        DAY, WEEK, MONTH
+    }
+
     companion object {
         //val TEMP_STEP_10 = 50 // 5 deg
-        val VCC_STEP_1000 = 500 // 0.5v
+        //val VCC_STEP_1000 = 500 // 0.5v
         val LEFT_BORD = 50 //
         val FONT_SZ = 20
         val FONT_SZ_SMALL = 14
@@ -50,14 +55,24 @@ class DrawView(context: Context, attrs: AttributeSet) : View(context, attrs) {
             prepare()
         }
 
-    var anythingToDisplay = false
-    var timeMax : Long = 0
-    var timeMin : Long = 0
-    var timeStart : Long = 0
-    var valMax : Int = 0
-    var valMin : Int = 0
-    var valStep : Int = 1
-    private var paint = Paint()
+    var dispPeriod : DispPeriod = DispPeriod.DAY
+        set (value) {
+            field = value
+            prepare()
+        }
+
+    private var anythingToDisplay = false
+    private var timeMax : Long = 0
+    private var timeMin : Long = 0
+    private var timeStart : Long = 0
+    private var valMax : Int = 0
+    private var valMin : Int = 0
+    private var valStep : Int = 1
+    private var ncols : Int = 25
+    private var periodSec : Long = 25L * 3600
+    private var colStepSec : Long = 3600L
+
+            private var paint = Paint()
     private var paintText = Paint()
     private var paintTextSmall = Paint()
     private var paintPath = Paint()
@@ -137,7 +152,6 @@ class DrawView(context: Context, attrs: AttributeSet) : View(context, attrs) {
             y += dy
         }
 
-        val ncols = 25
         var x = left
         val dx = (w-left)/ncols
         var time = timeStart
@@ -147,32 +161,20 @@ class DrawView(context: Context, attrs: AttributeSet) : View(context, attrs) {
         for(col in 0..ncols) {
             if(col !=0 && col !=ncols)
                 canvas.drawLine(x, top, x, h-bot, paint)
-            canvas.drawText("${convertTimeHOnly(time)}", x, h,  paintText)
+            if(dispPeriod==DispPeriod.DAY)
+                canvas.drawText("${convertTimeHOnly(time)}", x, h,  paintText)
+            else
+                canvas.drawText("${convertDateDOnly(time)}", x, h,  paintText)
             x+=dx
-            time += 3600L * 1000 // !!!!
+            time += colStepSec * 1000
         }
 
         canvas.drawText("${convertDateTime(timeMin)} .. $${convertDateTime(timeMax)} at ${convertDateTime(timeStart)}", left, h/2+dy, paintText)
         canvas.drawText("$valMin .. $valMax" , left, h/2 + dy*2, paintText)
 
-        /*
-        var i = sensHist.indexOfFirst { it.timestamp > timeStart }
-        if(i==-1) return
-
-        while(i<sensHist.size) {
-            val e = sensHist[i]
-            Log.d("Chart", "$i ${convertDateTime(e.timestamp)}")
-            i++
-        }
-        */
-
-        // NOTE - timestamp DESC (right to left) !!!!
-
-        //paint.strokeWidth = 4f
-
         val chartw = w-left
         val charth = h -top - bot
-        val chartw_l = 25*3600
+        val chartw_l = periodSec
         val charth_l = valMax-valMin
         val scale_x = chartw/chartw_l
         val scale_y = charth/charth_l
@@ -184,7 +186,6 @@ class DrawView(context: Context, attrs: AttributeSet) : View(context, attrs) {
             if(it.timestamp > timeStart) {
                 val sec_off = (it.timestamp - timeStart)/1000
                 val x = left+sec_off*scale_x
-                //val deg_off = it.temp10 - valMin
                 val deg_off = (if(disp==DispType.TEMPERATURE) it.temp10 else it.vcc1000) - valMin
                 val y = h-bot-deg_off*scale_y
                 if(cnt==0) path.moveTo(x, y)
@@ -204,18 +205,49 @@ class DrawView(context: Context, attrs: AttributeSet) : View(context, attrs) {
         // calculate time window
 
         // for 1 day so far
+    /*
+        val time0 = System.currentTimeMillis() - when(dispPeriod) {
+            DispPeriod.DAY -> 24L * 3600 * 1000
+            DispPeriod.WEEK -> 7L * 24L * 3600 * 1000
+            else -> 30L * 24L * 3600 * 1000
+        }
+*/
+        var offset=0L
+        if(dispPeriod == DispPeriod.DAY) {
+            offset = 24L * 3600 * 1000
+            ncols = 25
+            periodSec = 25*3600
+            colStepSec = 3600L
+            var dateStart = millsToLocalDateTime(System.currentTimeMillis()-offset)
+            dateStart = LocalDateTime.of(dateStart.year, dateStart.month, dateStart.dayOfMonth, dateStart.hour, 0)
+            timeStart = localDateTimeToMillis(dateStart)
+        }
+        else if(dispPeriod == DispPeriod.WEEK) {
+            offset = 7L * 24L * 3600 * 1000
+            ncols = 8
+            periodSec = 8L*24*3600
+            colStepSec = 24L*3600L
+            var dateStart = millsToLocalDateTime(System.currentTimeMillis()-offset)
+            dateStart = LocalDateTime.of(dateStart.year, dateStart.month, dateStart.dayOfMonth, 0, 0)
+            timeStart = localDateTimeToMillis(dateStart)
+        } else  {
+            offset = 30L * 24L * 3600 * 1000
+            ncols = 31
+            periodSec = 31L*24*3600
+            colStepSec = 24L*3600L
+            var dateStart = millsToLocalDateTime(System.currentTimeMillis()-offset)
+            dateStart = LocalDateTime.of(dateStart.year, dateStart.month, dateStart.dayOfMonth, 0, 0)
+            timeStart = localDateTimeToMillis(dateStart)
+        }
 
-        val time24hrs = System.currentTimeMillis() - 24L * 3600 * 1000
-        var dateStart = millsToLocalDateTime(time24hrs)
-        dateStart = LocalDateTime.of(dateStart.year, dateStart.month, dateStart.dayOfMonth, dateStart.hour, 0)
-        timeStart = localDateTimeToMillis(dateStart)
+
 
         Log.d("Chart", "Now ${convertDateTime(System.currentTimeMillis())}")
         Log.d("Chart", "Start ${convertDateTime(timeStart)}")
 
 
-        timeMax = System.currentTimeMillis() - 30L * 24 * 3600 * 1000
-        timeMin = System.currentTimeMillis() + 30L * 24 * 3600 * 1000
+        timeMax = System.currentTimeMillis() - 300L * 24 * 3600 * 1000
+        timeMin = System.currentTimeMillis() + 300L * 24 * 3600 * 1000
         valMin = Int.MAX_VALUE
         valMax = Int.MIN_VALUE
         var count = 0

@@ -10,6 +10,7 @@ class DateUtils {
         private val df_time = SimpleDateFormat("HH:mm:ss")
         private val df_time_short = SimpleDateFormat("HH:mm")
         private val df_time_honly = SimpleDateFormat("HH")
+        private val df_date_donly = SimpleDateFormat("dd")
         private val df_date = DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.getDefault())
         private var df_dt = DateFormat.getDateTimeInstance( DateFormat.SHORT, DateFormat.SHORT, Locale.GERMAN)
         // Note: formatters are not threadsafe bit it's no issue since called from UIThread only
@@ -24,6 +25,9 @@ class DateUtils {
         }
         fun convertTimeHOnly(date: Long): String {
             return df_time_honly.format(date)
+        }
+        fun convertDateDOnly(date: Long): String {
+            return df_date_donly.format(date)
         }
         fun convertDate(date: Long): String {
             return df_date.format(date)

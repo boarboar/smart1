@@ -25,22 +25,44 @@ class SensorChartFragment : SensorBaseFragment() {
             presenter.getSensor(idx)?.apply {
                 view.draw_view.sensHist = presenter.getSensorHistory(id.toInt())
             }
+            /*
             view.draw_view.disp =  if(view.radio_temp.isChecked) DrawView.DispType.TEMPERATURE
             else DrawView.DispType.VCC
+            view.draw_view.dispPeriod = when() {
+                view.radio_day.isChecked -> DrawView.DispPeriod.DAY
+                view.radio_week.isChecked -> DrawView.DispPeriod.WEEK
+                view.radio_month.isChecked -> DrawView.DispPeriod.MONTH
+            }
+              */
+            setChartParmeters(view)
         }
         view.radio_temp.setOnClickListener { update() }
         view.radio_vcc.setOnClickListener { update() }
+        view.radio_day.setOnClickListener { update() }
+        view.radio_month.setOnClickListener { update() }
+        view.radio_week.setOnClickListener { update() }
         return view
     }
 
     fun update() {
-
         val mview = view
-
         if(mview==null) return
-
+        setChartParmeters(mview)
+        /*
         mview.draw_view.disp =  if(mview.radio_temp.isChecked) DrawView.DispType.TEMPERATURE
             else DrawView.DispType.VCC
+            */
         mview.draw_view.invalidate()
+
+    }
+
+    fun setChartParmeters(mview : View) {
+        mview.draw_view.disp =  if(mview.radio_temp.isChecked) DrawView.DispType.TEMPERATURE
+        else DrawView.DispType.VCC
+        mview.draw_view.dispPeriod = when {
+            mview.radio_day.isChecked -> DrawView.DispPeriod.DAY
+            mview.radio_week.isChecked -> DrawView.DispPeriod.WEEK
+            else -> DrawView.DispPeriod.MONTH
+        }
     }
 }

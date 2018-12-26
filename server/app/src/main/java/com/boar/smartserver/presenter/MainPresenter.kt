@@ -157,7 +157,7 @@ class MainPresenter() {
 
     fun getServiceLog(position : Int) = service?.getServiceLog(position)
 
-    fun getSensorHistory(sensorId : Int, size: Int = 128) : List<SensorHistory> {
+    fun getSensorHistory(sensorId : Int, size: Int = 256) : List<SensorHistory> {
         // temporarily...
         // make cache for sensorId
         // add paging / periods...
@@ -171,7 +171,7 @@ class MainPresenter() {
         private var size: Int = -1
         private var hist : List<SensorHistory>? = null
 
-        fun getHistory(service: MainService?, sensorId : Int, size: Int = 128) : List<SensorHistory> {
+        fun getHistory(service: MainService?, sensorId : Int, size: Int = 2048) : List<SensorHistory> {
             if(hist == null || this.sensorId!=sensorId || this.size !=size) {
                 Log.i(tag, "Reread sensor cache for $sensorId")
                 this.sensorId=sensorId

@@ -64,7 +64,7 @@ class SystemLogListAdapter(private val presenter : MainPresenter,
     //override fun getItemCount() = presenter.sensorListSize
 
     override fun getItemCount() : Int {
-        return presenter.logListSize
+        return if(presenter.logListSize <= 128) presenter.logListSize else 128
     }
 
     class ViewHolder(view: View, private val itemClick: (Int) -> Unit)

@@ -22,16 +22,6 @@ class SystemLogFragment : SensorBaseFragment() {
     ): View? {
 
         val view = inflater?.inflate(R.layout.fragment_sensor_log, container, false)
-
-        /*
-        if (idx != -1)
-        {
-
-            val adapter = SensorLogListAdapter(presenter) {}
-            view.sensor_log.adapter = adapter
-        }
-        */
-
         return view
     }
 
@@ -60,8 +50,6 @@ class SystemLogListAdapter(private val presenter : MainPresenter,
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.bindLog(presenter, position)
     }
-
-    //override fun getItemCount() = presenter.sensorListSize
 
     override fun getItemCount() : Int {
         return if(presenter.logListSize <= 128) presenter.logListSize else 128

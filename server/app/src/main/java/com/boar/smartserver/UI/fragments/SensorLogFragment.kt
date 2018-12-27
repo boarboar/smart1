@@ -60,7 +60,8 @@ class SensorLogListAdapter(private val hist : List<SensorHistory>,
     }
 
     override fun getItemCount() : Int {
-        return hist.size
+        //return hist.size
+        return if(hist.size <= 128) hist.size else 128
     }
 
     class ViewHolder(view: View, private val itemClick: (Int) -> Unit)

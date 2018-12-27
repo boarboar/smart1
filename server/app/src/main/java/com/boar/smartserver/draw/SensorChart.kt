@@ -72,12 +72,14 @@ class DrawView(context: Context, attrs: AttributeSet) : View(context, attrs) {
     private var periodSec : Long = 25L * 3600
     private var colStepSec : Long = 3600L
 
-            private var paint = Paint()
+    private var paint = Paint()
     private var paintText = Paint()
     private var paintTextSmall = Paint()
     private var paintPath = Paint()
-    //private var dash = DashPathEffect(floatArrayOf(300f, 100f), 0f)
 
+    val getTemp = { it: SensorHistory -> it.temp10 }
+    val getVcc = { it: SensorHistory -> it.vcc1000 }
+    var getVal : (SensorHistory) -> Int = getTemp
 
     init {
         paint.apply {
@@ -169,8 +171,10 @@ class DrawView(context: Context, attrs: AttributeSet) : View(context, attrs) {
             time += colStepSec * 1000
         }
 
-        canvas.drawText("${convertDateTime(timeMin)} .. $${convertDateTime(timeMax)} at ${convertDateTime(timeStart)}", left, h/2+dy, paintText)
-        canvas.drawText("$valMin .. $valMax" , left, h/2 + dy*2, paintText)
+        paintText.color = ContextCompat.getColor(context, android.R.color.holo_blue_light)
+        canvas.drawText("${convertDateTime(timeMin)} .. ${convertDateTime(timeMax)} at ${convertDateTime(timeStart)}", left, h/4, paintText)
+        canvas.drawText("$valMin .. $valMax" , left, h*3/4, paintText)
+        paintText.color = ContextCompat.getColor(context, android.R.color.holo_green_light)
 
         val chartw = w-left
         val charth = h -top - bot
@@ -180,19 +184,23 @@ class DrawView(context: Context, attrs: AttributeSet) : View(context, attrs) {
         val scale_y = charth/charth_l
 
         val path = Path()
-        var cnt = 0
 
-        sensHist.forEach {
+        // todo - moving average
+        for(i in 0..sensHist.size-1) {
+            val it = sensHist[i]
             if(it.timestamp > timeStart) {
                 val sec_off = (it.timestamp - timeStart)/1000
                 val x = left+sec_off*scale_x
-                val deg_off = (if(disp==DispType.TEMPERATURE) it.temp10 else it.vcc1000) - valMin
+                val v = if(dispPeriod == DispPeriod.DAY) getVal(it)
+                        else when(i) { // moving 3-average
+                            0 -> getVal(it)
+                            sensHist.size-1 -> getVal(it)
+                            else -> (getVal(sensHist[i-1])+ getVal(it) + getVal(sensHist[i+1]))/3
+                        }
+                val deg_off = v - valMin
                 val y = h-bot-deg_off*scale_y
-                if(cnt==0) path.moveTo(x, y)
+                if(i==0) path.moveTo(x, y)
                 else path.lineTo(x, y)
-
-                cnt++
-                //Log.d("Chart", "$x $y")
             }
         }
 
@@ -202,16 +210,6 @@ class DrawView(context: Context, attrs: AttributeSet) : View(context, attrs) {
     fun prepare() {
 
         anythingToDisplay = false
-        // calculate time window
-
-        // for 1 day so far
-    /*
-        val time0 = System.currentTimeMillis() - when(dispPeriod) {
-            DispPeriod.DAY -> 24L * 3600 * 1000
-            DispPeriod.WEEK -> 7L * 24L * 3600 * 1000
-            else -> 30L * 24L * 3600 * 1000
-        }
-*/
         var offset=0L
         if(dispPeriod == DispPeriod.DAY) {
             offset = 24L * 3600 * 1000
@@ -240,11 +238,8 @@ class DrawView(context: Context, attrs: AttributeSet) : View(context, attrs) {
             timeStart = localDateTimeToMillis(dateStart)
         }
 
-
-
         Log.d("Chart", "Now ${convertDateTime(System.currentTimeMillis())}")
         Log.d("Chart", "Start ${convertDateTime(timeStart)}")
-
 
         timeMax = System.currentTimeMillis() - 300L * 24 * 3600 * 1000
         timeMin = System.currentTimeMillis() + 300L * 24 * 3600 * 1000
@@ -252,17 +247,15 @@ class DrawView(context: Context, attrs: AttributeSet) : View(context, attrs) {
         valMax = Int.MIN_VALUE
         var count = 0
 
+        getVal = if(disp==DispType.TEMPERATURE) getTemp else getVcc
+
         sensHist.forEach {
             if(it.timestamp > timeStart) { // should be in window
                 if (it.timestamp > timeMax) timeMax = it.timestamp
                 if (it.timestamp < timeMin) timeMin = it.timestamp
-                if(disp==DispType.TEMPERATURE) {
-                    if (it.temp10 > valMax) valMax = it.temp10
-                    if (it.temp10 < valMin) valMin = it.temp10
-                } else {
-                    if (it.vcc1000 > valMax) valMax = it.vcc1000
-                    if (it.vcc1000 < valMin) valMin = it.vcc1000
-                }
+                val v = getVal(it)
+                if (v > valMax) valMax = v
+                if (v < valMin) valMin = v
                 count ++
             }
         }

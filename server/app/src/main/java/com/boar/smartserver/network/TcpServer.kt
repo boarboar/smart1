@@ -67,7 +67,12 @@ class TcpServer(val ctx: Context, val port : Int, val srv: MainService) {
                     try {
                         val scanner = Scanner(client.inputStream)
                         val builder = StringBuilder()
+                        /*
                         while (scanner.hasNextLine()) {
+                            builder.append(scanner.nextLine())
+                        }
+                        */
+                        if (scanner.hasNextLine()) {
                             builder.append(scanner.nextLine())
                         }
                         Log.d("Client", "Raw: $builder")

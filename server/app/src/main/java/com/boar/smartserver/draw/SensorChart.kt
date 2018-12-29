@@ -185,7 +185,7 @@ class DrawView(context: Context, attrs: AttributeSet) : View(context, attrs) {
 
         val path = Path()
 
-        // todo - moving average
+
         for(i in 0..sensHist.size-1) {
             val it = sensHist[i]
             if(it.timestamp > timeStart) {
@@ -193,9 +193,13 @@ class DrawView(context: Context, attrs: AttributeSet) : View(context, attrs) {
                 val x = left+sec_off*scale_x
                 val v = if(dispPeriod == DispPeriod.DAY) getVal(it)
                         else when(i) { // moving 3-average
-                            0 -> getVal(it)
-                            sensHist.size-1 -> getVal(it)
-                            else -> (getVal(sensHist[i-1])+ getVal(it) + getVal(sensHist[i+1]))/3
+                            0, sensHist.size-1 ->
+                                getVal(it)
+                            1, sensHist.size-2 -> // moving average 3
+                                (getVal(sensHist[i-1]) + getVal(it) + getVal(sensHist[i+1]))/3
+                            else -> // moving average 5
+                                (getVal(sensHist[i-2]) + getVal(sensHist[i-1]) + getVal(it)
+                                        + getVal(sensHist[i+1]) + getVal(sensHist[i+2]))/5
                         }
                 val deg_off = v - valMin
                 val y = h-bot-deg_off*scale_y

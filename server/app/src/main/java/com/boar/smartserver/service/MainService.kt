@@ -7,9 +7,11 @@ import android.os.Binder
 import android.os.IBinder
 import android.util.Log
 import android.widget.Toast
+import com.boar.smartserver.SmartServer.Companion.ctx
 import com.boar.smartserver.db.SensorDb
 import com.boar.smartserver.domain.*
 import com.boar.smartserver.network.TcpServer
+import com.boar.smartserver.network.TcpTester
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
 import java.util.concurrent.Future
@@ -26,7 +28,7 @@ class MainService : Service() {
 
         //val HIST_KEEP_REC_MAX = 1_344 // ca 1 week for 2 sensors
         val HIST_KEEP_REC_MAX = 2_688 // ca 2 weeks for 2 sensors
-        val LOG_KEEP_REC_MAX = 128
+        val LOG_KEEP_REC_MAX = 256
         val BACKGROUND_TASK_TIMEOUT = 900_000L // every 15 min
 
         //val LOG_KEEP_REC_MAX = 8
@@ -212,7 +214,7 @@ class MainService : Service() {
     }
 
     fun processMessage(msg : String) {
-        logEventDb(msg)
+        //logEventDb(msg)
         val meas = sensors?.measFromJson(msg)
         if (meas != null) {
             val idx = lock.withLock { sensors?.update(meas) ?: -1 }
@@ -279,11 +281,13 @@ class MainService : Service() {
 
     fun runSimulation() {
         Log.v(tag, "Start simulation")
+        val tester = TcpTester (ctx, TCP_PORT)
         simFuture = doAsync {
             while(true) {
                 Thread.sleep(MainService.SIMULATION_TIMEOUT)
                 val msg =  SensorList.simulate()
-                processMessage(msg)
+                //processMessage(msg)
+                tester.send(msg)
             }
         }
     }
@@ -291,4 +295,6 @@ class MainService : Service() {
     fun stopSimulation() {
         simFuture?.cancel(true)
     }
+
+
 }

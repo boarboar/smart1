@@ -6,10 +6,12 @@ import com.boar.smartserver.SmartServer.Companion.tag
 import com.boar.smartserver.extensions.getLocalIpAddress
 import com.boar.smartserver.service.MainService
 import com.boar.smartserver.service.TaskExecutor
+import java.io.ByteArrayOutputStream
 import java.io.InterruptedIOException
 import java.net.ServerSocket
 import java.net.Socket
 import java.net.SocketException
+import java.net.SocketTimeoutException
 import java.util.*
 
 class TcpServer(val ctx: Context, val port : Int, val srv: MainService) {
@@ -31,8 +33,6 @@ class TcpServer(val ctx: Context, val port : Int, val srv: MainService) {
             isRunning = true
 
             while (true) {
-
-                //val client = server.accept()
 
                 lateinit var client : Socket
 
@@ -56,39 +56,13 @@ class TcpServer(val ctx: Context, val port : Int, val srv: MainService) {
                     continue
                 }
                 finally {
-                    ;
                 }
 
                 Log.d("Listener", "Client connected : ${client.inetAddress.hostAddress}")
                 srv.logEventDb("connected : ${client.inetAddress.hostAddress}")
 
                 executor.execute {
-                    srv.logEventDb("exec IN : ${client.inetAddress.hostAddress}")
-                    try {
-                        val scanner = Scanner(client.inputStream)
-                        val builder = StringBuilder()
-                        /*
-                        while (scanner.hasNextLine()) {
-                            builder.append(scanner.nextLine())
-                        }
-                        */
-                        if (scanner.hasNextLine()) {
-                            builder.append(scanner.nextLine())
-                        }
-                        Log.d("Client", "Raw: $builder")
-                        srv.logEventDb("Raw: $builder")
-                        handler(builder.toString())
-                        scanner.close()
-                    }
-                    catch (t: Throwable) {
-                        val msg = t.message ?: "Unknown TCP error"
-                        Log.w(tag, "read:: TCP error: $msg")
-                        srv.logEventDb(msg)
-                    }
-                    finally {
-                        client.close()
-                    }
-                    srv.logEventDb("exec OUT : ${client.inetAddress.hostAddress}")
+                    process(client, handler)
                 }
             }
 
@@ -96,7 +70,6 @@ class TcpServer(val ctx: Context, val port : Int, val srv: MainService) {
             isRunning = false
 
             Log.i(tag, "Listener thread [ STOP ]")
-
             srv.logEventDb("Listener thread [ STOP ]")
         }
     }
@@ -114,5 +87,57 @@ class TcpServer(val ctx: Context, val port : Int, val srv: MainService) {
             srv.logEventDb(msg)
         }
         Log.w(tag, "Stop:: done")
+    }
+
+    private fun process(socket: Socket, handler : (String) -> Unit) {
+        srv.logEventDb("exec IN : ${socket.inetAddress.hostAddress}")
+        try {
+            socket.soTimeout= 5_1000
+
+            /*
+            val scanner = Scanner(client.inputStream)
+            val builder = StringBuilder()
+
+
+            while (scanner.hasNextLine()) {
+                builder.append(scanner.nextLine())
+            }
+
+
+            //if (scanner.hasNextLine()) {
+            //    builder.append(scanner.nextLine())
+            //}
+
+
+
+            Log.d("Client", "Raw: $builder")
+            srv.logEventDb("Raw: $builder")
+            handler(builder.toString())
+            scanner.close()
+            */
+
+
+            val baos = ByteArrayOutputStream()
+            socket.inputStream.use { it.copyTo(baos) }
+            val inputAsString = baos.toString()
+
+            Log.d("Client", "Raw: $inputAsString")
+            srv.logEventDb("Raw: $inputAsString")
+            handler(inputAsString)
+        }
+        catch (t: SocketTimeoutException) {
+            Log.w(tag, "TCP error: SocketTimeoutException")
+            srv.logEventDb("accept: SocketTimeoutException")
+        }
+        catch (t: Throwable) {
+            val msg = t.message ?: "Unknown TCP error"
+            Log.w(tag, "read:: TCP error: $msg")
+            srv.logEventDb(msg)
+        }
+        finally {
+            srv.logEventDb("CLOSE")
+            socket.close()
+        }
+        srv.logEventDb("exec OUT")
     }
 }

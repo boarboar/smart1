@@ -157,7 +157,7 @@ class MainPresenter() {
 
     fun getServiceLog(position : Int) = service?.getServiceLog(position)
 
-    fun getSensorHistory(sensorId : Int, size: Int = 256) : List<SensorHistory> {
+    fun getSensorHistory(sensorId : Int, size: Int = 2048) : List<SensorHistory> {
         // temporarily...
         // make cache for sensorId
         // add paging / periods...

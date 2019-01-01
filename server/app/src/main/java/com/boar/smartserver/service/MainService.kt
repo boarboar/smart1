@@ -27,7 +27,8 @@ class MainService : Service() {
         val SIMULATION_TIMEOUT = 10_000L
 
         //val HIST_KEEP_REC_MAX = 1_344 // ca 1 week for 2 sensors
-        val HIST_KEEP_REC_MAX = 2_688 // ca 2 weeks for 2 sensors
+        //val HIST_KEEP_REC_MAX = 2_688 // ca 2 weeks for 2 sensors
+        val HIST_KEEP_REC_MAX = 5_376 // ca 4 weeks for 2 sensors
         val LOG_KEEP_REC_MAX = 256
         val BACKGROUND_TASK_TIMEOUT = 900_000L // every 15 min
 

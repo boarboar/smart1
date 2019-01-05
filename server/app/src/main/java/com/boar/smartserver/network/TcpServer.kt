@@ -127,7 +127,7 @@ class TcpServer(val ctx: Context, val port : Int, val srv: MainService) {
         }
         catch (t: SocketTimeoutException) {
             Log.w(tag, "TCP error: SocketTimeoutException")
-            srv.logEventDb("accept: SocketTimeoutException")
+            srv.logEventDb("read: SocketTimeoutException")
         }
         catch (t: Throwable) {
             val msg = t.message ?: "Unknown TCP error"

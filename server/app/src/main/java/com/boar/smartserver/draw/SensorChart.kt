@@ -16,6 +16,7 @@ import com.boar.smartserver.UI.DateUtils.Companion.convertTimeShort
 import com.boar.smartserver.UI.DateUtils.Companion.localDateTimeToMillis
 import com.boar.smartserver.UI.DateUtils.Companion.millsToLocalDateTime
 import kotlinx.android.synthetic.main.item_sensor_hist.view.*
+import org.threeten.bp.DayOfWeek
 import org.threeten.bp.LocalDateTime
 
 import java.util.*
@@ -76,6 +77,8 @@ class DrawView(context: Context, attrs: AttributeSet) : View(context, attrs) {
     private var paintText = Paint()
     private var paintTextSmall = Paint()
     private var paintPath = Paint()
+    private val color_green = ContextCompat.getColor(context, android.R.color.holo_green_light)
+    private val color_red = ContextCompat.getColor(context, android.R.color.holo_red_light)
 
     val getTemp = { it: SensorHistory -> it.temp10 }
     val getVcc = { it: SensorHistory -> it.vcc1000 }
@@ -83,7 +86,7 @@ class DrawView(context: Context, attrs: AttributeSet) : View(context, attrs) {
 
     init {
         paint.apply {
-            color = ContextCompat.getColor(context, android.R.color.holo_green_light)
+            color = color_green
             style = Paint.Style.STROKE
             strokeJoin = Paint.Join.ROUND
             strokeCap = Paint.Cap.ROUND
@@ -99,12 +102,12 @@ class DrawView(context: Context, attrs: AttributeSet) : View(context, attrs) {
             isAntiAlias = true
         }
         paintText.apply {
-            color = ContextCompat.getColor(context, android.R.color.holo_green_light)
+            color = color_green
             typeface = Typeface.MONOSPACE
             textSize = resources.displayMetrics.scaledDensity * FONT_SZ
         }
         paintTextSmall.apply {
-            color = ContextCompat.getColor(context, android.R.color.holo_green_light)
+            color = color_green
             typeface = Typeface.MONOSPACE
             textSize = resources.displayMetrics.scaledDensity * FONT_SZ_SMALL
         }
@@ -119,6 +122,8 @@ class DrawView(context: Context, attrs: AttributeSet) : View(context, attrs) {
         val top = 0F
         val bot = resources.displayMetrics.scaledDensity * BOT_BORD
         val td = resources.displayMetrics.scaledDensity * FONT_SZ
+
+        Log.d("Chart", "Type $disp, Priod $dispPeriod")
 
         paint.strokeWidth = 4f
         //paint.pathEffect = null
@@ -147,7 +152,14 @@ class DrawView(context: Context, attrs: AttributeSet) : View(context, attrs) {
             else
                 canvas.drawText("${(t/10).toFloat()/100F}", 0F, y+td, paintText)
             if(row !=0 && row !=nsteps) {
-                paint.strokeWidth = if(t==0) 4F else 1F
+                if(disp==DispType.TEMPERATURE) {
+                    paint.color=color_green
+                    paint.strokeWidth = if (t == 0) 4F else 1F
+                }
+                else {
+                    paint.strokeWidth = if(t==2500) 4F else 1F
+                    paint.color= if(t==2500) color_red else color_green
+                }
                 canvas.drawLine(left, y, w, y, paint)
             }
             t -= valStep
@@ -159,18 +171,27 @@ class DrawView(context: Context, attrs: AttributeSet) : View(context, attrs) {
         var time = timeStart
 
         paint.strokeWidth = 1f
+        paint.color=color_green
 
         for(col in 0..ncols) {
-            if(col !=0 && col !=ncols)
-                canvas.drawLine(x, top, x, h-bot, paint)
+            var date = millsToLocalDateTime(time)
+            if(col !=0 && col !=ncols) {
+                paint.color = if(dispPeriod!=DispPeriod.DAY &&
+                        (date.dayOfWeek==DayOfWeek.SUNDAY || date.dayOfWeek==DayOfWeek.MONDAY))
+                    color_red else color_green
+                canvas.drawLine(x, top, x, h - bot, paint)
+            }
             if(dispPeriod==DispPeriod.DAY)
                 canvas.drawText("${convertTimeHOnly(time)}", x, h,  paintText)
-            else
-                canvas.drawText("${convertDateDOnly(time)}", x, h,  paintText)
+            else {
+                paintText.color = if(date.dayOfWeek==DayOfWeek.SUNDAY) color_red else color_green
+                canvas.drawText("${convertDateDOnly(time)}", x, h, paintText)
+            }
             x+=dx
             time += colStepSec * 1000
         }
 
+        paint.color=color_green
         paintText.color = ContextCompat.getColor(context, android.R.color.holo_blue_light)
         canvas.drawText("${convertDateTime(timeMin)} .. ${convertDateTime(timeMax)} at ${convertDateTime(timeStart)}", left, h/4, paintText)
         canvas.drawText("$valMin .. $valMax" , left, h*3/4, paintText)
@@ -197,9 +218,14 @@ class DrawView(context: Context, attrs: AttributeSet) : View(context, attrs) {
                                 getVal(it)
                             1, sensHist.size-2 -> // moving average 3
                                 (getVal(sensHist[i-1]) + getVal(it) + getVal(sensHist[i+1]))/3
-                            else -> // moving average 5
+                            2, sensHist.size-3 -> // moving average 5
                                 (getVal(sensHist[i-2]) + getVal(sensHist[i-1]) + getVal(it)
                                         + getVal(sensHist[i+1]) + getVal(sensHist[i+2]))/5
+                            else -> // moving average 7
+                                (getVal(sensHist[i-3]) + getVal(sensHist[i-2]) +
+                                        getVal(sensHist[i-1]) + getVal(it)
+                                        + getVal(sensHist[i+1]) + getVal(sensHist[i+2])  +
+                                        getVal(sensHist[i+3]))/7
                         }
                 val deg_off = v - valMin
                 val y = h-bot-deg_off*scale_y
@@ -242,8 +268,8 @@ class DrawView(context: Context, attrs: AttributeSet) : View(context, attrs) {
             timeStart = localDateTimeToMillis(dateStart)
         }
 
-        Log.d("Chart", "Now ${convertDateTime(System.currentTimeMillis())}")
-        Log.d("Chart", "Start ${convertDateTime(timeStart)}")
+        //Log.d("Chart", "Now ${convertDateTime(System.currentTimeMillis())}")
+        //Log.d("Chart", "Start ${convertDateTime(timeStart)}")
 
         timeMax = System.currentTimeMillis() - 300L * 24 * 3600 * 1000
         timeMin = System.currentTimeMillis() + 300L * 24 * 3600 * 1000

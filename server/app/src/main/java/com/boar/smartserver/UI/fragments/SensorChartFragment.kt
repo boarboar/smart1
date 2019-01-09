@@ -41,6 +41,9 @@ class SensorChartFragment : SensorBaseFragment() {
         view.radio_day.setOnClickListener { update() }
         view.radio_month.setOnClickListener { update() }
         view.radio_week.setOnClickListener { update() }
+
+        //update()
+
         return view
     }
 
@@ -57,6 +60,7 @@ class SensorChartFragment : SensorBaseFragment() {
     }
 
     fun setChartParmeters(mview : View) {
+
         mview.draw_view.disp =  if(mview.radio_temp.isChecked) DrawView.DispType.TEMPERATURE
         else DrawView.DispType.VCC
         mview.draw_view.dispPeriod = when {
@@ -64,5 +68,7 @@ class SensorChartFragment : SensorBaseFragment() {
             mview.radio_week.isChecked -> DrawView.DispPeriod.WEEK
             else -> DrawView.DispPeriod.MONTH
         }
+
+        Log.v(ftag, "[ CHART SETPARAMS ${mview.draw_view.disp} ${mview.draw_view.dispPeriod} ]")
     }
 }

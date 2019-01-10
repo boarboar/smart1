@@ -222,7 +222,7 @@ class SensorDb(private val dbHelper: DbHelper = DbHelper.instance
                         SensorHistoryTable.TEMPERATURE, SensorHistoryTable.VCC
                         )
                         .whereArgs("${SensorHistoryTable.SENSOR_ID} = {sensorID}","sensorID" to  sensorId)
-                        .orderBy(LogTable.ID, SqlOrderDirection.DESC).limit(maxLogRec)
+                        .orderBy(SensorHistoryTable.ID, SqlOrderDirection.DESC).limit(maxLogRec)
                         .parseList(parserSensorHistory)
             }
             catch (t: Throwable) {
@@ -273,5 +273,41 @@ class SensorDb(private val dbHelper: DbHelper = DbHelper.instance
             }
         }
         return cnt
+    }
+
+    fun setLatestSensorHist( sensors: SensorList) {
+        lateinit var hist : List<SensorHistory>
+        dbHelper.use {
+            // what if error ?
+            try {
+                hist = select(SensorHistoryTable.NAME, SensorHistoryTable.ID,
+                        SensorHistoryTable.TIMESTAMP, SensorHistoryTable.SENSOR_ID,
+                        SensorHistoryTable.TEMPERATURE, SensorHistoryTable.VCC
+                )
+                        .orderBy(SensorHistoryTable.ID, SqlOrderDirection.DESC).limit(sensors.size*4)
+                        .parseList(parserSensorHistory)
+            }
+            catch (t: Throwable) {
+                val msg = t.message ?: "Unknown DB error"
+                Log.w(tag, "DB error: $msg")
+                hist = listOf()
+            }
+        }
+
+        /*
+        val latest  = mutableMapOf<Int, SensorHistory>()
+
+        hist.forEach {
+            if(!(it.sensorId in latest)) latest[it.sensorId] = it
+        }
+
+        return latest.values.toList()
+        */
+        for(sensor in sensors) {
+            val l = hist.find { it.sensorId == sensor.id.toInt() }
+            l?.let {
+                sensor.pushHistTemp(it)
+            }
+        }
     }
 }

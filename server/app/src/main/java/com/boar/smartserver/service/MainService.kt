@@ -97,6 +97,13 @@ class MainService : Service() {
         sensors = db.requestSensors()
         logsdb = db.requestLog(LOG_KEEP_REC_MAX) // TODO - lazy!
 
+        //val latest = db.requestLatestSensorHist()
+        //Log.v(tag, "Latest: $latest")
+
+        sensors?.let {
+            db.setLatestSensorHist(it)
+        }
+
         logEventDb("SRV START")
         val intent = Intent()
         intent.action = BROADCAST_ACTION
@@ -109,6 +116,7 @@ class MainService : Service() {
         startBgTask()
 
         return Service.START_STICKY
+
     }
 
     override fun onBind(p0: Intent?): IBinder {

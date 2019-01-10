@@ -56,15 +56,8 @@ class SensorList : ArrayList<Sensor>() {
         val sensorIdx = indexOfFirst {it.id == newmeas.id}
         if(sensorIdx==-1) return -1
         if(newmeas.validated) {
-            /*
-            val meas_prev_v = this[sensorIdx].meas
-
-            set(sensorIdx, this[sensorIdx].copy(meas = newmeas, meas_prev=meas_prev_v,
-                    lastValidMeasTime = System.currentTimeMillis()))
-                    */
             set(sensorIdx, this[sensorIdx].copy(meas = newmeas,
                     lastValidMeasTime = System.currentTimeMillis(), outdated=false))
-
             this[sensorIdx].pushHist()
 
         }
@@ -94,50 +87,62 @@ class SensorList : ArrayList<Sensor>() {
 data class Sensor(val id: Short, val description: String,
                   val lastValidMeasTime: Long = 0,
                   val meas: SensorMeasurement? = null,
-                  val hist : ArrayList<Int> = arrayListOf<Int>(),
+                  val hist : ArrayList<SensorHistory> = arrayListOf(),
                   var outdated : Boolean = false
 
 ) {
-    val temperature : Float
-        get() = if(meas!=null) meas.temp10.toFloat()/10f else 0f
+    fun validate() : Boolean = id>0 && description.isNotEmpty()
+    /*
     val vcc : Float
         get() = if(meas!=null) (meas.vcc1000/10).toFloat()/100f else 0f
+    val temperature : Float
+        get() = if(meas!=null) meas.temp10.toFloat()/10f else 0f
+        */
     val resolution : Short
         get() = if(meas!=null) meas.resolution else 0
     val model : Short
         get() = if(meas!=null) meas.model else 0
     val parasite : Short
         get() = if(meas!=null) meas.parasite else -1
-    val updated : Long
-        get() = meas?.updated ?: 0L
     val validated : Boolean
         get() = meas?.validated ?: true
-    /*
-    val temp_grad : Int
-        get() = if(meas!=null && meas_prev!=null) (meas.temp10 - meas_prev.temp10) else 0
-*/
+
+    //val updated : Long
+    //    get() = meas?.updated ?: 0L
+
+    val updated : Long
+        get() = if(hist.size>0) hist[0].timestamp else 0L
+
     val temp_grad : Int
         get() = if(hist.size>1) {
-            val aver = hist.average().toInt()
-            hist[0] - aver
+            val aver = hist.map{it.temp10}.average().toInt()
+            hist[0].temp10 - aver
         } else 0
 
+    /*
     val temperatureAsString : String
         get() = if(meas!=null) "${meas.temp10.toFloat()/10f}" else "--.-"
     val vccAsString : String
         get() = if(meas!=null) "${(meas.vcc1000/10).toFloat()/100f}" else "-.--"
+    */
+
+    val temperatureAsString : String
+        get() = if(hist.size>0) "${hist[0].temp10.toFloat()/10f}" else "--.-"
+    val vccAsString : String
+        get() = if(hist.size>0) "${(hist[0].vcc1000/10).toFloat()/100f}" else "-.--"
 
     val msg : String
         get() = meas?.msg ?: "none"
 
-
-    fun validate() : Boolean = id>0 && description.isNotEmpty()
     fun pushHist()  {
         if(meas!=null) {
-            hist.add(0, meas.temp10.toInt())
-            if(hist.size>4)
-                hist.removeAt(hist.size-1)
+            pushHistTemp(SensorHistory(meas.id.toInt(), meas.temp10.toInt(), meas.vcc1000.toInt()))
         }
+    }
+    fun pushHistTemp(h : SensorHistory)  {
+        hist.add(0, h)
+        if(hist.size>4)
+            hist.removeAt(hist.size-1)
     }
 }
 

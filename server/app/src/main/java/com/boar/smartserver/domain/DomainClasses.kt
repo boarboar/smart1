@@ -3,6 +3,7 @@ package com.boar.smartserver.domain
 import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
+import kotlinx.android.synthetic.main.item_sensor_log.view.*
 import java.util.*
 
 fun Random.nextInt(range: IntRange): Int {
@@ -56,17 +57,12 @@ class SensorList : ArrayList<Sensor>() {
         val sensorIdx = indexOfFirst {it.id == newmeas.id}
         if(sensorIdx==-1) return -1
         if(newmeas.validated) {
-            set(sensorIdx, this[sensorIdx].copy(meas = newmeas,
-                    lastValidMeasTime = System.currentTimeMillis(), outdated=false))
-            this[sensorIdx].pushHist()
-
+            set(sensorIdx, this[sensorIdx].copy(lastValidMeasTime = System.currentTimeMillis(), outdated=false))
+            this[sensorIdx].pushHist(newmeas)
         }
         else {
             //Log.w(tag, "Bad measurement: $newmeas")
-            this[sensorIdx].meas?.let  {
-                val updmeas = it.copy(validated = false, updated = newmeas.updated)
-                set(sensorIdx, this[sensorIdx].copy(meas = updmeas))
-            }
+            this[sensorIdx].invalidateLastMeasurement(newmeas.updated)
         }
         return sensorIdx
     }
@@ -84,34 +80,25 @@ class SensorList : ArrayList<Sensor>() {
 }
 
 
-data class Sensor(val id: Short, val description: String,
+data class Sensor(val id: Int, val description: String,
                   val lastValidMeasTime: Long = 0,
-                  val meas: SensorMeasurement? = null,
-                  val hist : ArrayList<SensorHistory> = arrayListOf(),
+                  val hist: ArrayList<SensorMeasurement> = arrayListOf(),
                   var outdated : Boolean = false
 
 ) {
     fun validate() : Boolean = id>0 && description.isNotEmpty()
-    /*
-    val vcc : Float
-        get() = if(meas!=null) (meas.vcc1000/10).toFloat()/100f else 0f
-    val temperature : Float
-        get() = if(meas!=null) meas.temp10.toFloat()/10f else 0f
-        */
-    val resolution : Short
-        get() = if(meas!=null) meas.resolution else 0
-    val model : Short
-        get() = if(meas!=null) meas.model else 0
-    val parasite : Short
-        get() = if(meas!=null) meas.parasite else -1
-    val validated : Boolean
-        get() = meas?.validated ?: true
 
-    //val updated : Long
-    //    get() = meas?.updated ?: 0L
+    val measValidated : Boolean
+        get() = if(hist.size>0) hist[0].validated else true
+    val measUpdatedTime : Long
+        get() = if(hist.size>0) hist[0].updated else 0L
 
-    val updated : Long
-        get() = if(hist.size>0) hist[0].timestamp else 0L
+    val resolution : Int
+        get() = if(hist.size>0) hist[0].resolution else 0
+    val model : Int
+        get() = if(hist.size>0) hist[0].model else 0
+    val parasite : Int
+        get() = if(hist.size>0) hist[0].parasite else -1
 
     val temp_grad : Int
         get() = if(hist.size>1) {
@@ -119,30 +106,32 @@ data class Sensor(val id: Short, val description: String,
             hist[0].temp10 - aver
         } else 0
 
-    /*
-    val temperatureAsString : String
-        get() = if(meas!=null) "${meas.temp10.toFloat()/10f}" else "--.-"
-    val vccAsString : String
-        get() = if(meas!=null) "${(meas.vcc1000/10).toFloat()/100f}" else "-.--"
-    */
-
     val temperatureAsString : String
         get() = if(hist.size>0) "${hist[0].temp10.toFloat()/10f}" else "--.-"
     val vccAsString : String
         get() = if(hist.size>0) "${(hist[0].vcc1000/10).toFloat()/100f}" else "-.--"
 
     val msg : String
-        get() = meas?.msg ?: "none"
+        get() = if(hist.size>0) hist[0].msg else "none"
 
-    fun pushHist()  {
-        if(meas!=null) {
-            pushHistTemp(SensorHistory(meas.id.toInt(), meas.temp10.toInt(), meas.vcc1000.toInt()))
-        }
-    }
-    fun pushHistTemp(h : SensorHistory)  {
-        hist.add(0, h)
+    fun pushHist(meas : SensorMeasurement)  {
+        hist.add(0, meas)
         if(hist.size>4)
             hist.removeAt(hist.size-1)
+    }
+
+    fun pushHistTemp(h : SensorHistory)  {
+        pushHist(
+                SensorMeasurement(h.sensorId, 0, h.vcc1000,0,0,0,
+                        h.temp10,  h.timestamp, true)
+        )
+    }
+
+    fun invalidateLastMeasurement(timestamp : Long) {
+        if(hist.size>0) {
+            val updmeas = hist[0].copy(validated = false, updated = timestamp)
+            hist.set(0, updmeas)
+        }
     }
 }
 
@@ -150,12 +139,15 @@ data class Sensor(val id: Short, val description: String,
 // '{"I":"1","M":64,"P":0,"R":8,"T":210,"V":310}'
 
 data class SensorMeasurement(
-        @SerializedName("I") val id: Short,
-        @SerializedName("M") val model: Short = 0,
-        @SerializedName("P") val parasite: Short = 0,
-        @SerializedName("R") val resolution: Short = 0,
-        @SerializedName("T") val temp10: Short,
-        @SerializedName("V") val vcc1000: Short,
+        @SerializedName("I") val id: Int,
+        @SerializedName("Y") val ver: Int,
+        @SerializedName("V") val vcc1000: Int,
+
+        @SerializedName("M") val model: Int = 0,
+        @SerializedName("P") val parasite: Int = 0,
+        @SerializedName("R") val resolution: Int = 0,
+        @SerializedName("T") val temp10: Int = -1271,
+
         val updated: Long=System.currentTimeMillis(),
         val validated: Boolean = false,
         val msg: String = ""

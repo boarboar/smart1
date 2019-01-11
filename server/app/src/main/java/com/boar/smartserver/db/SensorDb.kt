@@ -16,7 +16,7 @@ class SensorDb(private val dbHelper: DbHelper = DbHelper.instance
     companion object {
         private const val tag = "SNS DB"
         private val parserSensor = rowParser { id: Int, description: String ->
-            Sensor(id.toShort(), description)
+            Sensor(id, description)
         }
         private val parserLog = rowParser { id: Long, timestamp: Long, msg: String ->
             ServiceLog(msg, id, timestamp)

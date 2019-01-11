@@ -26,7 +26,7 @@ class SensorDetailFragment : SensorBaseFragment() {
                 view.sensor_res.text = "${resolution}"
                 view.sensor_model.text = "${model}"
                 view.sensor_par.text = "${parasite}"
-                view.sensor_last_updated.text = if (updated != 0L) DateUtils.convertTime(updated) else "--:--:--"
+                view.sensor_last_updated.text = if (measUpdatedTime != 0L) DateUtils.convertTime(measUpdatedTime) else "--:--:--"
                 view.sensor_last_valid.text = if (lastValidMeasTime != 0L) DateUtils.convertTime(lastValidMeasTime) else "--:--:--"
                 view.sensor_msg.text = msg
             }

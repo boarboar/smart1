@@ -79,6 +79,7 @@ class DrawView(context: Context, attrs: AttributeSet) : View(context, attrs) {
     private var paintPath = Paint()
     private val color_green = ContextCompat.getColor(context, android.R.color.holo_green_light)
     private val color_red = ContextCompat.getColor(context, android.R.color.holo_red_light)
+    private val color_blue = ContextCompat.getColor(context, android.R.color.holo_blue_light)
 
     val getTemp = { it: SensorHistory -> it.temp10 }
     val getVcc = { it: SensorHistory -> it.vcc1000 }
@@ -94,7 +95,7 @@ class DrawView(context: Context, attrs: AttributeSet) : View(context, attrs) {
             isAntiAlias = true
         }
         paintPath.apply {
-            color = ContextCompat.getColor(context, android.R.color.holo_blue_light)
+            color = color_blue
             style = Paint.Style.STROKE
             strokeJoin = Paint.Join.ROUND
             strokeCap = Paint.Cap.ROUND
@@ -192,10 +193,10 @@ class DrawView(context: Context, attrs: AttributeSet) : View(context, attrs) {
         }
 
         paint.color=color_green
-        paintText.color = ContextCompat.getColor(context, android.R.color.holo_blue_light)
-        canvas.drawText("${convertDateTime(timeMin)} .. ${convertDateTime(timeMax)} at ${convertDateTime(timeStart)}", left, h/4, paintText)
-        canvas.drawText("$valMin .. $valMax" , left, h*3/4, paintText)
-        paintText.color = ContextCompat.getColor(context, android.R.color.holo_green_light)
+        //paintText.color = color_blue
+        //canvas.drawText("${convertDateTime(timeMin)} .. ${convertDateTime(timeMax)} at ${convertDateTime(timeStart)}", left, h/4, paintText)
+        //canvas.drawText("$valMin .. $valMax" , left, h*3/4, paintText)
+        paintText.color = color_green
 
         val chartw = w-left
         val charth = h -top - bot

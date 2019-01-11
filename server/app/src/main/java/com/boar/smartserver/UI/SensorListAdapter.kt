@@ -36,13 +36,13 @@ class SensorListAdapter(private val presenter : MainPresenter,
         }
         fun bindForecast( presenter : MainPresenter, position: Int) {
             presenter.getSensor(position)?.apply {
-                 itemView.date.text = if(updated !=0L ) DateUtils.convertTime(updated) else "--:--:--"
-                 itemView.date.setTextColor(if(updated !=0L && outdated) color_bad else color_ok)
+                 itemView.date.text = if(measUpdatedTime !=0L ) DateUtils.convertTime(measUpdatedTime) else "--:--:--"
+                 itemView.date.setTextColor(if(measUpdatedTime !=0L && outdated) color_bad else color_ok)
                  itemView.description.text = description
                  itemView.temperature.text = "${temperatureAsString}º"
                  itemView.vcc.text = "${vccAsString} v"
-                 if(validated && !outdated) {
-                     itemView.status.text = if(updated !=0L ) "\u2713" else ""
+                 if(measValidated && !outdated) {
+                     itemView.status.text = if(measUpdatedTime !=0L ) "\u2713" else ""
                      //itemView.status.setTextColor(ctx.resolveColor(android.R.color.holo_green_light))
                      itemView.status.setTextColor(color_ok)
                  } else {

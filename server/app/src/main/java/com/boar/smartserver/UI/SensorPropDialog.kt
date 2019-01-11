@@ -70,7 +70,7 @@ class SensorPropDialog(context: Context, var sensor: Sensor?, val isEdit:Boolean
                 // verify TODO
                 //sensor = Sensor(sens_id.toShortOrNull()?:0, sens_loc)
                 val res: Boolean =
-                        func?.invoke(Sensor(sens_id.toShortOrNull()?:0, sens_loc)) ?: false
+                        func?.invoke(Sensor(sens_id.toIntOrNull()?:0, sens_loc)) ?: false
                 if (res) dialog?.dismiss()
             }
         }

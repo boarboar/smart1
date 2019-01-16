@@ -18,16 +18,30 @@ Cfg loaded
 Invalid config, force setup!
 */
 
-const int NCFGS=4; 
+//const int NCFGS=4; 
 
 CfgDrv CfgDrv::Cfg; // singleton
 
 CfgDrv::CfgDrv() : srv_port(0), id(0), sleep_min(1), fs_ok(false)
- {
+ {   
    *srv_addr=0;
    *SSID=0;
    *PWD=0;
+   for(int i=0; i<MAX_SENS; i++) sensors[i]=SENSOR_NONE;
   }
+
+void CfgDrv::print() {
+  Serial.print(F("ID=")); Serial.println(id); 
+  Serial.print(F("SSID=")); Serial.println(SSID);
+  Serial.print(F("PWD=")); Serial.println(PWD);
+  Serial.print(F("ADDR=")); Serial.println(srv_addr); 
+  Serial.print(F("PORT=")); Serial.println(srv_port); 
+  Serial.print(F("SLP=")); Serial.println(sleep_min); 
+  for(int i=0; i<MAX_SENS; i++) {
+    Serial.print(pszSensKeys[i]); Serial.print(F("="));
+    Serial.println(sensors[i]);
+  }
+}  
 
 int16_t CfgDrv::init() {
   fs_ok=SPIFFS.begin();
@@ -90,19 +104,17 @@ int16_t CfgDrv::load() {
           //Serial.println(ps);
          strncpy(PWD, ps, MAX_PWD_SZ);
          PWD[MAX_PWD_SZ-1]=0;
-        }        
+        }     
+       for(int i=0; i<MAX_SENS; i++) {          
+          sensors[i] = (SensorTypes)((int)(json[pszSensKeys[i]]));
+        }
       }
     } // new line
   } // while !EOF
 
   uint16_t t=millis()-ms1;
   Serial.print(F("Cfg sz ")); Serial.print(size); Serial.print(F(", read in ")); Serial.println(t);
-  Serial.print(F("ID=")); Serial.println(id); 
-  Serial.print(F("SSID=")); Serial.println(SSID);
-  Serial.print(F("PWD=")); Serial.println(PWD);
-  Serial.print(F("ADDR=")); Serial.println(srv_addr); 
-  Serial.print(F("PORT=")); Serial.println(srv_port); 
-  Serial.print(F("SLP=")); Serial.println(sleep_min); 
+  print();
   return 1;
 }
 
@@ -126,6 +138,9 @@ int16_t CfgDrv::store() {
   json["PORT"]=srv_port;
   json["ID"]=id;
   json["SLP"]=sleep_min;
+  for(int i=0; i<MAX_SENS; i++) {          
+    json[pszSensKeys[i]] = (int)sensors[i];
+  }        
 
   json.printTo(f);
   f.write('\n');
@@ -138,10 +153,10 @@ int16_t CfgDrv::store() {
 int16_t CfgDrv::setup() 
 {
   char buf[MAX_CFG_LINE_SZ];
-  int16_t cnt=0;
+  //int16_t cnt=0;
   Serial.setTimeout(-1);
   Serial.println(F("=============SETUP MODE!"));
- 
+ /*
   cnt=readLine("SSID", SSID, buf, MAX_CFG_LINE_SZ);
   if(cnt>0) {
     // TODO: add validation
@@ -163,6 +178,8 @@ int16_t CfgDrv::setup()
     srv_addr[MAX_ADDR_SZ-1]=0;
   }
   Serial.println(srv_addr);
+
+
   cnt=readInt("Server port", srv_port);
   if(cnt>0) {
     // TODO: add validation
@@ -181,6 +198,24 @@ int16_t CfgDrv::setup()
     sleep_min=cnt;
   }  
   Serial.println(sleep_min);
+  */
+  readLine1("SSID", SSID, buf, SSID, MAX_SSID_SZ);
+  readLine1("PWD", PWD, buf, PWD, MAX_PWD_SZ);
+  readLine1("Server IP", srv_addr, buf, srv_addr, MAX_ADDR_SZ);
+  srv_port = readInt("Server port", srv_port, true); 
+  id = readInt("Sensor ID", id, true);
+  sleep_min = readInt("Sleep (min)", sleep_min, true);
+  for(int i=0; i<MAX_SENS; i++) {     
+    bool succ = false;
+    while(!succ) {
+      int16_t sens = readInt(pszSensKeys[i], sensors[i], false);
+      if(sens>=SENSOR_NONE && sens<SENSOR_INV) {
+        sensors[i] = (SensorTypes)sens;
+        succ = true;
+      }
+    }
+  }
+  print();
   return 1;
 }
 
@@ -189,7 +224,7 @@ bool CfgDrv::validate() {
   return true;
 }
 
-
+/*
 int16_t CfgDrv::readLine(const char *prompt, const char *initv, char *buf, int16_t sz) {
   boolean res=false;
   boolean leadingspace=true;
@@ -230,10 +265,52 @@ int16_t CfgDrv::readLine(const char *prompt, const char *initv, char *buf, int16
     bytes=0; //overflow, probably caused hang up at start...    
     buf[bytes]=0; 
   }
+  
   return bytes;
+} 
+*/ 
+
+void CfgDrv::readLine1(const char *prompt, const char *initv, char *buf, char *dst, int16_t dstsz) {
+  boolean res=false;
+  boolean leadingspace=true;
+  int16_t bytes=0;   
+  buf[bytes]=0; 
+
+  while (Serial.available() > 0)  Serial.read();
+  if(prompt!=NULL) {
+    Serial.print(prompt);
+    if(initv!=NULL) {
+      Serial.print("[");
+      Serial.print(initv);
+      Serial.print("]");
+    }
+    Serial.print(":");
+  }
+
+  while (!res && bytes<dstsz-1) // 
+  {
+    while(!res && Serial.available()) 
+    {
+      buf[bytes] = Serial.read();
+      if (buf[bytes] == 10 || buf[bytes] == 13)
+      {
+        buf[bytes]=0;        
+        res=true; 
+     }
+      else 
+        if(leadingspace) {
+          if(!isspace(buf[bytes])) leadingspace=false;
+        }
+        if(!leadingspace) bytes++;
+    }    
+    if(!res) yield();
+  }
+  buf[bytes]=0; 
+  strncpy(dst, buf, dstsz);
+  dst[dstsz-1]=0;
 }  
 
-int16_t CfgDrv::readInt(const char *prompt, int initv) {
+int16_t CfgDrv::readInt(const char *prompt, int initv, bool nonzero) {
   while (Serial.available() > 0)  Serial.read();
   if(prompt!=NULL) {
     Serial.print(prompt);
@@ -244,6 +321,12 @@ int16_t CfgDrv::readInt(const char *prompt, int initv) {
     }
     Serial.print(":");
   }
-  return Serial.parseInt();
+  int16_t res = 0;
+  do {
+    res = Serial.parseInt();
+    Serial.println(":");
+  } while(res>0 || !nonzero);
+  Serial.println(res);
+  return res;
 }
 

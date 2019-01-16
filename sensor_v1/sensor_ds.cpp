@@ -4,11 +4,14 @@
 
 
 SensDS::SensDS(int16_t pin) :
-    SensAbstract(pin), oneWire(pin), sensors(&oneWire), _tData{0}
+    SensAbstract(pin), 
+    oneWire(pin), 
+    sensors(&oneWire), _tData{0}
 {
 }
 
 int16_t SensDS::init() {
+    oneWire.begin(_pin);
     sensors.begin();
     return 0;
 }

@@ -5,10 +5,13 @@
 #define MAX_PWD_SZ 16
 #define MAX_ADDR_SZ 16
 
-#define MAX_SENS  2
+//#define MAX_SENS  2
+
+class SensAbstract;
 
 class CfgDrv {
 public:
+  static const int MAX_SENS=2;
   enum SensorTypes { SENSOR_NONE=0, SENSOR_DS18=1, SENSOR_DHT11=2, SENSOR_HUMD=3, SENSOR_INV=4};
 
   static CfgDrv Cfg; // singleton
@@ -16,6 +19,12 @@ public:
   int16_t load();
   int16_t store();
   int16_t setup(); 
+  int16_t sensors_cfg(int16_t ports[MAX_SENS]);
+  int16_t sensors_init();
+  int16_t sensors_setup();
+  int16_t sensors_measure();
+  int16_t sensors_tojson(JsonObject &json);
+
   bool validate();
   void print();
  public: 
@@ -26,8 +35,9 @@ public:
   uint16_t srv_port;
   uint8_t id;
   uint8_t sleep_min;
-  SensorTypes sensors[MAX_SENS];
+  
 protected:  
+
   const char *szFileName = "/config.json"; 
   const char *pszSensKeys[MAX_SENS] = {"S1", "S2"};
   CfgDrv();
@@ -35,6 +45,9 @@ protected:
   void readLine1(const char *prompt, const char *initv, char *buf, char *dst, int16_t dstsz);
   int16_t readInt(const char *prompt, int init, bool nonzero=false);
   bool fs_ok;
+
+  SensorTypes sensors[MAX_SENS];
+  SensAbstract* sensors_inst[MAX_SENS];
 };
 
 #endif //_UMP_CFG_H_

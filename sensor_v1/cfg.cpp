@@ -2,6 +2,8 @@
 #include <ArduinoJson.h>
 //#include <ESP8266WiFi.h>
 #include "FS.h"
+#include "sensor_ds.h"
+
 #include "cfg.h"
 
 #define MAX_CFG_LINE_SZ 120
@@ -19,6 +21,8 @@ Invalid config, force setup!
 */
 
 //const int NCFGS=4; 
+
+static SensDS sensor_ds;
 
 CfgDrv CfgDrv::Cfg; // singleton
 
@@ -330,3 +334,51 @@ int16_t CfgDrv::readInt(const char *prompt, int initv, bool nonzero) {
   return res;
 }
 
+int16_t CfgDrv::sensors_cfg(int16_t ports[MAX_SENS]) {
+  for(int i=0; i<MAX_SENS; i++) {
+    switch(sensors[i]) {
+      case SENSOR_DS18 : sensors_inst[i] = &sensor_ds; break;
+      case SENSOR_DHT11 : sensors_inst[i] = NULL; break;
+      case SENSOR_HUMD : sensors_inst[i] = NULL; break;
+      default: sensors_inst[i] = NULL;
+    }
+    Serial.print(F("PORT(")); Serial.print(ports[i]); Serial.print(F(")->"));
+    if(sensors_inst[i] != NULL)  {
+      sensors_inst[i]->setPin(ports[i]);
+      Serial.println(sensors_inst[i]->describe());      
+    } else Serial.println();
+
+    Serial.print(pszSensKeys[i]); Serial.print(F("="));
+    Serial.println(sensors[i]);
+  } 
+  return 0; 
+}
+
+int16_t CfgDrv::sensors_init() {
+  for(int i=0; i<MAX_SENS; i++) 
+    if(sensors_inst[i] != NULL) sensors_inst[i]->init();
+  return 0;  
+}
+
+int16_t CfgDrv::sensors_setup() {
+  for(int i=0; i<MAX_SENS; i++) 
+    if(sensors_inst[i] != NULL) sensors_inst[i]->cfg();
+  return 0;  
+}
+
+int16_t CfgDrv::sensors_measure() {
+  int16_t rc=0, rci;
+  for(int i=0; i<MAX_SENS; i++)
+    if(sensors_inst[i] != NULL) {
+      rci=sensors_inst[i]->measure();
+      if(rci) rc=rci;
+    }
+  return rc;  
+}
+
+int16_t CfgDrv::sensors_tojson(JsonObject &json) {
+  for(int i=0; i<MAX_SENS; i++) 
+    if(sensors_inst[i] != NULL) sensors_inst[i]->toJson(json);
+
+  return 0;  
+}

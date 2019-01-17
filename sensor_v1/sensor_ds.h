@@ -22,6 +22,7 @@ protected:
     static void printAddress(DeviceAddress deviceAddress);    
 public:
     SensDS(int16_t pin=DATA_BUS_DEF);
+    inline const char *describe() { return "DS18"; }
     int16_t init();
     int16_t cfg();
     int16_t measure();

@@ -3,6 +3,8 @@
 //#include <ESP8266WiFi.h>
 #include "FS.h"
 #include "sensor_ds.h"
+#include "sensor_humd.h"
+#include "sensor_dht.h"
 
 #include "cfg.h"
 
@@ -23,6 +25,8 @@ Invalid config, force setup!
 //const int NCFGS=4; 
 
 static SensDS sensor_ds;
+static SensHUMD sensor_humd;
+static SensDHT11 sensor_dht11;
 
 CfgDrv CfgDrv::Cfg; // singleton
 
@@ -338,8 +342,8 @@ int16_t CfgDrv::sensors_cfg(int16_t ports[MAX_SENS]) {
   for(int i=0; i<MAX_SENS; i++) {
     switch(sensors[i]) {
       case SENSOR_DS18 : sensors_inst[i] = &sensor_ds; break;
-      case SENSOR_DHT11 : sensors_inst[i] = NULL; break;
-      case SENSOR_HUMD : sensors_inst[i] = NULL; break;
+      case SENSOR_DHT11 : sensors_inst[i] = &sensor_dht11;  break;
+      case SENSOR_HUMD : sensors_inst[i] = &sensor_humd; break;
       default: sensors_inst[i] = NULL;
     }
     Serial.print(F("PORT(")); Serial.print(ports[i]); Serial.print(F(")->"));

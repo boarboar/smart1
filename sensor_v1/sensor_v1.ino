@@ -65,7 +65,9 @@ void setup(void)
     digitalWrite(LED_PIN, HIGH); 
     do {
       CfgDrv::Cfg.setup();
-      isCfgValid = CfgDrv::Cfg.validate();      
+      isCfgValid = CfgDrv::Cfg.validate();  
+      Serial.print(F("VALID:"));    
+      Serial.println(isCfgValid);
     } while (!isCfgValid);
     CfgDrv::Cfg.store();
     delay(1000);
@@ -83,15 +85,17 @@ void setup(void)
   CfgDrv::Cfg.sensors_init();
     
   tData.id = CfgDrv::Cfg.id;
- 
+
+  Serial.println(F("Measuring..."));
   if(CfgDrv::Cfg.sensors_measure()) {
-    Serial.println(F("Bad temp!"));
+    Serial.println(F("Bad meas!"));
     blink(400, 2);
   }
 
+  Serial.print(F("Getting vcc..."));
   tData.vcc = ESP.getVcc();
   tData.magic = 37;
-
+  Serial.println(tData.vcc);
   if(doConnect()) {
     for(int i=0; i<TRIES_TO_SEND; i++) {
       if(!doSend(&tData)) {

@@ -314,8 +314,12 @@ void CfgDrv::readLine1(const char *prompt, const char *initv, char *buf, char *d
     if(!res) yield();
   }
   buf[bytes]=0; 
+
+  if(!bytes) return;
+    
   strncpy(dst, buf, dstsz);
   dst[dstsz-1]=0;
+  
 }  
 
 int16_t CfgDrv::readInt(const char *prompt, int initv, bool nonzero) {
@@ -332,8 +336,9 @@ int16_t CfgDrv::readInt(const char *prompt, int initv, bool nonzero) {
   int16_t res = 0;
   do {
     res = Serial.parseInt();
-    Serial.println(":");
-  } while(res>0 || !nonzero);
+    if(res==0 && nonzero) res=initv;
+    //Serial.println(":");
+  } while(res==0 && nonzero);
   Serial.println(res);
   return res;
 }
@@ -352,8 +357,8 @@ int16_t CfgDrv::sensors_cfg(int16_t ports[MAX_SENS]) {
       Serial.println(sensors_inst[i]->describe());      
     } else Serial.println();
 
-    Serial.print(pszSensKeys[i]); Serial.print(F("="));
-    Serial.println(sensors[i]);
+    //Serial.print(pszSensKeys[i]); Serial.print(F("="));
+    //Serial.println(sensors[i]);
   } 
   return 0; 
 }

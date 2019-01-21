@@ -10,6 +10,8 @@
 
 #define MAX_CFG_LINE_SZ 120
 
+static const char *sthelp = "0-NONE, 1-DS18, 2-DHT11, 3 - HUMD";
+  
 /*
 {"SSID":"NETGEAR","PWD":"boarboar","ADDR":"192.168.1.149","PORT":9999,"ID":1}
 Cfg sz 78, read in 5
@@ -97,19 +99,13 @@ int16_t CfgDrv::load() {
           strncpy(srv_addr, ps, MAX_ADDR_SZ);
           srv_addr[MAX_ADDR_SZ-1]=0;
         }
-       // Serial.println("check SSID");        
         ps=json["SSID"];
         if(ps!=NULL) {
-          //Serial.print("SSID not NULL: ");
-          //Serial.println(ps);
           strncpy(SSID, ps, MAX_SSID_SZ);
           SSID[MAX_SSID_SZ-1]=0;
         }
-         //Serial.println("check PWD"); 
         ps=json["PWD"];
         if(ps!=NULL) {
-          //Serial.print("PWD not NULL: ");
-          //Serial.println(ps);
          strncpy(PWD, ps, MAX_PWD_SZ);
          PWD[MAX_PWD_SZ-1]=0;
         }     
@@ -161,58 +157,16 @@ int16_t CfgDrv::store() {
 int16_t CfgDrv::setup() 
 {
   char buf[MAX_CFG_LINE_SZ];
-  //int16_t cnt=0;
   Serial.setTimeout(-1);
   Serial.println(F("=============SETUP MODE!"));
- /*
-  cnt=readLine("SSID", SSID, buf, MAX_CFG_LINE_SZ);
-  if(cnt>0) {
-    // TODO: add validation
-    strncpy(SSID, buf, MAX_SSID_SZ);
-    SSID[MAX_SSID_SZ-1]=0;
-  }
-  Serial.println(SSID);
-  cnt=readLine("PWD", PWD, buf, MAX_CFG_LINE_SZ);
-  if(cnt>0) {
-    // TODO: add validation
-    strncpy(PWD, buf, MAX_PWD_SZ);
-    PWD[MAX_PWD_SZ-1]=0;
-  }
-  Serial.println(PWD);
-  cnt=readLine("Server IP", srv_addr, buf, MAX_CFG_LINE_SZ);
-  if(cnt>0) {
-    // TODO: add validation
-    strncpy(srv_addr, buf, MAX_ADDR_SZ);
-    srv_addr[MAX_ADDR_SZ-1]=0;
-  }
-  Serial.println(srv_addr);
-
-
-  cnt=readInt("Server port", srv_port);
-  if(cnt>0) {
-    // TODO: add validation
-    srv_port=cnt;
-  }
-  Serial.println(srv_port);
-  cnt=readInt("Sensor ID", id);
-  if(cnt>0) {
-    // TODO: add validation
-    id=cnt;
-  }  
-  Serial.println(id);
-  cnt=readInt("Sleep (min)", sleep_min);
-  if(cnt>0) {
-    // TODO: add validation
-    sleep_min=cnt;
-  }  
-  Serial.println(sleep_min);
-  */
   readLine1("SSID", SSID, buf, SSID, MAX_SSID_SZ);
   readLine1("PWD", PWD, buf, PWD, MAX_PWD_SZ);
   readLine1("Server IP", srv_addr, buf, srv_addr, MAX_ADDR_SZ);
   srv_port = readInt("Server port", srv_port, true); 
   id = readInt("Sensor ID", id, true);
   sleep_min = readInt("Sleep (min)", sleep_min, true);
+  Serial.print(F("Sensors setup, "));
+  Serial.println(sthelp);
   for(int i=0; i<MAX_SENS; i++) {     
     bool succ = false;
     while(!succ) {

@@ -23,7 +23,9 @@ protected:
 public:
     inline SensDHT11(int16_t pin=DATA_BUS_DEF) : _sens() {;}
     inline const char *describe() { return "DHT11"; }
-    inline int16_t init() {_sens.setPin(_pin); return 0;}
+    inline int16_t init() {_sens.setPin(_pin); 
+      Serial.print("Init DHT11 to pin ");Serial.println(_pin);
+      return 0;}
     inline int16_t cfg() { return 0; }
     inline int16_t measure() {
         byte temperature = 0;
@@ -36,13 +38,12 @@ public:
             return -1;
         }
         
-        Serial.print("DHT11 OK: ");
-        Serial.print(_tData.t10); Serial.print(" *C, "); 
-        Serial.print(_tData.h10); Serial.println(" H");
-
         _tData.t10 = (int16_t)temperature * 10;
         _tData.h10 = (int16_t)humidity * 10;
 
+        Serial.print("DHT11 OK: ");
+        Serial.print(_tData.t10); Serial.print(" *C, "); 
+        Serial.print(_tData.h10); Serial.println(" H");
         return 0;
     }
 

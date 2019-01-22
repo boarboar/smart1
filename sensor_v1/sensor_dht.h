@@ -35,13 +35,14 @@ public:
             _tData.h10 = -1270;
             return -1;
         }
-
-        _tData.t10 = (int16_t)temperature;
-        _tData.h10 = (int16_t)humidity;
-
-        Serial.print("Sample OK: ");
+        
+        Serial.print("DHT11 OK: ");
         Serial.print(_tData.t10); Serial.print(" *C, "); 
         Serial.print(_tData.h10); Serial.println(" H");
+
+        _tData.t10 = (int16_t)temperature * 10;
+        _tData.h10 = (int16_t)humidity * 10;
+
         return 0;
     }
 

@@ -15,6 +15,9 @@
 
 #define TRIES_TO_SEND 3
 
+#define POWER_PIN 4 // vcc supply for the sensors_cfg
+
+
 static int16_t ports[CfgDrv::MAX_SENS] = {DATA_BUS_1, DATA_BUS_2};
 
 struct TempData {
@@ -33,7 +36,9 @@ void setup(void)
 
   pinMode(LED_PIN, OUTPUT);
 
-  blink(100, 1);
+  pinMode(POWER_PIN, OUTPUT);
+
+  blink(50, 1);
 
   Serial.begin(115200);
   Serial.println();
@@ -73,29 +78,36 @@ void setup(void)
     delay(1000);
     Serial.println(F("Cfg OK"));
     delay(1000);
+    digitalWrite(POWER_PIN, HIGH); 
     CfgDrv::Cfg.sensors_cfg(ports);
     CfgDrv::Cfg.sensors_init();
     CfgDrv::Cfg.sensors_setup();
+    digitalWrite(POWER_PIN, LOW); 
     digitalWrite(LED_PIN, LOW); 
     Serial.println(F("Restarting..."));
     ESP.deepSleep(1000000L);
   } 
   
+  digitalWrite(POWER_PIN, HIGH); 
+    
   CfgDrv::Cfg.sensors_cfg(ports);
   CfgDrv::Cfg.sensors_init();
     
-  tData.id = CfgDrv::Cfg.id;
-
+  
   Serial.println(F("Measuring..."));
   if(CfgDrv::Cfg.sensors_measure()) {
     Serial.println(F("Bad meas!"));
     blink(400, 2);
   }
 
+  digitalWrite(POWER_PIN, LOW); 
+    
   Serial.print(F("Getting vcc..."));
+  tData.id = CfgDrv::Cfg.id;
   tData.vcc = ESP.getVcc();
   tData.magic = 37;
   Serial.println(tData.vcc);
+
   if(doConnect()) {
     for(int i=0; i<TRIES_TO_SEND; i++) {
       if(!doSend(&tData)) {
@@ -112,7 +124,7 @@ void setup(void)
   Serial.print(CfgDrv::Cfg.sleep_min);
   Serial.print(F(" min"));
 
-  blink(100, 1);
+  blink(50, 1);
 
   ESP.deepSleep(60000000L*CfgDrv::Cfg.sleep_min);
 

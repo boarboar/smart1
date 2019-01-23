@@ -9,7 +9,7 @@
     android:layout_marginRight="@dimen/spacing_xlarge"
     android:background="?attr/selectableItemBackground"
     android:gravity="center_vertical"
-    android:layout_marginTop="10dp"
+    android:layout_marginTop="@dimen/spacing_medium"
     android:orientation="vertical">
 
     <RelativeLayout

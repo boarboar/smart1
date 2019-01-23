@@ -54,6 +54,7 @@ data class WeatherSys(
 
 data class Weather(
         @SerializedName("cod") val cod: Int,
+        @SerializedName("dt") val dt: Long,
         @SerializedName("name") val name: String,
         @SerializedName("main") val main: WeatherMain,
         @SerializedName("wind") val wind: WeatherWind,

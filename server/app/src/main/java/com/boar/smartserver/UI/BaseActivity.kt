@@ -5,6 +5,7 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
+import android.os.PersistableBundle
 import android.support.v7.app.AppCompatActivity
 //import android.support.v7.widget.Toolbar
 import android.util.Log
@@ -62,6 +63,11 @@ abstract class BaseActivity : AppCompatActivity() {
         setContentView(getLayout())
         //setSupportActionBar(toolbar)
         Log.v(tag, "[ ON CREATE ]")
+    }
+
+    override fun onSaveInstanceState(outState: Bundle?, outPersistentState: PersistableBundle?) {
+        super.onSaveInstanceState(outState, outPersistentState)
+        Log.v(tag, "[ ON SAVE INST STATE ]")
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

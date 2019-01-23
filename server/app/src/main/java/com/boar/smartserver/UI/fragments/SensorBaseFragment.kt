@@ -28,6 +28,11 @@ abstract class SensorBaseFragment : Fragment() {
         Log.v(ftag, "[ ON BASE FRAG CREATE ]")
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        Log.v(ftag, "[ ON SAVE INST STATE ]")
+    }
+
     override fun onStart() {
         super.onStart()
         Log.v(ftag, "[ ON BASE FRAG START ]")

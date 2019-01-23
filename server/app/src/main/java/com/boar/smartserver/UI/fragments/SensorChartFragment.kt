@@ -38,6 +38,14 @@ class SensorChartFragment : SensorBaseFragment() {
         return view
     }
 
+    override fun onResume() {
+        super.onResume()
+        //Log.v(ftag, "[ ON BASE FRAG RESUME ]")
+        val mview = view
+        if(mview==null) return
+        setChartParmeters(mview)
+    }
+
     fun update() {
         val mview = view
         if(mview==null) return

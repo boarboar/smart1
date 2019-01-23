@@ -128,6 +128,7 @@ class MainActivity : BaseActivity(), ToolbarManager {
                     iconpng.into(icon)
                     sunrise.text = "${getString(R.string.sunrise)} ${DateUtils.convertTimeShort(it.sys.sunrise*1000)}"
                     sunset.text = "${getString(R.string.sunset)} ${DateUtils.convertTimeShort(it.sys.sunset*1000)}"
+                    updated.text = DateUtils.convertTimeShort(it.dt*1000)
                     //.error(R.drawable.user_image).resize(110, 110).centerCrop()
                     //setIndicatorsEnabled(true) // to show if cached
                 }

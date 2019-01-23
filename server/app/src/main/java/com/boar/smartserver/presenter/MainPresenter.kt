@@ -95,7 +95,7 @@ class MainPresenter() {
                 weatherForecast = weatherForceastResponse.body()
                 weatherForecast?.let {
                     //Log.i(tag, "Get weather forecast $it")
-                    //updated = System.currentTimeMillis()
+                    updatedForecast = System.currentTimeMillis()
                     if(it.cod==200)
                         refreshView(it)
                     //Log.i(tag, "Get weather forecast valid")

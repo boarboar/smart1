@@ -41,6 +41,8 @@ class SensorListAdapter(private val presenter : MainPresenter,
                  itemView.description.text = description
                  itemView.temperature.text = "${temperatureAsString}º"
                  itemView.vcc.text = "${vccAsString} v"
+                 itemView.hm.text = "$humidityAsString"
+                 itemView.hd.text = if(humidityDig==1) "\u2614" else ""
                  if(measValidated && !outdated) {
                      itemView.status.text = if(measUpdatedTime !=0L ) "\u2713" else ""
                      //itemView.status.setTextColor(ctx.resolveColor(android.R.color.holo_green_light))

@@ -20,12 +20,17 @@ class SensorList : ArrayList<Sensor>() {
         fun simulate() : String {
             val random = Random()
             val maybeerror = random.nextBoolean()
-            val id = random.nextInt(1..3)
+            val id = random.nextInt(1..4)
             val temp10 = if(maybeerror) random.nextInt(-1200..1200)
                 else random.nextInt(-400..400)
             val vcc1000 = random.nextInt(2540..4950)
+            val h10 = random.nextInt(10..1000)
+            val hd = random.nextInt(1..3)
 
-            return "{\"I\":$id,\"M\":64,\"P\":0,\"R\":8,\"T\":$temp10,\"V\":$vcc1000,\"Y\":37}"
+            return if(id==3)
+                "{\"I\":$id,\"T\":$temp10,\"V\":$vcc1000,\"H\":$h10,\"HD\":$hd,\"Y\":37}"
+                else
+                "{\"I\":$id,\"M\":64,\"P\":0,\"R\":8,\"T\":$temp10,\"V\":$vcc1000,\"Y\":37}"
         }
     }
 
@@ -94,9 +99,9 @@ data class Sensor(val id: Int, val description: String,
         get() = if(hist.size>0) hist[0].updated else 0L
 
     val resolution : Int
-        get() = if(hist.size>0) hist[0].resolution else 0
+        get() = if(hist.size>0) hist[0].resolution else -1
     val model : Int
-        get() = if(hist.size>0) hist[0].model else 0
+        get() = if(hist.size>0) hist[0].model else -1
     val parasite : Int
         get() = if(hist.size>0) hist[0].parasite else -1
 
@@ -108,6 +113,14 @@ data class Sensor(val id: Int, val description: String,
 
     val temperatureAsString : String
         get() = if(hist.size>0) "${hist[0].temp10.toFloat()/10f}" else "--.-"
+
+    val humidityAsString : String
+        get() = if(hist.size>0 && hist[0].hum10>0) "${hist[0].hum10.toFloat()/10f} %" else ""
+
+    val humidityDig : Int
+        get() = if(hist.size>0) hist[0].hd else 0
+
+
     val vccAsString : String
         get() = if(hist.size>0) "${(hist[0].vcc1000/10).toFloat()/100f}" else "-.--"
 
@@ -123,7 +136,9 @@ data class Sensor(val id: Int, val description: String,
     fun pushHistTemp(h : SensorHistory)  {
         pushHist(
                 SensorMeasurement(h.sensorId, 0, h.vcc1000,0,0,0,
-                        h.temp10,  h.timestamp, true)
+                        h.temp10,
+                        -1, -1,
+                        h.timestamp, true)
         )
     }
 
@@ -143,10 +158,12 @@ data class SensorMeasurement(
         @SerializedName("Y") val ver: Int,
         @SerializedName("V") val vcc1000: Int,
 
-        @SerializedName("M") val model: Int = 0,
-        @SerializedName("P") val parasite: Int = 0,
-        @SerializedName("R") val resolution: Int = 0,
+        @SerializedName("M") val model: Int = -1,
+        @SerializedName("P") val parasite: Int = -1,
+        @SerializedName("R") val resolution: Int = -1,
         @SerializedName("T") val temp10: Int = -1271,
+        @SerializedName("H") val hum10: Int = -1,
+        @SerializedName("HD") val hd: Int = -1,
 
         val updated: Long=System.currentTimeMillis(),
         val validated: Boolean = false,

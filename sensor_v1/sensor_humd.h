@@ -12,7 +12,7 @@ public:
     inline int16_t init() { pinMode(_pin, INPUT_PULLUP); return 0;}
     inline int16_t cfg() {return 0;}
     inline int16_t measure() { 
-        _val=digitalRead(_pin); 
+        _val=digitalRead(_pin)+1; 
         Serial.print("HUMD: "); Serial.println(_val);         
         return 0;}
     inline int16_t toJson(JsonObject &json) { json["HD"] = _val; return 0;} 

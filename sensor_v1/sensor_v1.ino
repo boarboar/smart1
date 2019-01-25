@@ -78,12 +78,12 @@ void setup(void)
     delay(1000);
     Serial.println(F("Cfg OK"));
     delay(1000);
+    digitalWrite(LED_PIN, LOW); 
     digitalWrite(POWER_PIN, HIGH); 
     CfgDrv::Cfg.sensors_cfg(ports);
     CfgDrv::Cfg.sensors_init();
     CfgDrv::Cfg.sensors_setup();
     digitalWrite(POWER_PIN, LOW); 
-    digitalWrite(LED_PIN, LOW); 
     Serial.println(F("Restarting..."));
     ESP.deepSleep(1000000L);
   } 

@@ -15,7 +15,7 @@
 
 #define TRIES_TO_SEND 3
 
-#define POWER_PIN 4 // vcc supply for the sensors_cfg
+#define POWER_PIN 12 // vcc supply for the sensors_cfg
 
 
 static int16_t ports[CfgDrv::MAX_SENS] = {DATA_BUS_1, DATA_BUS_2};
@@ -79,7 +79,8 @@ void setup(void)
     Serial.println(F("Cfg OK"));
     delay(1000);
     digitalWrite(LED_PIN, LOW); 
-    digitalWrite(POWER_PIN, HIGH); 
+    digitalWrite(POWER_PIN, HIGH);
+    delay(100); 
     CfgDrv::Cfg.sensors_cfg(ports);
     CfgDrv::Cfg.sensors_init();
     CfgDrv::Cfg.sensors_setup();
@@ -89,12 +90,14 @@ void setup(void)
   } 
   
   digitalWrite(POWER_PIN, HIGH); 
-    
+  delay(50);    
   CfgDrv::Cfg.sensors_cfg(ports);
   CfgDrv::Cfg.sensors_init();
     
   
   Serial.println(F("Measuring..."));
+
+
   if(CfgDrv::Cfg.sensors_measure()) {
     Serial.println(F("Bad meas!"));
     blink(400, 2);

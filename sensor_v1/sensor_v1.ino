@@ -199,7 +199,7 @@ bool doSend(TempData *pData) {
   Serial.print("Sent in "); 
   Serial.print(millis() - timeout);
   Serial.println("ms"); 
- 
+  delay(50);
   client.stop(); 
   return true;         
 }

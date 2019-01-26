@@ -4,7 +4,7 @@
 //      VCC: 5V or 3V
 //      GND: GND
 //      DATA: 2
-int pinDHT11 = 2;
+int pinDHT11 = 14;
 SimpleDHT11 dht11(pinDHT11);
 
 int cnt=0;

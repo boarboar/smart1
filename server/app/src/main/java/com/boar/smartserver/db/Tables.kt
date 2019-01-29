@@ -20,4 +20,6 @@ object SensorHistoryTable {
     val SENSOR_ID = "sensor_id"
     val TEMPERATURE = "t"
     val VCC = "v"
+    val HUMIDITY = "h"
+    val DHUMIDITY = "dh"
 }

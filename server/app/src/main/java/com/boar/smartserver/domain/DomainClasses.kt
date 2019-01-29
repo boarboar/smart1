@@ -137,7 +137,7 @@ data class Sensor(val id: Int, val description: String,
         pushHist(
                 SensorMeasurement(h.sensorId, 0, h.vcc1000,0,0,0,
                         h.temp10,
-                        -1, -1,
+                        h.h10, h.hd,
                         h.timestamp, true)
         )
     }
@@ -171,11 +171,20 @@ data class SensorMeasurement(
 )
 
 data class SensorHistory(val sensorId: Int, val temp10: Int, val vcc1000: Int,
+                         val h10: Int, val hd: Int,
                          val id: Long = 0, val timestamp: Long = System.currentTimeMillis()) {
     val temperature: Float
         get() = temp10.toFloat() / 10f
     val vcc : Float
         get() = (vcc1000/10).toFloat()/100f
+    val humidity: Float
+        get() = h10.toFloat() / 10f
+
+    val humidityAsString : String
+        get() = if(h10>0) "${h10.toFloat()/10f} %" else "-"
+
+    val hdAsString : String
+        get() = if(hd>0) "$hd" else "-"
 }
 
 data class ServiceLog(val message: String, val id: Long = 0, val timestamp: Long = System.currentTimeMillis())

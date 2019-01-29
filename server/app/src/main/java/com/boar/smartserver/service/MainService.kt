@@ -241,7 +241,8 @@ class MainService : Service() {
 
     fun saveToHist(meas : SensorMeasurement) {
         if(meas.validated) {
-            val hist = SensorHistory(meas.id.toInt(), meas.temp10.toInt(), meas.vcc1000.toInt())
+            val hist = SensorHistory(meas.id.toInt(), meas.temp10, meas.vcc1000,
+                    meas.hum10, meas.hd)
             db.saveSensorHist(hist)
         }
     }

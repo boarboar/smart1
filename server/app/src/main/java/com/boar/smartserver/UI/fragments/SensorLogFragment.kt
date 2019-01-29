@@ -70,8 +70,10 @@ class SensorLogListAdapter(private val hist : List<SensorHistory>,
 
             hist[position].apply {
                 itemView.timestamp.text = DateUtils.convertDateTime(timestamp)
-                itemView.temperature.text = "$temperature"
-                itemView.vcc.text = "$vcc"
+                itemView.temperature.text = "${temperature}º"
+                itemView.vcc.text = "$vcc v"
+                itemView.h.text = "$humidityAsString"
+                itemView.hd.text = "$hdAsString"
             }
         }
     }

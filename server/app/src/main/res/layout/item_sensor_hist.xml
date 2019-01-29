@@ -26,9 +26,9 @@
         android:layout_height="wrap_content"
         android:textColor = "@android:color/holo_green_light"
         android:textAppearance="@style/TextAppearance.AppCompat.Headline"
-        android:gravity = "right"
         android:layout_marginLeft="@dimen/spacing_xlarge"
         android:layout_marginRight="@dimen/spacing_xlarge"
+        android:gravity="right"
         tools:text="--.--"/>
     <TextView
         android:id="@+id/vcc"
@@ -36,8 +36,28 @@
         android:layout_height="wrap_content"
         android:textColor = "@android:color/holo_green_light"
         android:textAppearance="@style/TextAppearance.AppCompat.Headline"
-        android:gravity = "right"
         android:layout_marginRight="@dimen/spacing_xlarge"
         android:layout_marginLeft="@dimen/spacing_xlarge"
+        android:gravity="right"
+        tools:text="--.--"/>
+    <TextView
+        android:id="@+id/h"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:textColor = "@android:color/holo_green_light"
+        android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+        android:layout_marginRight="@dimen/spacing_xlarge"
+        android:layout_marginLeft="@dimen/spacing_xlarge"
+        android:gravity="right"
+        tools:text="--.--"/>
+    <TextView
+        android:id="@+id/hd"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:textColor = "@android:color/holo_green_light"
+        android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+        android:layout_marginRight="@dimen/spacing_xlarge"
+        android:layout_marginLeft="@dimen/spacing_xlarge"
+        android:gravity="right"
         tools:text="--.--"/>
 </LinearLayout>

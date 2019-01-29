@@ -22,8 +22,9 @@ class SensorDb(private val dbHelper: DbHelper = DbHelper.instance
             ServiceLog(msg, id, timestamp)
         }
         private val parserSensorHistory = rowParser { id: Long, timestamp: Long,
-                                                      sensorId : Int, t : Int, v: Int ->
-            SensorHistory(sensorId, t, v, id, timestamp)
+                                                      sensorId : Int, t : Int, v: Int,
+                                                      h: Int, hd: Int ->
+            SensorHistory(sensorId, t, v, h, hd, id, timestamp)
         }
         private val parserLogMinMax = rowParser { idmax: Long, idmin: Long ->
             Pair(idmax, idmin)
@@ -196,7 +197,10 @@ class SensorDb(private val dbHelper: DbHelper = DbHelper.instance
                         SensorHistoryTable.TIMESTAMP to  hist.timestamp,
                         SensorHistoryTable.SENSOR_ID to hist.sensorId,
                         SensorHistoryTable.TEMPERATURE to hist.temp10,
-                        SensorHistoryTable.VCC to hist.vcc1000)
+                        SensorHistoryTable.VCC to hist.vcc1000,
+                        SensorHistoryTable.HUMIDITY to hist.h10,
+                        SensorHistoryTable.DHUMIDITY to hist.hd
+                        )
                 result = true
             }
 
@@ -219,7 +223,8 @@ class SensorDb(private val dbHelper: DbHelper = DbHelper.instance
             try {
                 hist = select(SensorHistoryTable.NAME, SensorHistoryTable.ID,
                         SensorHistoryTable.TIMESTAMP, SensorHistoryTable.SENSOR_ID,
-                        SensorHistoryTable.TEMPERATURE, SensorHistoryTable.VCC
+                        SensorHistoryTable.TEMPERATURE, SensorHistoryTable.VCC,
+                        SensorHistoryTable.HUMIDITY, SensorHistoryTable.DHUMIDITY
                         )
                         .whereArgs("${SensorHistoryTable.SENSOR_ID} = {sensorID}","sensorID" to  sensorId)
                         .orderBy(SensorHistoryTable.ID, SqlOrderDirection.DESC).limit(maxLogRec)
@@ -282,8 +287,8 @@ class SensorDb(private val dbHelper: DbHelper = DbHelper.instance
             try {
                 hist = select(SensorHistoryTable.NAME, SensorHistoryTable.ID,
                         SensorHistoryTable.TIMESTAMP, SensorHistoryTable.SENSOR_ID,
-                        SensorHistoryTable.TEMPERATURE, SensorHistoryTable.VCC
-                )
+                        SensorHistoryTable.TEMPERATURE, SensorHistoryTable.VCC,
+                        SensorHistoryTable.HUMIDITY, SensorHistoryTable.DHUMIDITY)
                         .orderBy(SensorHistoryTable.ID, SqlOrderDirection.DESC).limit(sensors.size*4)
                         .parseList(parserSensorHistory)
             }

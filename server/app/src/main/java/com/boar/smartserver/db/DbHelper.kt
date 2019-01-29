@@ -7,13 +7,19 @@ import com.boar.smartserver.SmartServer
 //import com.boar.smartserver.domain.Sensor
 import org.jetbrains.anko.db.*
 
+
+fun SQLiteDatabase.addColumn(tableName: String, column: String, type: SqlType, default: String) {
+    val escapedTableName = tableName.replace("`", "``")
+    execSQL("ALTER TABLE `$escapedTableName`  ADD COLUMN $column ${type.render()} DEFAULT $default;")
+}
+
 class DbHelper(ctx: Context = SmartServer.ctx) : ManagedSQLiteOpenHelper(ctx,
         DbHelper.DB_NAME, null, DbHelper.DB_VERSION) {
 
     companion object {
         private const val tag = "DB HLP"
         val DB_NAME = "smartserver.db"
-        val DB_VERSION = 3
+        val DB_VERSION = 4
         val instance by lazy { DbHelper() }
     }
 
@@ -51,6 +57,9 @@ class DbHelper(ctx: Context = SmartServer.ctx) : ManagedSQLiteOpenHelper(ctx,
         //db.dropTable(LogTable.NAME, true)
         //db.dropTable(SensorHistoryTable.NAME, true)
 
-        onCreate(db)
+        //onCreate(db)
+
+        db.addColumn(SensorHistoryTable.NAME, SensorHistoryTable.HUMIDITY, INTEGER, "0")
+        db.addColumn(SensorHistoryTable.NAME, SensorHistoryTable.DHUMIDITY, INTEGER, "0")
     }
 }

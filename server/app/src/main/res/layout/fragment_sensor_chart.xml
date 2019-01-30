@@ -46,6 +46,17 @@
                 android:textAppearance="@style/TextAppearance.AppCompat.Headline"
                 />
 
+            <RadioButton
+                android:id="@+id/radio_h"
+                android:layout_weight="1"
+                android:text="@string/humidity"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/spacing_xlarge"
+                android:textColor = "@android:color/holo_green_light"
+                android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+                />
+
         </RadioGroup>
 
         <RadioGroup

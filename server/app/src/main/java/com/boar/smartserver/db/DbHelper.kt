@@ -51,7 +51,7 @@ class DbHelper(ctx: Context = SmartServer.ctx) : ManagedSQLiteOpenHelper(ctx,
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
 
-        Log.v(tag, "[ ON DB UPGRADE ]")
+        Log.w(tag, "DB UPGRADE from $oldVersion to $newVersion !")
 
         //db.dropTable(SensorTable.NAME, true)
         //db.dropTable(LogTable.NAME, true)
@@ -61,5 +61,7 @@ class DbHelper(ctx: Context = SmartServer.ctx) : ManagedSQLiteOpenHelper(ctx,
 
         db.addColumn(SensorHistoryTable.NAME, SensorHistoryTable.HUMIDITY, INTEGER, "0")
         db.addColumn(SensorHistoryTable.NAME, SensorHistoryTable.DHUMIDITY, INTEGER, "0")
+
+        Log.w(tag, "DB UPGRADE completed")
     }
 }

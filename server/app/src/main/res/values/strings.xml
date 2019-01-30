@@ -20,6 +20,8 @@
     <string name="sensor_hist_cnt">Историй:</string>
     <string name="temp">Темп</string>
     <string name="vcc">Vcc</string>
+    <string name="humidity">Влажность</string>
+    <string name="dhumidity">Протечка</string>
     <string name="intrv_day">День</string>
     <string name="intrv_week">Неделя</string>
     <string name="intrv_month">Месяц</string>

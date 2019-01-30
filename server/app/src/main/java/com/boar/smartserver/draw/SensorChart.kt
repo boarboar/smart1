@@ -16,6 +16,7 @@ import com.boar.smartserver.UI.DateUtils.Companion.convertTimeShort
 import com.boar.smartserver.UI.DateUtils.Companion.localDateTimeToMillis
 import com.boar.smartserver.UI.DateUtils.Companion.millsToLocalDateTime
 import kotlinx.android.synthetic.main.item_sensor_hist.view.*
+import kotlinx.android.synthetic.main.weather.view.*
 import org.threeten.bp.DayOfWeek
 import org.threeten.bp.LocalDateTime
 
@@ -25,7 +26,7 @@ import java.util.*
 class DrawView(context: Context, attrs: AttributeSet) : View(context, attrs) {
 
     enum class DispType {
-        TEMPERATURE, VCC
+        TEMPERATURE, VCC, HUMIDITY, LEAKAGE
     }
 
     enum class DispPeriod {
@@ -83,6 +84,7 @@ class DrawView(context: Context, attrs: AttributeSet) : View(context, attrs) {
 
     val getTemp = { it: SensorHistory -> it.temp10 }
     val getVcc = { it: SensorHistory -> it.vcc1000 }
+    val getHumidity = { it: SensorHistory -> it.h10 }
     var getVal : (SensorHistory) -> Int = getTemp
 
     init {
@@ -157,6 +159,10 @@ class DrawView(context: Context, attrs: AttributeSet) : View(context, attrs) {
                     paint.color=color_green
                     paint.strokeWidth = if (t == 0) 4F else 1F
                 }
+                else if(disp==DispType.HUMIDITY) {
+                    paint.strokeWidth = 1F
+                    paint.color= if(t==900) color_red else color_green
+                }
                 else {
                     paint.strokeWidth = if(t==2500) 4F else 1F
                     paint.color= if(t==2500) color_red else color_green
@@ -207,6 +213,7 @@ class DrawView(context: Context, attrs: AttributeSet) : View(context, attrs) {
 
         val path = Path()
 
+        var prevVal = 0
 
         for(i in 0..sensHist.size-1) {
             val it = sensHist[i]
@@ -230,8 +237,13 @@ class DrawView(context: Context, attrs: AttributeSet) : View(context, attrs) {
                         }
                 val deg_off = v - valMin
                 val y = h-bot-deg_off*scale_y
-                if(i==0) path.moveTo(x, y)
+
+                val ignore = (disp==DispType.HUMIDITY && (prevVal==0 || getVal(it)==0))
+
+                if(i==0 || ignore) path.moveTo(x, y)
                 else path.lineTo(x, y)
+
+                prevVal = getVal(it)
             }
         }
 
@@ -278,7 +290,11 @@ class DrawView(context: Context, attrs: AttributeSet) : View(context, attrs) {
         valMax = Int.MIN_VALUE
         var count = 0
 
-        getVal = if(disp==DispType.TEMPERATURE) getTemp else getVcc
+        getVal = when(disp) {
+            DispType.TEMPERATURE -> getTemp
+            DispType.VCC -> getVcc
+            else -> getHumidity
+        }
 
         sensHist.forEach {
             if(it.timestamp > timeStart) { // should be in window
@@ -312,10 +328,14 @@ class DrawView(context: Context, attrs: AttributeSet) : View(context, attrs) {
                 valMax - valMin <= 10 -> 20
                 else -> 50
             }
-        } else {
+        } else if(disp==DispType.VCC) {
             valMin = 0
             valMax = 5000
             valStep = 500
+        } else { // HUMIDITY
+            valMin = 0
+            valMax = 1000
+            valStep = 100
         }
 
         var tmr = (valMax/valStep)  // rounded to 5 grad

@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_marginLeft="@dimen/spacing_xlarge"
     android:layout_marginRight="@dimen/spacing_xlarge"
     android:background="?attr/selectableItemBackground"
     android:gravity="center_vertical"
     android:layout_marginTop="@dimen/spacing_medium"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    >
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -188,3 +189,5 @@
 
 </LinearLayout>
 -->
+
+    <!--app:fontFamily="@font/digital_7_mono_italic" -->

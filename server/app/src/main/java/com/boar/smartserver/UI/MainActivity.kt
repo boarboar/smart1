@@ -115,35 +115,37 @@ class MainActivity : BaseActivity(), ToolbarManager {
         }
 
         Timer().schedule(100, 1000*60*15){// Weather
-            presenter.refreshWeather {
-                //val iconpng = picasso.load("http://openweathermap.org/img/w/${it.weather[0].iconCode}.png") // is it lazy?
-                val iconpng = picasso.load(MainPresenter.iconToUrl(it)) // is it lazy?
-                runOnUiThread {
-                    weather_city.text = "${it.name}"
-                    weather_now_temp.text = "${it.main.temp}º"
-                    humidity.text = "${it.main.humidity} %"
-                    pressure.text = "${it.main.pressure_mm} мм"
-                    wind.text = "${it.wind.speed} м/с"
-                    wind_dir.text = it.wind.dir
-                    iconpng.into(icon)
-                    sunrise.text = "${getString(R.string.sunrise)} ${DateUtils.convertTimeShort(it.sys.sunrise*1000)}"
-                    sunset.text = "${getString(R.string.sunset)} ${DateUtils.convertTimeShort(it.sys.sunset*1000)}"
-                    updated.text = DateUtils.convertTimeShort(it.dt*1000)
-                    //.error(R.drawable.user_image).resize(110, 110).centerCrop()
-                    //setIndicatorsEnabled(true) // to show if cached
+            doAsync {
+                presenter.refreshWeather {
+                    //val iconpng = picasso.load("http://openweathermap.org/img/w/${it.weather[0].iconCode}.png") // is it lazy?
+                    val iconpng = picasso.load(MainPresenter.iconToUrl(it)) // is it lazy?
+                    runOnUiThread {
+                        weather_city.text = "${it.name}"
+                        weather_now_temp.text = "${it.main.temp}º"
+                        humidity.text = "${it.main.humidity} %"
+                        pressure.text = "${it.main.pressure_mm} мм"
+                        wind.text = "${it.wind.speed} м/с"
+                        wind_dir.text = it.wind.dir
+                        iconpng.into(icon)
+                        sunrise.text = "${getString(R.string.sunrise)} ${DateUtils.convertTimeShort(it.sys.sunrise * 1000)}"
+                        sunset.text = "${getString(R.string.sunset)} ${DateUtils.convertTimeShort(it.sys.sunset * 1000)}"
+                        updated.text = DateUtils.convertTimeShort(it.dt * 1000)
+                        //.error(R.drawable.user_image).resize(110, 110).centerCrop()
+                        //setIndicatorsEnabled(true) // to show if cached
+                    }
                 }
-            }
-            presenter.refreshWeatherForecast {
-                runOnUiThread {
-                    var pos = 0
-                    val fieldsTemp = arrayOf(for_0_temp, for_1_temp, for_2_temp, for_3_temp)
-                    val fieldsTime = arrayOf(for_0_time, for_1_time, for_2_time, for_3_time)
-                    it.forecast.take(4).forEach {
-                        val tms = it.dt * 1000
-                        //Log.v(tag, " ${tms} - ${DateUtils.convertTimeShort(tms)} - ${it.main.temp}")
-                        fieldsTime[pos].text = DateUtils.convertTimeShort(tms)
-                        fieldsTemp[pos].text = "${it.main.temp}º"
-                        pos++
+                presenter.refreshWeatherForecast {
+                    runOnUiThread {
+                        var pos = 0
+                        val fieldsTemp = arrayOf(for_0_temp, for_1_temp, for_2_temp, for_3_temp)
+                        val fieldsTime = arrayOf(for_0_time, for_1_time, for_2_time, for_3_time)
+                        it.forecast.take(4).forEach {
+                            val tms = it.dt * 1000
+                            //Log.v(tag, " ${tms} - ${DateUtils.convertTimeShort(tms)} - ${it.main.temp}")
+                            fieldsTime[pos].text = DateUtils.convertTimeShort(tms)
+                            fieldsTemp[pos].text = "${it.main.temp}º"
+                            pos++
+                        }
                     }
                 }
             }
@@ -166,7 +168,7 @@ class MainActivity : BaseActivity(), ToolbarManager {
             return
         }
 
-        if((isLoaded || force)  && presenter.isDataLoaded) {
+        if((!isLoaded || force)  && presenter.isDataLoaded) {
 
             val adapter = SensorListAdapter(presenter) {
                 //startActivity<SensorDetailActivity>(SensorDetailActivity.IDX to it)

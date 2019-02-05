@@ -94,24 +94,26 @@ class MainService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Log.v(tag, "[ ON START COMMAND ]")
 
-        sensors = db.requestSensors()
-        logsdb = db.requestLog(LOG_KEEP_REC_MAX) // TODO - lazy!
+        doAsync {
+            sensors = db.requestSensors()
+            logsdb = db.requestLog(LOG_KEEP_REC_MAX) // TODO - lazy!
 
-        //val latest = db.requestLatestSensorHist()
-        //Log.v(tag, "Latest: $latest")
+            //val latest = db.requestLatestSensorHist()
+            //Log.v(tag, "Latest: $latest")
 
-        sensors?.let {
-            db.setLatestSensorHist(it)
+            sensors?.let {
+                db.setLatestSensorHist(it)
+            }
+
+            logEventDb("SRV START")
+            val intent = Intent()
+            intent.action = BROADCAST_ACTION
+            intent.putExtra(BROADCAST_EXTRAS_OPERATION, BROADCAST_EXTRAS_OP_LOAD)
+            sendBroadcast(intent)
         }
 
-        logEventDb("SRV START")
-        val intent = Intent()
-        intent.action = BROADCAST_ACTION
-        intent.putExtra(BROADCAST_EXTRAS_OPERATION, BROADCAST_EXTRAS_OP_LOAD)
-        sendBroadcast(intent)
-
         tcpServer = TcpServer(applicationContext, TCP_PORT, this)
-        tcpServer.run {processMessage(it)}
+        tcpServer.run { processMessage(it) }
 
         startBgTask()
 

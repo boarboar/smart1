@@ -1,5 +1,6 @@
 package com.boar.smartserver.presenter
 
+import android.content.Context
 import android.content.IntentFilter
 import android.util.Log
 import com.boar.smartserver.R.id.weather_city
@@ -14,6 +15,12 @@ import com.boar.smartserver.network.WeatherServiceApi
 import com.boar.smartserver.receiver.MainServiceReceiver
 import com.boar.smartserver.service.MainService
 import kotlinx.android.synthetic.main.weather.*
+import android.net.NetworkInfo
+import android.content.Context.CONNECTIVITY_SERVICE
+import android.support.v4.content.ContextCompat.getSystemService
+import android.net.ConnectivityManager
+
+
 
 class MainPresenter() {
 

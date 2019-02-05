@@ -1,6 +1,7 @@
 package com.boar.smartserver.extensions
 
 import android.content.Context
+import android.net.ConnectivityManager
 import android.net.wifi.WifiManager
 import android.support.v4.content.ContextCompat
 import android.util.Log

@@ -20,6 +20,8 @@
         android:background="@color/colorPrimaryLight"
         android:gravity="center_vertical"
         android:orientation="horizontal"
+        android:layout_marginRight="@dimen/spacing_xlarge"
+
         >
 
         <ImageView
@@ -227,6 +229,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="right"
+            android:layout_marginRight="@dimen/spacing_xlarge"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium"
             android:textColor = "@android:color/holo_blue_dark"
             tools:text="--:--"/>

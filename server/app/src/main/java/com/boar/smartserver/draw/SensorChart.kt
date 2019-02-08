@@ -15,6 +15,7 @@ import com.boar.smartserver.UI.DateUtils.Companion.convertTimeHOnly
 import com.boar.smartserver.UI.DateUtils.Companion.convertTimeShort
 import com.boar.smartserver.UI.DateUtils.Companion.localDateTimeToMillis
 import com.boar.smartserver.UI.DateUtils.Companion.millsToLocalDateTime
+import com.boar.smartserver.domain.SensorMeasurement
 import kotlinx.android.synthetic.main.item_sensor_hist.view.*
 import kotlinx.android.synthetic.main.weather.view.*
 import org.threeten.bp.DayOfWeek
@@ -41,6 +42,7 @@ class DrawView(context: Context, attrs: AttributeSet) : View(context, attrs) {
         val FONT_SZ_SMALL = 14
         val TOP_BORD = FONT_SZ
         val BOT_BORD = FONT_SZ
+        val CIRCLE_RAD = 5
     }
 
     var sensHist : List<SensorHistory> = listOf()
@@ -128,6 +130,7 @@ class DrawView(context: Context, attrs: AttributeSet) : View(context, attrs) {
 
         Log.d("Chart", "Type $disp, Priod $dispPeriod")
 
+        paint.color=color_green
         paint.strokeWidth = 4f
         //paint.pathEffect = null
 
@@ -244,6 +247,16 @@ class DrawView(context: Context, attrs: AttributeSet) : View(context, attrs) {
                 else path.lineTo(x, y)
 
                 prevVal = getVal(it)
+
+                // dislay leackage for humidity mode
+                if(disp==DispType.HUMIDITY) {
+                    if(it.hd == SensorMeasurement.DHUM_VALS.LEAK.value) {
+                        paint.color = color_red
+                        paint.strokeWidth = 4f
+                        canvas.drawCircle (x, top+CIRCLE_RAD, CIRCLE_RAD.toFloat(), paint)
+                    }
+                }
+
             }
         }
 

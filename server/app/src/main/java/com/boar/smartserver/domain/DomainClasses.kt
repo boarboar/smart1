@@ -168,11 +168,17 @@ data class SensorMeasurement(
         val updated: Long=System.currentTimeMillis(),
         val validated: Boolean = false,
         val msg: String = ""
-)
+) {
+    enum class DHUM_VALS(val value: Int) {
+        NOTSET(0), LEAK(1), NORM(2)
+    }
+}
 
 data class SensorHistory(val sensorId: Int, val temp10: Int, val vcc1000: Int,
                          val h10: Int, val hd: Int,
                          val id: Long = 0, val timestamp: Long = System.currentTimeMillis()) {
+
+
     val temperature: Float
         get() = temp10.toFloat() / 10f
     val vcc : Float

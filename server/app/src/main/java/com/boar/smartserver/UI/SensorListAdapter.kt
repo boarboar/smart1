@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.boar.smartserver.R
 import com.boar.smartserver.SmartServer.Companion.ctx
+import com.boar.smartserver.domain.SensorMeasurement
 import com.boar.smartserver.extensions.resolveColor
 import com.boar.smartserver.presenter.MainPresenter
 import kotlinx.android.synthetic.main.item_sensor.view.*
@@ -42,7 +43,7 @@ class SensorListAdapter(private val presenter : MainPresenter,
                  itemView.temperature.text = "${temperatureAsString}º"
                  itemView.vcc.text = "${vccAsString} v"
                  itemView.hm.text = "$humidityAsString"
-                 if(humidityDig==1) {
+                 if(humidityDig == SensorMeasurement.DHUM_VALS.LEAK.value) {
                      itemView.hd.text = "!"
                      itemView.hd.setTextColor(color_bad)
                  }

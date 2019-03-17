@@ -19,7 +19,7 @@ class DbHelper(ctx: Context = SmartServer.ctx) : ManagedSQLiteOpenHelper(ctx,
     companion object {
         private const val tag = "DB HLP"
         val DB_NAME = "smartserver.db"
-        val DB_VERSION = 4
+        val DB_VERSION = 5
         val instance by lazy { DbHelper() }
     }
 
@@ -41,7 +41,9 @@ class DbHelper(ctx: Context = SmartServer.ctx) : ManagedSQLiteOpenHelper(ctx,
                 SensorHistoryTable.SENSOR_ID to INTEGER ,
                 SensorHistoryTable.TIMESTAMP to INTEGER,
                 SensorHistoryTable.TEMPERATURE to INTEGER,
-                SensorHistoryTable.VCC to INTEGER
+                SensorHistoryTable.VCC to INTEGER,
+                SensorHistoryTable.HUMIDITY to INTEGER,
+                SensorHistoryTable.DHUMIDITY to INTEGER
         )
         db.createIndex(SensorHistoryTable.SENSOR_ID, SensorHistoryTable.NAME,
                 false, true, SensorHistoryTable.SENSOR_ID)

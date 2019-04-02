@@ -18,6 +18,12 @@ import java.util.concurrent.Future
 import java.util.concurrent.locks.Lock
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
+import android.R
+import android.app.PendingIntent
+import android.support.v4.app.NotificationCompat
+import com.boar.smartserver.UI.MainActivity
+
+
 
 class MainService : Service() {
 
@@ -84,6 +90,21 @@ class MainService : Service() {
         SensorDb()
     }
 
+    fun startFg() {
+        val notificationIntent = Intent(this, MainActivity::class.java)
+
+        val pendingIntent = PendingIntent.getActivity(this, 0,
+                notificationIntent, 0)
+
+        val notification = NotificationCompat.Builder(this)
+                .setSmallIcon(R.drawable.ic_menu_send)
+                .setContentTitle("My Awesome App")
+                .setContentText("Doing some work...")
+                .setContentIntent(pendingIntent).build()
+
+        startForeground(1337, notification)
+    }
+
     override fun onCreate() {
         super.onCreate()
         // called
@@ -93,6 +114,8 @@ class MainService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Log.v(tag, "[ ON START COMMAND ]")
+
+        startFg()
 
         doAsync {
             sensors = db.requestSensors()

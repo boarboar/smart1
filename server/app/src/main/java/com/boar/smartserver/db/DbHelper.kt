@@ -61,8 +61,8 @@ class DbHelper(ctx: Context = SmartServer.ctx) : ManagedSQLiteOpenHelper(ctx,
 
         //onCreate(db)
 
-        db.addColumn(SensorHistoryTable.NAME, SensorHistoryTable.HUMIDITY, INTEGER, "0")
-        db.addColumn(SensorHistoryTable.NAME, SensorHistoryTable.DHUMIDITY, INTEGER, "0")
+        //db.addColumn(SensorHistoryTable.NAME, SensorHistoryTable.HUMIDITY, INTEGER, "0")
+        //db.addColumn(SensorHistoryTable.NAME, SensorHistoryTable.DHUMIDITY, INTEGER, "0")
 
         Log.w(tag, "DB UPGRADE completed")
     }

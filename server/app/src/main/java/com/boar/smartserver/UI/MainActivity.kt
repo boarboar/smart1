@@ -36,6 +36,7 @@ class MainActivity : BaseActivity(), ToolbarManager {
     override val tag = "Main activity"
     override val toolbar by lazy { find<Toolbar>(R.id.toolbar) }
     val pBar by lazy { find<ProgressBar>(R.id.pBar) }
+    //var dispUpdateBar = false
 
     override fun getLayout() = R.layout.activity_main
     //override fun getActivityTitle() = R.string.app_name
@@ -110,8 +111,16 @@ class MainActivity : BaseActivity(), ToolbarManager {
         }
 
         Timer().schedule(100, 1000){// Time
-            val showUpdated = if(System.currentTimeMillis() < presenter.lastUpdated + 5000) "\u21BB" else ""
+            val showUpdated = if (System.currentTimeMillis() < presenter.lastUpdated + 5000) "\u21BB" else ""
             runOnUiThread { toolbarTitle = "${DateUtils.convertDateTime(System.currentTimeMillis())} $showUpdated" }
+            /*
+            val dispUpd = System.currentTimeMillis() < presenter.lastUpdated + 5000
+            if( dispUpd != dispUpdateBar) {
+                dispUpdateBar = dispUpd
+                val showUpdated = if (dispUpd) "\u21BB" else ""
+                runOnUiThread { toolbarTitle = "${DateUtils.convertDateTime(System.currentTimeMillis())} $showUpdated" }
+            }
+            */
         }
 
         Timer().schedule(100, 1000*60*15){// Weather

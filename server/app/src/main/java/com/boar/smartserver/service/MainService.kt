@@ -18,7 +18,7 @@ import java.util.concurrent.Future
 import java.util.concurrent.locks.Lock
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
-import android.R
+import com.boar.smartserver.R
 import android.app.PendingIntent
 import android.support.v4.app.NotificationCompat
 import com.boar.smartserver.UI.MainActivity
@@ -97,7 +97,7 @@ class MainService : Service() {
                 notificationIntent, 0)
 
         val notification = NotificationCompat.Builder(this)
-                .setSmallIcon(R.drawable.ic_menu_send)
+                .setSmallIcon(R.mipmap.ic_launcher)
                 .setContentTitle("My Awesome App")
                 .setContentText("Doing some work...")
                 .setContentIntent(pendingIntent).build()

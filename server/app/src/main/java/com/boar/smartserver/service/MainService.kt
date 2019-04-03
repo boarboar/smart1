@@ -21,6 +21,7 @@ import kotlin.concurrent.withLock
 import com.boar.smartserver.R
 import android.app.PendingIntent
 import android.support.v4.app.NotificationCompat
+import android.support.v4.content.LocalBroadcastManager
 import com.boar.smartserver.UI.MainActivity
 
 
@@ -96,7 +97,7 @@ class MainService : Service() {
         val pendingIntent = PendingIntent.getActivity(this, 0,
                 notificationIntent, 0)
 
-        val notification = NotificationCompat.Builder(this)
+        val notification = NotificationCompat.Builder(this, "chid")
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setContentTitle("My Awesome App")
                 .setContentText("Doing some work...")
@@ -112,7 +113,7 @@ class MainService : Service() {
 
     }
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+    override fun onStartCommand(intent_: Intent?, flags: Int, startId: Int): Int {
         Log.v(tag, "[ ON START COMMAND ]")
 
         startFg()
@@ -132,7 +133,7 @@ class MainService : Service() {
             val intent = Intent()
             intent.action = BROADCAST_ACTION
             intent.putExtra(BROADCAST_EXTRAS_OPERATION, BROADCAST_EXTRAS_OP_LOAD)
-            sendBroadcast(intent)
+            LocalBroadcastManager.getInstance(ctx).sendBroadcast(intent)
         }
 
         tcpServer = TcpServer(applicationContext, TCP_PORT, this)
@@ -196,7 +197,7 @@ class MainService : Service() {
                 intent.action = BROADCAST_ACTION
                 intent.putExtra(BROADCAST_EXTRAS_OPERATION, BROADCAST_EXTRAS_OP_ADD)
                 intent.putExtra(BROADCAST_EXTRAS_IDX, size - 1)
-                sendBroadcast(intent)
+                LocalBroadcastManager.getInstance(ctx).sendBroadcast(intent)
             }
             else {
                 runOnUiThread {
@@ -216,7 +217,7 @@ class MainService : Service() {
                 intent.action = BROADCAST_ACTION
                 intent.putExtra(BROADCAST_EXTRAS_OPERATION, BROADCAST_EXTRAS_OP_UPD)
                 intent.putExtra(BROADCAST_EXTRAS_IDX, position)
-                sendBroadcast(intent)
+                LocalBroadcastManager.getInstance(ctx).sendBroadcast(intent)
             }
             else {
                 runOnUiThread {
@@ -237,7 +238,7 @@ class MainService : Service() {
                 intent.action = BROADCAST_ACTION
                 intent.putExtra(BROADCAST_EXTRAS_OPERATION, BROADCAST_EXTRAS_OP_DEL)
                 intent.putExtra(BROADCAST_EXTRAS_IDX, position)
-                sendBroadcast(intent)
+                LocalBroadcastManager.getInstance(ctx).sendBroadcast(intent)
             }
             else {
                 runOnUiThread {
@@ -259,7 +260,7 @@ class MainService : Service() {
                 intent.action = BROADCAST_ACTION
                 intent.putExtra(BROADCAST_EXTRAS_OPERATION, BROADCAST_EXTRAS_OP_UPD)
                 intent.putExtra(BROADCAST_EXTRAS_IDX, idx)
-                sendBroadcast(intent)
+                LocalBroadcastManager.getInstance(ctx).sendBroadcast(intent)
             }
         }
     }
@@ -300,7 +301,7 @@ class MainService : Service() {
                     intent.action = BROADCAST_ACTION
                     intent.putExtra(BROADCAST_EXTRAS_OPERATION, BROADCAST_EXTRAS_OP_UPD)
                     intent.putExtra(BROADCAST_EXTRAS_IDX, it)
-                    sendBroadcast(intent)
+                    LocalBroadcastManager.getInstance(ctx).sendBroadcast(intent)
                 }
             }
         }

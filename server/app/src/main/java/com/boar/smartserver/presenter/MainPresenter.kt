@@ -19,7 +19,8 @@ import android.net.NetworkInfo
 import android.content.Context.CONNECTIVITY_SERVICE
 import android.support.v4.content.ContextCompat.getSystemService
 import android.net.ConnectivityManager
-
+import android.support.v4.content.LocalBroadcastManager
+import com.boar.smartserver.SmartServer.Companion.ctx
 
 
 class MainPresenter() {
@@ -119,11 +120,15 @@ class MainPresenter() {
 
     //run restartTcpService() {service?.restartTcpService()}
 
-    fun detachReceiver() : Unit {}
+    fun detachReceiver() : Unit {
+        //SmartServer.ctx.unregisterReceiver(receiver)
+        LocalBroadcastManager.getInstance(ctx).unregisterReceiver(receiver)
+    }
     fun attachReceiver() = apply {
         val filter = IntentFilter()
         filter.addAction(MainService.BROADCAST_ACTION)
-        SmartServer.ctx.registerReceiver(receiver, filter)
+        //SmartServer.ctx.registerReceiver(receiver, filter)
+        LocalBroadcastManager.getInstance(ctx).registerReceiver(receiver, filter)
     }
     fun onSensorAdd(sensorAddUandler : (Int)->Unit) = apply { this.sensorAddHandler = sensorAddUandler }
     fun onSensorUpdate(sensorUpdateUandler : (Int)->Unit) = apply { this.sensorUpdateHandler = sensorUpdateUandler }

@@ -23,6 +23,7 @@ import android.app.PendingIntent
 import android.support.v4.app.NotificationCompat
 import android.support.v4.content.LocalBroadcastManager
 import com.boar.smartserver.UI.MainActivity
+import android.os.Process
 
 
 
@@ -99,8 +100,8 @@ class MainService : Service() {
 
         val notification = NotificationCompat.Builder(this, "chid")
                 .setSmallIcon(R.mipmap.ic_launcher)
-                .setContentTitle("My Awesome App")
-                .setContentText("Doing some work...")
+                .setContentTitle(getString(R.string.app_name))
+                .setContentText("Service starting...")
                 .setContentIntent(pendingIntent).build()
 
         startForeground(1337, notification)
@@ -135,6 +136,8 @@ class MainService : Service() {
             intent.putExtra(BROADCAST_EXTRAS_OPERATION, BROADCAST_EXTRAS_OP_LOAD)
             LocalBroadcastManager.getInstance(ctx).sendBroadcast(intent)
         }
+
+        Log.v(tag, "Started with PRIO ${Process.getThreadPriority(0)}")
 
         tcpServer = TcpServer(applicationContext, TCP_PORT, this)
         tcpServer.run { processMessage(it) }

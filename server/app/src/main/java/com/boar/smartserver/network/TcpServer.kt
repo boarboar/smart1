@@ -12,6 +12,8 @@ import java.net.ServerSocket
 import java.net.Socket
 import java.net.SocketException
 import java.net.SocketTimeoutException
+import android.os.Process
+
 import java.util.*
 
 class TcpServer(val ctx: Context, val port : Int, val srv: MainService) {
@@ -24,7 +26,7 @@ class TcpServer(val ctx: Context, val port : Int, val srv: MainService) {
     fun run(handler : (String) -> Unit ) {
         server = ServerSocket(port)
         executor.execute {
-            Log.i(tag, "Listener thread [ START ]")
+            Log.i(tag, "Listener thread [ START ] with PRIO ${Process.getThreadPriority(0)}")
             Log.d(tag, "WiFi Address detected as: ${ctx.getLocalIpAddress()}")
             Log.d("Listener", "Server running on port ${server.inetAddress.hostAddress} : ${server.localPort} (${server.inetAddress.hostName})")
 

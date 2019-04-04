@@ -1,6 +1,7 @@
 package com.boar.smartserver.UI
 
 import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Bundle
@@ -91,7 +92,7 @@ abstract class BaseActivity : AppCompatActivity() {
         super.onResume()
 
         val intent = Intent(this, MainService::class.java)
-        bindService(intent, serviceConnection,  android.content.Context.BIND_AUTO_CREATE)
+        bindService(intent, serviceConnection,  Context.BIND_AUTO_CREATE + Context.BIND_IMPORTANT)
 
         Log.v(tag, "[ ON RESUME ]")
     }

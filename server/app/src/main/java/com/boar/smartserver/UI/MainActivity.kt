@@ -22,6 +22,7 @@ import kotlinx.android.synthetic.main.weather.view.*
 import org.jetbrains.anko.*
 import java.util.*
 import kotlin.concurrent.schedule
+import android.os.Process
 
 
 class MainActivity : BaseActivity(), ToolbarManager {
@@ -76,6 +77,8 @@ class MainActivity : BaseActivity(), ToolbarManager {
 */
     override fun onResume() {
         super.onResume()
+
+        Log.v(tag, "[ ON RESUME ] PRIO = ${Process.getThreadPriority(0)}")
 
         if(!isLoaded && !presenter.isDataLoaded)
             pBar.visibility = View.VISIBLE

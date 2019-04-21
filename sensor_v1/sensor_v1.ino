@@ -13,7 +13,7 @@
 #define DATA_BUS_1 13
 #define DATA_BUS_2 14
 
-#define TRIES_TO_SEND 3
+#define TRIES_TO_SEND 1
 
 #define POWER_PIN 12 // vcc supply for the sensors_cfg
 
@@ -100,7 +100,7 @@ void setup(void)
 
   if(CfgDrv::Cfg.sensors_measure()) {
     Serial.println(F("Bad meas!"));
-    blink(400, 2);
+    blink(200, 4);
   }
 
   digitalWrite(POWER_PIN, LOW); 
@@ -115,12 +115,12 @@ void setup(void)
     for(int i=0; i<TRIES_TO_SEND; i++) {
       if(!doSend(&tData)) {
         Serial.println(F("Failed to send"));
-        blink(400, 4);
+        blink(200, 2);
         if(i<TRIES_TO_SEND-1) delay(1000+i*1000);
       } else break;
     }
   } else {
-    blink(400, 3);
+    blink(200, 3);
   }
 
   Serial.print(F("deep sleep for "));

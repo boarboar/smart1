@@ -23,7 +23,7 @@ class SensorListAdapter(private val presenter : MainPresenter,
 
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bindForecast(presenter, position)
+        holder.bindSensor(presenter, position)
     }
 
     override fun getItemCount() = presenter.sensorListSize
@@ -34,21 +34,28 @@ class SensorListAdapter(private val presenter : MainPresenter,
         companion object {
             val color_ok = ctx.resolveColor(android.R.color.holo_green_light)
             val color_bad = ctx.resolveColor(android.R.color.holo_red_light)
+            val color_outdated = ctx.resolveColor(android.R.color.darker_gray)
+            val color_vcc_low = ctx.resolveColor(android.R.color.holo_orange_light)
         }
-        fun bindForecast( presenter : MainPresenter, position: Int) {
+        fun bindSensor( presenter : MainPresenter, position: Int) {
             presenter.getSensor(position)?.apply {
-                 itemView.date.text = if(measUpdatedTime !=0L ) DateUtils.convertTime(measUpdatedTime) else "--:--:--"
-                 itemView.date.setTextColor(if(measUpdatedTime !=0L && outdated) color_bad else color_ok)
                  itemView.description.text = description
+                 itemView.date.text = if(measUpdatedTime !=0L ) DateUtils.convertTime(measUpdatedTime) else "--:--:--"
+                 //itemView.date.setTextColor(if(measUpdatedTime !=0L && outdated) color_outdated else color_ok)
+                 itemView.date.setTextColor(if(measUpdatedTime ==0L || outdated) color_outdated else color_ok)
                  itemView.temperature.text = "${temperatureAsString}º"
+                 itemView.temperature.setTextColor(if(measUpdatedTime ==0L || outdated) color_outdated else color_ok)
                  itemView.vcc.text = "${vccAsString} v"
+                 itemView.vcc.setTextColor(if(measUpdatedTime ==0L || outdated) color_outdated else
+                     if(isVccLow) color_vcc_low else color_ok) // VCC alarm
                  itemView.hm.text = "$humidityAsString"
+                 itemView.hm.setTextColor(if(measUpdatedTime ==0L || outdated) color_outdated else color_ok)
                  if(humidityDig == SensorMeasurement.DHUM_VALS.LEAK.value) {
                      itemView.hd.text = "!"
-                     itemView.hd.setTextColor(color_bad)
+                     itemView.hd.setTextColor(if(measUpdatedTime ==0L || outdated) color_outdated else color_bad)
                  }
                  else itemView.hd.text = ""
-                 //itemView.hd.text = if(humidityDig==1) "\u2614" else ""
+                //itemView.hd.text = if(humidityDig==1) "\u2614" else ""
                  if(measValidated && !outdated) {
                      itemView.status.text = if(measUpdatedTime !=0L ) "\u2713" else ""
                      //itemView.status.setTextColor(ctx.resolveColor(android.R.color.holo_green_light))
@@ -56,7 +63,8 @@ class SensorListAdapter(private val presenter : MainPresenter,
                  } else {
                      itemView.status.text = "\u2717"
                      //itemView.status.setTextColor(ctx.resolveColor(android.R.color.holo_red_light))
-                     itemView.status.setTextColor(color_bad)
+                     //itemView.status.setTextColor(color_bad)
+                     itemView.status.setTextColor(color_outdated)
                  }
                  itemView.temp_grad.text = when {
                      //temp_grad > 0 -> "\u2197"
@@ -65,7 +73,7 @@ class SensorListAdapter(private val presenter : MainPresenter,
                      temp_grad < 0 -> "\u21D8"
                      else -> ""
                  }
-
+                 itemView.temp_grad.setTextColor(if(measUpdatedTime ==0L || outdated) color_outdated else color_ok)
                  itemView.setOnClickListener { itemClick(position) }
             }
             /*

@@ -91,6 +91,11 @@ data class Sensor(val id: Int, val description: String,
                   var outdated : Boolean = false
 
 ) {
+    companion object {
+        private val VCC_LOW_1000 = 330
+        private val VCC_LOW_DHT11_1000 = 290
+    }
+
     fun validate() : Boolean = id>0 && description.isNotEmpty()
 
     val measValidated : Boolean
@@ -115,7 +120,7 @@ data class Sensor(val id: Int, val description: String,
         get() = if(hist.size>0) "${hist[0].temp10.toFloat()/10f}" else "--.-"
 
     val humidityAsString : String
-        get() = if(hist.size>0 && hist[0].hum10>0) "${hist[0].hum10.toFloat()/10f} %" else ""
+        get() = if(hist.size>0 && hist[0].hum10>0 && hist[0].vcc1000 > VCC_LOW_DHT11_1000) "${hist[0].hum10.toFloat()/10f} %" else ""
 
     val humidityDig : Int
         get() = if(hist.size>0) hist[0].hd else 0
@@ -123,6 +128,9 @@ data class Sensor(val id: Int, val description: String,
 
     val vccAsString : String
         get() = if(hist.size>0) "${(hist[0].vcc1000/10).toFloat()/100f}" else "-.--"
+
+    val isVccLow : Boolean
+        get() = hist.size>0 && hist[0].vcc1000 < VCC_LOW_1000
 
     val msg : String
         get() = if(hist.size>0) hist[0].msg else "none"

@@ -32,7 +32,7 @@ class MainService : Service() {
     companion object {
         val TCP_PORT = 9999
 
-        val SIMULATION_TIMEOUT = 10_000L
+        val SIMULATION_TIMEOUT = 20_000L
 
         //val HIST_KEEP_REC_MAX = 1_344 // ca 1 week for 2 sensors
         //val HIST_KEEP_REC_MAX = 2_688 // ca 2 weeks for 2 sensors

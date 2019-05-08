@@ -18,13 +18,14 @@ import java.util.*
 
 class TcpServer(val ctx: Context, val port : Int, val srv: MainService) {
     private val tag = "TcpServ"
-    private var executor = TaskExecutor.getInstance(2)
+    private var executor = TaskExecutor.getInstance(3)
     private lateinit var server : ServerSocket
     private var isRunning = false
 
 
     fun run(handler : (String) -> Unit ) {
         server = ServerSocket(port)
+        //server.soTimeout = 15_000
         executor.execute {
             Log.i(tag, "Listener thread [ START ] with PRIO ${Process.getThreadPriority(0)}")
             Log.d(tag, "WiFi Address detected as: ${ctx.getLocalIpAddress()}")
@@ -94,7 +95,7 @@ class TcpServer(val ctx: Context, val port : Int, val srv: MainService) {
     private fun process(socket: Socket, handler : (String) -> Unit) {
         srv.logEventDb("exec IN : ${socket.inetAddress.hostAddress}")
         try {
-            socket.soTimeout= 5_1000
+            socket.soTimeout= 5_000
 
             /*
             val scanner = Scanner(client.inputStream)
@@ -122,6 +123,9 @@ class TcpServer(val ctx: Context, val port : Int, val srv: MainService) {
             val baos = ByteArrayOutputStream()
             socket.inputStream.use { it.copyTo(baos) }
             val inputAsString = baos.toString()
+
+            baos.flush() // ???
+            baos.close() // ???
 
             Log.d("Client", "Raw: $inputAsString")
             srv.logEventDb("Raw: $inputAsString")

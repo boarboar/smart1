@@ -312,6 +312,7 @@ class SensorDb(private val dbHelper: DbHelper = DbHelper.instance
             val l = hist.find { it.sensorId == sensor.id.toInt() }
             l?.let {
                 sensor.pushHistTemp(it)
+                sensor.outdated = true
             }
         }
     }

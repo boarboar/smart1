@@ -144,6 +144,7 @@ void loop(void)
 
 bool doConnect()
 {
+  const int CONN_COUNT = 60;
   byte mac[6]; 
   uint8_t i = 0;
   WiFi.macAddress(mac);
@@ -156,9 +157,9 @@ bool doConnect()
   WiFi.begin(CfgDrv::Cfg.SSID, CfgDrv::Cfg.PWD);
   Serial.print(F("\nConnecting to ")); Serial.print(CfgDrv::Cfg.SSID);
   i = 0;
-  while (WiFi.status() != WL_CONNECTED && i++ < 60) {delay(500); Serial.print(".");}
+  while (WiFi.status() != WL_CONNECTED && i++ < CONN_COUNT) {delay(500); Serial.print(".");}
   Serial.println();
-  if(i == 21){
+  if(i == CONN_COUNT){
     Serial.print(F("Could not connect to ")); Serial.println(CfgDrv::Cfg.SSID);
     return false;
   }
@@ -171,7 +172,7 @@ bool doConnect()
 
 bool doSend(TempData *pData) {
   WiFiClient client;
-  client.setTimeout(10000); //10s
+  client.setTimeout(30000); //30s
   if (!client.connect(CfgDrv::Cfg.srv_addr, CfgDrv::Cfg.srv_port)) {
       Serial.println("connection failed");
       return false;

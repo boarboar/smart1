@@ -15,6 +15,7 @@ import com.boar.smartserver.UI.DateUtils.Companion.convertTimeHOnly
 import com.boar.smartserver.UI.DateUtils.Companion.convertTimeShort
 import com.boar.smartserver.UI.DateUtils.Companion.localDateTimeToMillis
 import com.boar.smartserver.UI.DateUtils.Companion.millsToLocalDateTime
+import com.boar.smartserver.domain.Sensor
 import com.boar.smartserver.domain.SensorMeasurement
 import kotlinx.android.synthetic.main.item_sensor_hist.view.*
 import kotlinx.android.synthetic.main.weather.view.*
@@ -166,9 +167,9 @@ class DrawView(context: Context, attrs: AttributeSet) : View(context, attrs) {
                     paint.strokeWidth = 1F
                     paint.color= if(t==900) color_red else color_green
                 }
-                else {
-                    paint.strokeWidth = if(t==2500) 4F else 1F
-                    paint.color= if(t==2500) color_red else color_green
+                else { // VCC
+                    paint.strokeWidth = if(t== Sensor.VCC_LOW_1000) 4F else 1F
+                    paint.color= if(t==Sensor.VCC_LOW_1000) color_red else color_green
                 }
                 canvas.drawLine(left, y, w, y, paint)
             }

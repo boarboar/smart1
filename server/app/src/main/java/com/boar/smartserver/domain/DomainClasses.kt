@@ -92,8 +92,8 @@ data class Sensor(val id: Int, val description: String,
 
 ) {
     companion object {
-        private val VCC_LOW_1000 = 330
-        private val VCC_LOW_DHT11_1000 = 290
+        const val VCC_LOW_1000 = 3500
+        const val VCC_LOW_DHT11_1000 = 2900
     }
 
     fun validate() : Boolean = id>0 && description.isNotEmpty()

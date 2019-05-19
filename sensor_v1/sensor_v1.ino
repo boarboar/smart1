@@ -38,7 +38,7 @@ void setup(void)
 
   pinMode(POWER_PIN, OUTPUT);
 
-  blink(50, 1);
+  blink(25, 1);
 
   Serial.begin(115200);
   Serial.println();
@@ -127,7 +127,7 @@ void setup(void)
   Serial.print(CfgDrv::Cfg.sleep_min);
   Serial.print(F(" min"));
 
-  blink(50, 1);
+  blink(25, 1);
 
   ESP.deepSleep(60000000L*CfgDrv::Cfg.sleep_min);
 
@@ -172,7 +172,7 @@ bool doConnect()
 
 bool doSend(TempData *pData) {
   WiFiClient client;
-  client.setTimeout(30000); //30s
+  client.setTimeout(10000); //10s
   if (!client.connect(CfgDrv::Cfg.srv_addr, CfgDrv::Cfg.srv_port)) {
       Serial.println("connection failed");
       return false;

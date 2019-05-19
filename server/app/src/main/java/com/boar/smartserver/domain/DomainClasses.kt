@@ -14,8 +14,7 @@ class SensorList : ArrayList<Sensor>() {
 
     companion object {
         private val tag = "Sensor list"
-        private val MEAS_OBOLETE_PERIOD = 1000L * 60L * 46L // 46 min
-        //private val MEAS_OBOLETE_PERIOD = 1000L * 60L  // for test
+        //private val MEAS_OBOLETE_PERIOD = 1000L * 60L * 46L // 46 min
 
         fun simulate() : String {
             val random = Random()
@@ -75,10 +74,13 @@ class SensorList : ArrayList<Sensor>() {
     fun checkForOutdated() : ArrayList<Int> {
         var idxs = arrayListOf<Int>()
         forEachIndexed { idx, it ->
+            /*
             if(!it.outdated && (it.lastValidMeasTime < System.currentTimeMillis()-MEAS_OBOLETE_PERIOD)) {
                 it.outdated = true
                 idxs.add(idx)
             }
+            */
+            if(it.checkForOutdated()) idxs.add(idx)
         }
         return idxs
     }
@@ -88,15 +90,24 @@ class SensorList : ArrayList<Sensor>() {
 data class Sensor(val id: Int, val description: String,
                   val lastValidMeasTime: Long = 0,
                   val hist: ArrayList<SensorMeasurement> = arrayListOf(),
-                  var outdated : Boolean = false
+                  var outdated : Boolean = false,
+                  var obsolete : Boolean = false
 
 ) {
     companion object {
         const val VCC_LOW_1000 = 3500
         const val VCC_LOW_DHT11_1000 = 2900
+        const val MEAS_OUTDATED_PERIOD = 1000L * 60L * 46L // 46 min
     }
 
     fun validate() : Boolean = id>0 && description.isNotEmpty()
+
+    fun checkForOutdated() : Boolean {
+        if(!outdated && (lastValidMeasTime < System.currentTimeMillis()-MEAS_OUTDATED_PERIOD)) {
+            outdated = true
+            return true
+        } else return false
+    }
 
     val measValidated : Boolean
         get() = if(hist.size>0) hist[0].validated else true

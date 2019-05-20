@@ -61,7 +61,7 @@ class SensorList : ArrayList<Sensor>() {
         val sensorIdx = indexOfFirst {it.id == newmeas.id}
         if(sensorIdx==-1) return -1
         if(newmeas.validated) {
-            set(sensorIdx, this[sensorIdx].copy(lastValidMeasTime = System.currentTimeMillis(), outdated=false))
+            set(sensorIdx, this[sensorIdx].copy(lastValidMeasTime = System.currentTimeMillis(), outdated=false, obsolete=false))
             this[sensorIdx].pushHist(newmeas)
         }
         else {
@@ -81,6 +81,7 @@ class SensorList : ArrayList<Sensor>() {
             }
             */
             if(it.checkForOutdated()) idxs.add(idx)
+            if(it.checkForObsolete() && !idxs.contains(idx)) idxs.add(idx)
         }
         return idxs
     }
@@ -88,7 +89,7 @@ class SensorList : ArrayList<Sensor>() {
 
 
 data class Sensor(val id: Int, val description: String,
-                  val lastValidMeasTime: Long = 0,
+                  var lastValidMeasTime: Long = 0,
                   val hist: ArrayList<SensorMeasurement> = arrayListOf(),
                   var outdated : Boolean = false,
                   var obsolete : Boolean = false
@@ -98,6 +99,7 @@ data class Sensor(val id: Int, val description: String,
         const val VCC_LOW_1000 = 3500
         const val VCC_LOW_DHT11_1000 = 2900
         const val MEAS_OUTDATED_PERIOD = 1000L * 60L * 46L // 46 min
+        const val MEAS_OBSOLETE_PERIOD = 1000L * 60L * 60L * 4L// 4hrs
     }
 
     fun validate() : Boolean = id>0 && description.isNotEmpty()
@@ -105,6 +107,13 @@ data class Sensor(val id: Int, val description: String,
     fun checkForOutdated() : Boolean {
         if(!outdated && (lastValidMeasTime < System.currentTimeMillis()-MEAS_OUTDATED_PERIOD)) {
             outdated = true
+            return true
+        } else return false
+    }
+
+    fun checkForObsolete() : Boolean {
+        if(!obsolete && (lastValidMeasTime < System.currentTimeMillis()-MEAS_OBSOLETE_PERIOD)) {
+            obsolete = true
             return true
         } else return false
     }
@@ -128,23 +137,23 @@ data class Sensor(val id: Int, val description: String,
         } else 0
 
     val temperatureAsString : String
-        get() = if(hist.size>0) "${hist[0].temp10.toFloat()/10f}" else "--.-"
+        get() = if(hist.size>0 && !obsolete) "${hist[0].temp10.toFloat()/10f}" else "--.-"
 
     val humidityAsString : String
-        get() = if(hist.size>0 && hist[0].hum10>0 && hist[0].vcc1000 > VCC_LOW_DHT11_1000) "${hist[0].hum10.toFloat()/10f} %" else ""
+        get() = if(hist.size>0  && !obsolete && hist[0].hum10>0 && hist[0].vcc1000 > VCC_LOW_DHT11_1000) "${hist[0].hum10.toFloat()/10f} %" else ""
 
     val humidityDig : Int
-        get() = if(hist.size>0) hist[0].hd else 0
+        get() = if(hist.size>0 && !obsolete) hist[0].hd else 0
 
 
     val vccAsString : String
-        get() = if(hist.size>0) "${(hist[0].vcc1000/10).toFloat()/100f}" else "-.--"
+        get() = if(hist.size>0  && !obsolete) "${(hist[0].vcc1000/10).toFloat()/100f}" else "-.--"
 
     val isVccLow : Boolean
-        get() = hist.size>0 && hist[0].vcc1000 < VCC_LOW_1000
+        get() = hist.size>0  && !obsolete && hist[0].vcc1000 < VCC_LOW_1000
 
     val msg : String
-        get() = if(hist.size>0) hist[0].msg else "none"
+        get() = if(hist.size>0  && !obsolete) hist[0].msg else "none"
 
     fun pushHist(meas : SensorMeasurement)  {
         hist.add(0, meas)
@@ -159,6 +168,7 @@ data class Sensor(val id: Int, val description: String,
                         h.h10, h.hd,
                         h.timestamp, true)
         )
+        lastValidMeasTime = h.timestamp
     }
 
     fun invalidateLastMeasurement(timestamp : Long) {

@@ -313,6 +313,7 @@ class SensorDb(private val dbHelper: DbHelper = DbHelper.instance
             l?.let {
                 sensor.pushHistTemp(it)
                 sensor.outdated = true
+                sensor.checkForObsolete()
             }
         }
     }

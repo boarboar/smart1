@@ -90,6 +90,7 @@ abstract class BaseActivity : AppCompatActivity() {
     }
     override fun onResume() {
         super.onResume()
+        presenter.onUserInteraction(this)
 
         val intent = Intent(this, MainService::class.java)
         bindService(intent, serviceConnection,  Context.BIND_AUTO_CREATE + Context.BIND_IMPORTANT)
@@ -103,7 +104,10 @@ abstract class BaseActivity : AppCompatActivity() {
     override fun onPause() {
         super.onPause()
         unbindService(serviceConnection)
+        presenter.onUserInteraction(null)
+
         Log.v(tag, "[ ON PAUSE ]")
+
     }
     override fun onStop() {
         super.onStop()
@@ -112,6 +116,12 @@ abstract class BaseActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         Log.v(tag, "[ ON DESTROY ]")
+    }
+
+    override fun onUserInteraction() {
+        super.onUserInteraction()
+        presenter.onUserInteraction(this)
+        //Log.v(tag, "[ ON USER INTERACT ]")
     }
 
 }

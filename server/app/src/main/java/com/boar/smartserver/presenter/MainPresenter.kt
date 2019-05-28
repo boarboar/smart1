@@ -19,8 +19,12 @@ import android.net.NetworkInfo
 import android.content.Context.CONNECTIVITY_SERVICE
 import android.support.v4.content.ContextCompat.getSystemService
 import android.net.ConnectivityManager
+import android.support.v4.content.ContextCompat.startActivity
 import android.support.v4.content.LocalBroadcastManager
 import com.boar.smartserver.SmartServer.Companion.ctx
+import com.boar.smartserver.UI.BaseActivity
+import java.util.*
+import kotlin.concurrent.schedule
 
 
 class MainPresenter() {
@@ -31,6 +35,7 @@ class MainPresenter() {
         //private val CITYCODE = "192071,Ru"
         private val CITYCODE = "193312,Ru"
         private val RETAIN_WEATHER = 300_000 // milliseconds
+        private val USER_INACTIVITY_TMO = 60_000L // milliseconds
         val instance = MainPresenter()
     }
 
@@ -69,6 +74,13 @@ class MainPresenter() {
     private var sensorUpdateHandler : ((Int)->Unit) ? = null
     private var sensorDeleteHandler : ((Int)->Unit) ? = null
     private var dataLoadHandler : (()->Unit) ? = null
+
+    private var inactivityTask : TimerTask ? = null
+    private var currentActivity : BaseActivity ?= null
+
+    init {
+        onUserInteraction(null)  // init inactivitytask
+    }
 
     fun refreshWeather( refreshView : (Weather)->Unit ) {
         if(weather !=null && System.currentTimeMillis() < updated + RETAIN_WEATHER) {
@@ -198,6 +210,18 @@ class MainPresenter() {
                 hist = null
                 this.sensorId=-1
                 this.size=-1
+            }
+        }
+    }
+
+    fun onUserInteraction(activity: BaseActivity?) {
+        inactivityTask?.cancel()
+        currentActivity = activity
+        inactivityTask = Timer().schedule(USER_INACTIVITY_TMO) {
+            Log.i(tag, "===USER INACTIVITY===="+currentActivity)
+            currentActivity?.let {
+                if(!(it is MainActivity))
+                    it.runOnUiThread { it.onBackPressed() }
             }
         }
     }

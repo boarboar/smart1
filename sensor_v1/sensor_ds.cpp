@@ -22,6 +22,10 @@ int16_t SensDS::measure() {
   
     if(!sensors.getAddress(tempDeviceAddress, 0)) {
         Serial.println("Failed to get device"); 
+        _tData.isParasite = 0;
+        _tData.res = 0;
+        _tData.make = 0;
+        _tData.t10 = -1271;
         return -1;
     }
 
@@ -29,12 +33,11 @@ int16_t SensDS::measure() {
     _tData.res = sensors.getResolution(tempDeviceAddress);
     _tData.make = tempDeviceAddress[0];
   
-    Serial.print("Parasite: "); Serial.print(_tData.isParasite); 
-    Serial.print("  Res: "); Serial.print(_tData.res); 
-    Serial.print("  Make: "); Serial.println(_tData.make, HEX); 
+    //Serial.print("Parasite: "); Serial.print(_tData.isParasite); 
+    //Serial.print("  Res: "); Serial.print(_tData.res); 
+    //Serial.print("  Make: "); Serial.println(_tData.make, HEX); 
 
     sensors.requestTemperatures(); // Send the command to get temperatures
-    // After we got the temperatures, we can print them here.
     // We use the function ByIndex, and as an example get the temperature from the first sensor only.
     float t=sensors.getTempCByIndex(0);
     Serial.print("Temperature is: ");

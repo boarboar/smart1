@@ -16,18 +16,29 @@
         android:icon="@android:drawable/ic_menu_add"
         app:showAsAction="never"/>
     <item
-        android:id="@+id/action_sim_start"
+        android:id="@+id/action_tcp_sim_start"
         android:orderInCategory="102"
-        android:title="@string/sim_start"
+        android:title="@string/sim_tcp_start"
         app:showAsAction="never"/>
     <item
-        android:id="@+id/action_sim_stop"
+        android:id="@+id/action_tcp_sim_stop"
         android:orderInCategory="103"
-        android:title="@string/sim_stop"
+        android:title="@string/sim_tcp_stop"
         app:showAsAction="never"/>
+    <item
+        android:id="@+id/action_udp_sim_start"
+        android:orderInCategory="104"
+        android:title="@string/sim_udp_start"
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/action_udp_sim_stop"
+        android:orderInCategory="105"
+        android:title="@string/sim_udp_stop"
+        app:showAsAction="never"/>
+
     <item
         android:id="@+id/action_tcp_restart"
-        android:orderInCategory="103"
+        android:orderInCategory="106"
         android:title="@string/tcp_restart"
         app:showAsAction="never"/>
 </menu>

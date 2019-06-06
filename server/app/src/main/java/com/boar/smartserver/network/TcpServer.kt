@@ -96,30 +96,6 @@ class TcpServer(val ctx: Context, val port : Int, val srv: MainService) {
         srv.logEventDb("exec IN : ${socket.inetAddress.hostAddress}")
         try {
             socket.soTimeout= 5_000
-
-            /*
-            val scanner = Scanner(client.inputStream)
-            val builder = StringBuilder()
-
-
-            while (scanner.hasNextLine()) {
-                builder.append(scanner.nextLine())
-            }
-
-
-            //if (scanner.hasNextLine()) {
-            //    builder.append(scanner.nextLine())
-            //}
-
-
-
-            Log.d("Client", "Raw: $builder")
-            srv.logEventDb("Raw: $builder")
-            handler(builder.toString())
-            scanner.close()
-            */
-
-
             val baos = ByteArrayOutputStream()
             socket.inputStream.use { it.copyTo(baos) }
             val inputAsString = baos.toString()

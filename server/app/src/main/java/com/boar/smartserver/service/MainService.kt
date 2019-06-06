@@ -24,14 +24,15 @@ import android.support.v4.app.NotificationCompat
 import android.support.v4.content.LocalBroadcastManager
 import com.boar.smartserver.UI.MainActivity
 import android.os.Process
-
+import com.boar.smartserver.network.UdpServer
+import com.boar.smartserver.network.UdpTester
 
 
 class MainService : Service() {
 
     companion object {
         val TCP_PORT = 9999
-
+        val UDP_PORT = 9998
         val SIMULATION_TIMEOUT = 20_000L
 
         //val HIST_KEEP_REC_MAX = 1_344 // ca 1 week for 2 sensors
@@ -58,7 +59,8 @@ class MainService : Service() {
     private val tag = "Main service"
     private var binder = getServiceBinder()
     private var executor = TaskExecutor.getInstance(2)
-    private var simFuture  : Future<Unit>? = null
+    private var simTcpFuture  : Future<Unit>? = null
+    private var simUdpFuture  : Future<Unit>? = null
     private var bgTaskFuture  : Future<Unit>? = null
     private val lock : Lock =  ReentrantLock()
 
@@ -66,6 +68,7 @@ class MainService : Service() {
     private var logsdb : MutableList<ServiceLog>? = null  // DESC order
 
     lateinit private var tcpServer : TcpServer
+    lateinit private var udpServer : UdpServer
 
     /*
     private val logsdb : MutableList<ServiceLog> by lazy {
@@ -142,6 +145,9 @@ class MainService : Service() {
         tcpServer = TcpServer(applicationContext, TCP_PORT, this)
         tcpServer.run { processMessage(it) }
 
+        udpServer = UdpServer(applicationContext, UDP_PORT, this)
+        udpServer.run { processMessage(it) }
+
         startBgTask()
 
         return Service.START_STICKY
@@ -186,6 +192,11 @@ class MainService : Service() {
         executor.execute {
             tcpServer.stop()
             tcpServer.run { processMessage(it) }
+        }
+
+        executor.execute {
+            udpServer.stop()
+            udpServer.run { processMessage(it) }
         }
     }
 
@@ -318,10 +329,10 @@ class MainService : Service() {
     }
 
 
-    fun runSimulation() {
-        Log.v(tag, "Start simulation")
+    fun runTcpSimulation() {
+        Log.v(tag, "Start TCP simulation")
         val tester = TcpTester (ctx, TCP_PORT)
-        simFuture = doAsync {
+        simTcpFuture = doAsync {
             while(true) {
                 Thread.sleep(MainService.SIMULATION_TIMEOUT)
                 val msg =  SensorList.simulate()
@@ -331,9 +342,24 @@ class MainService : Service() {
         }
     }
 
-    fun stopSimulation() {
-        simFuture?.cancel(true)
+    fun runUdpSimulation() {
+        Log.v(tag, "Start UDP simulation")
+        val tester = UdpTester (ctx, UDP_PORT)
+        simUdpFuture = doAsync {
+            while(true) {
+                Thread.sleep(MainService.SIMULATION_TIMEOUT)
+                val msg =  SensorList.simulate()
+                //processMessage(msg)
+                tester.send(msg)
+            }
+        }
+    }
+    fun stopTcpSimulation() {
+        simTcpFuture?.cancel(true)
     }
 
+    fun stopUdpSimulation() {
+        simUdpFuture?.cancel(true)
+    }
 
 }

@@ -6,9 +6,11 @@
     <string name="add_sensor">Add sensor</string>
     <string name="edit_sensor">Edit sensor</string>
     <string name="delete_sensor">Delete sensor</string>
-    <string name="sim_start">Start simulation</string>
-    <string name="sim_stop">Stop simulation</string>
-    <string name="tcp_restart">Restart TCP Server</string>
+    <string name="sim_tcp_start">Start TCP simulation</string>
+    <string name="sim_tcp_stop">Stop TCP simulation</string>
+    <string name="sim_udp_start">Start UDP simulation</string>
+    <string name="sim_udp_stop">Stop UDP simulation</string>
+    <string name="tcp_restart">Restart TCP/UDP Server</string>
     <string name="wifi_ip">WiFi IP:</string>
     <string name="sensor_id">ID:</string>
     <string name="sensor_loc">Location:</string>

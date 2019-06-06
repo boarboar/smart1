@@ -106,8 +106,10 @@ class MainActivity : BaseActivity(), ToolbarManager {
                 //R.id.action_settings -> startActivity<SettingsActivity>()
                 R.id.action_settings -> startActivity<SystemPagerActivity>()
                 R.id.action_add -> showSensorPropUI()
-                R.id.action_sim_start -> service?.runSimulation()
-                R.id.action_sim_stop -> service?.stopSimulation()
+                R.id.action_tcp_sim_start -> service?.runTcpSimulation()
+                R.id.action_udp_sim_start -> service?.runUdpSimulation()
+                R.id.action_tcp_sim_stop -> service?.stopTcpSimulation()
+                R.id.action_udp_sim_stop -> service?.stopUdpSimulation()
                 R.id.action_tcp_restart -> service?.restartTcpService()
                 else -> toast("Unknown option")
             }

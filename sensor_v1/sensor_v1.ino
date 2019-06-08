@@ -38,7 +38,7 @@ void setup(void)
 
   pinMode(POWER_PIN, OUTPUT);
 
-  blink(25, 1);
+  blink(20, 1);
 
   Serial.begin(115200);
   Serial.println();
@@ -100,7 +100,7 @@ void setup(void)
 
   if(CfgDrv::Cfg.sensors_measure()) {
     Serial.println(F("Bad meas!"));
-    blink(200, 4);
+    blink(100, 4);
   }
 
   digitalWrite(POWER_PIN, LOW); 
@@ -115,19 +115,19 @@ void setup(void)
     for(int i=0; i<TRIES_TO_SEND; i++) {
       if(!doSend(&tData)) {
         Serial.println(F("Failed to send"));
-        blink(200, 2);
+        blink(100, 2);
         if(i<TRIES_TO_SEND-1) delay(1000+i*1000);
       } else break;
     }
   } else {
-    blink(200, 3);
+    blink(100, 3);
   }
 
   Serial.print(F("deep sleep for "));
   Serial.print(CfgDrv::Cfg.sleep_min);
   Serial.print(F(" min"));
 
-  blink(25, 1);
+  blink(20, 1);
 
   ESP.deepSleep(60000000L*CfgDrv::Cfg.sleep_min);
 

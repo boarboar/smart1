@@ -128,11 +128,11 @@ class MainActivity : BaseActivity(), ToolbarManager {
             */
         }
 
-        Timer().schedule(100, 1000*60*15){// Weather
+        Timer().schedule(100, 1000*60*30){// Weather
             doAsync {
                 presenter.refreshWeather {
                     //val iconpng = picasso.load("http://openweathermap.org/img/w/${it.weather[0].iconCode}.png") // is it lazy?
-                    val iconpng = picasso.load(MainPresenter.iconToUrl(it)) // is it lazy?
+                    val iconpng = picasso.load(MainPresenter.iconToUrl(it.weather)) // is it lazy?
                     runOnUiThread {
                         weather_city.text = "${it.name}"
                         weather_now_temp.text = "${it.main.temp}º"
@@ -153,11 +153,13 @@ class MainActivity : BaseActivity(), ToolbarManager {
                         var pos = 0
                         val fieldsTemp = arrayOf(for_0_temp, for_1_temp, for_2_temp, for_3_temp)
                         val fieldsTime = arrayOf(for_0_time, for_1_time, for_2_time, for_3_time)
+                        val fieldsIcon = arrayOf(for_0_icon, for_1_icon, for_2_icon, for_3_icon)
                         it.forecast.take(4).forEach {
                             val tms = it.dt * 1000
                             //Log.v(tag, " ${tms} - ${DateUtils.convertTimeShort(tms)} - ${it.main.temp}")
                             fieldsTime[pos].text = DateUtils.convertTimeShort(tms)
                             fieldsTemp[pos].text = "${it.main.temp}º"
+                            picasso.load(MainPresenter.iconToUrl(it.weather)).into(fieldsIcon[pos])
                             pos++
                         }
                     }

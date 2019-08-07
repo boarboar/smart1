@@ -7,10 +7,6 @@ import com.boar.smartserver.R.id.weather_city
 import com.boar.smartserver.R.id.weather_now_temp
 import com.boar.smartserver.SmartServer
 import com.boar.smartserver.UI.MainActivity
-import com.boar.smartserver.domain.Sensor
-import com.boar.smartserver.domain.SensorHistory
-import com.boar.smartserver.domain.Weather
-import com.boar.smartserver.domain.WeatherForecast
 import com.boar.smartserver.network.WeatherServiceApi
 import com.boar.smartserver.receiver.MainServiceReceiver
 import com.boar.smartserver.service.MainService
@@ -23,6 +19,7 @@ import android.support.v4.content.ContextCompat.startActivity
 import android.support.v4.content.LocalBroadcastManager
 import com.boar.smartserver.SmartServer.Companion.ctx
 import com.boar.smartserver.UI.BaseActivity
+import com.boar.smartserver.domain.*
 import java.util.*
 import kotlin.concurrent.schedule
 
@@ -31,7 +28,8 @@ class MainPresenter() {
 
     companion object {
         private val tag = "Main presenter"
-        fun iconToUrl(w : Weather) = if(w.weather.size>0) "http://openweathermap.org/img/w/${w.weather[0].iconCode}.png" else ""
+        //fun iconToUrl(w : Weather) = if(w.weather.size>0) "http://openweathermap.org/img/w/${w.weather[0].iconCode}.png" else ""
+        fun iconToUrl(wa :  ArrayList<WeatherWeather>) = if(wa.size>0) "http://openweathermap.org/img/w/${wa[0].iconCode}.png" else ""
         //private val CITYCODE = "192071,Ru"
         private val CITYCODE = "193312,Ru"
         private val RETAIN_WEATHER = 300_000 // milliseconds

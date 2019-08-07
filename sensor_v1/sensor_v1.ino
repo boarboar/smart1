@@ -1,6 +1,7 @@
 // Include the libraries we need
 
 #include <ESP8266WiFi.h>
+#include <WiFiUdp.h>
 #include <ArduinoJson.h>
 #include "cfg.h"
 
@@ -38,7 +39,7 @@ void setup(void)
 
   pinMode(POWER_PIN, OUTPUT);
 
-  blink(25, 1);
+  blink(20, 1);
 
   Serial.begin(115200);
   Serial.println();
@@ -100,7 +101,7 @@ void setup(void)
 
   if(CfgDrv::Cfg.sensors_measure()) {
     Serial.println(F("Bad meas!"));
-    blink(200, 4);
+    blink(100, 4);
   }
 
   digitalWrite(POWER_PIN, LOW); 
@@ -113,21 +114,21 @@ void setup(void)
 
   if(doConnect()) {
     for(int i=0; i<TRIES_TO_SEND; i++) {
-      if(!doSend(&tData)) {
+      if(!doSendUdp(&tData)) {
         Serial.println(F("Failed to send"));
-        blink(200, 2);
+        blink(100, 2);
         if(i<TRIES_TO_SEND-1) delay(1000+i*1000);
       } else break;
     }
   } else {
-    blink(200, 3);
+    blink(100, 3);
   }
 
   Serial.print(F("deep sleep for "));
   Serial.print(CfgDrv::Cfg.sleep_min);
   Serial.print(F(" min"));
 
-  blink(25, 1);
+  blink(20, 1);
 
   ESP.deepSleep(60000000L*CfgDrv::Cfg.sleep_min);
 
@@ -194,15 +195,61 @@ bool doSend(TempData *pData) {
   CfgDrv::Cfg.sensors_tojson(rootOut);
   
   rootOut.printTo(bufout, BUF_SZ-1);
+ 
+  unsigned long timeout = millis();
+ 
   client.print(bufout);
   
-  unsigned long timeout = millis();
   Serial.print("Sent in "); 
   Serial.print(millis() - timeout);
   Serial.println("ms"); 
   delay(50);
   client.stop(); 
   return true;         
+}
+
+bool doSendUdp(TempData *pData) {
+  
+  WiFiUDP udp_snd;
+  IPAddress addr;
+
+  char bufout[BUF_SZ];
+  StaticJsonBuffer<448> jsonBufferOut;
+  JsonObject& rootOut = jsonBufferOut.createObject();
+  rootOut["I"] = pData->id;
+  rootOut["V"] = pData->vcc;
+  rootOut["Y"] = pData->magic;
+  
+  CfgDrv::Cfg.sensors_tojson(rootOut);
+  
+  rootOut.printTo(bufout, BUF_SZ-1);
+
+  unsigned long timeout = millis();
+  if(!addr.fromString(CfgDrv::Cfg.srv_addr)) {
+    Serial.println("bad addr");
+    return false;
+  }
+  if(!udp_snd.beginPacket(addr, CfgDrv::Cfg.srv_port)) {
+    Serial.println("UDP begin packet failed");
+    return false;
+  }
+  udp_snd.write(bufout, strlen(bufout));
+  int res = udp_snd.endPacket();
+
+  if(res) {
+    Serial.print("UDP Sent in "); 
+    Serial.print(millis() - timeout);
+    Serial.print("ms  to ");
+  } else {
+    Serial.print("UDP failed to send to ");
+  }
+  Serial.print(addr);
+  Serial.print(":");
+  Serial.println(CfgDrv::Cfg.srv_port);
+ 
+  delay(50);
+   
+  return res;         
 }
 
 void blink(uint16_t dly, uint16_t n)

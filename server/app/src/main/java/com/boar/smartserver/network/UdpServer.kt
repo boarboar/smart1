@@ -28,10 +28,9 @@ class UdpServer(val ctx: Context, val port : Int, val srv: MainService) {
         //server.soTimeout = 10_000
         executor.execute {
             Log.i(tag, "Datagram listener thread [ START ] with PRIO ${Process.getThreadPriority(0)}")
-            Log.d(tag, "WiFi Address detected as: ${ctx.getLocalIpAddress()}")
-            //Log.d("Listener", "Datagram server running on port ${server.inetAddress.hostAddress} : ${server.localPort} (${server.inetAddress.hostName})")
-
-            //srv.logEventDb("Datagram listener thread [ START ] on port ${server.inetAddress.hostAddress} : ${server.localPort}")
+            //Log.d(tag, "WiFi Address detected as: ${ctx.getLocalIpAddress()}")
+            Log.d("Listener", "Datagram server running on port  ${server.localPort}")
+            srv.logEventDb("Datagram listener thread [ START ] on port  ${server.localPort}")
 
             isRunning = true
 

@@ -41,9 +41,7 @@
             android:layout_marginStart="16dp"
             android:layout_marginLeft="16dp"
             app:layout_constraintBottom_toBottomOf="@id/forecast_item_time"
-            app:layout_constraintLeft_toRightfOf="@id/forecast_item_time"
             app:layout_constraintStart_toEndOf="@+id/forecast_item_time"
-            app:layout_constraintStart_toEndfOf="@id/forecast_item_time"
             tools:src="@mipmap/ic_launcher" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

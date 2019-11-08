@@ -77,6 +77,19 @@
                 app:layout_constraintTop_toTopOf="@+id/weather_icon" />
 
             <TextView
+                android:id="@+id/weather_test"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginLeft="16dp"
+                android:text="@{viewModel.test}"
+                android:textSize="24sp"
+                app:layout_constraintLeft_toRightOf="@id/weather_temp"
+                app:layout_constraintStart_toEndOf="@+id/weather_temp"
+                app:layout_constraintTop_toTopOf="@+id/weather_temp" />
+
+
+            <TextView
                 android:id="@+id/weather_pressure"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -134,6 +147,7 @@
                 tools:itemCount="2"
                 tools:listitem="@layout/forecast_item"
                  />
+
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

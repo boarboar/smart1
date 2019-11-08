@@ -30,7 +30,6 @@ class OverviewFragment : Fragment() {
         // Giving the binding access to the OverviewViewModel
         binding.viewModel = viewModel
 
-
         //setHasOptionsMenu(true)
 
         return binding.root

@@ -82,7 +82,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginLeft="16dp"
-                android:text="@{viewModel.test}"
+                app:weatherApiTextStatus="@{viewModel.test}"
                 android:textSize="24sp"
                 app:layout_constraintLeft_toRightOf="@id/weather_temp"
                 app:layout_constraintStart_toEndOf="@+id/weather_temp"
@@ -197,3 +197,5 @@
 <!--app:layout_constraintRight_toRightOf="parent"-->
 <!--app:layout_constraintTop_toTopOf="parent"-->
 <!--app:marsApiStatus="@{viewModel.status}" />-->
+
+<!--    android:text="@{viewModel.test}" -->

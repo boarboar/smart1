@@ -14,6 +14,13 @@ data class WeatherMain(
         get() = (humidity_f).toInt()
     val temp : Float
         get() = (temp_f*10).toInt()/10.0F
+
+    val tempString : String
+        get() = temp.toString()+"º"
+    val humString : String
+        get() = humidity.toString()+"%"
+    val presString : String
+        get() = pressure_mm.toString()+" mm"
 }
 
 data class WeatherWeather(
@@ -45,6 +52,9 @@ data class WeatherWind(
         }
     val speed : Int
         get() = (speed_f).toInt()
+
+    val speedString : String
+        get() = (speed_f).toInt().toString()+" m/c"
 }
 
 data class WeatherSys(
@@ -61,14 +71,16 @@ data class Weather(
         @SerializedName("sys") val sys: WeatherSys,
         @SerializedName("weather") val weather: ArrayList<WeatherWeather>)
 {
-    /*
-    val pressure_mm : Int
-        get() = (pressure_f * 75 / 100).toInt()
-    val humidity : Int
-        get() = (humidity_f).toInt()
-        */
     val temp : String
-        get() = ((main.temp_f*10).toInt()/10.0F).toString()+"º"
+        get() = main.tempString
+    val humidity : String
+        get() = main.humString
+    val pressure : String
+        get() = main.presString
+    val wind_value : String
+        get() = wind.speedString
+    val wind_dir : String
+        get() = wind.dir
 }
 
 

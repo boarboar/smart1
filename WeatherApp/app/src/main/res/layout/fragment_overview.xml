@@ -95,7 +95,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="16dp"
                 android:layout_marginRight="16dp"
-                android:text="---mm"
+                android:text="@{viewModel.weather.pressure}"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/weather_temp" />
 
@@ -107,7 +107,7 @@
                 android:layout_marginEnd="16dp"
                 android:layout_marginRight="16dp"
                 android:layout_marginBottom="16dp"
-                android:text="--%"
+                android:text="@{viewModel.weather.humidity}"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/weather_pressure" />
 
@@ -117,7 +117,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="16dp"
                 android:layout_marginRight="16dp"
-                android:text="--m/s"
+                android:text="@{viewModel.weather.wind_value}"
                 app:layout_constraintEnd_toStartOf="@id/weather_pressure"
                 app:layout_constraintTop_toTopOf="@+id/weather_temp" />
 
@@ -129,7 +129,7 @@
                 android:layout_marginEnd="16dp"
                 android:layout_marginRight="16dp"
                 android:layout_marginBottom="16dp"
-                android:text="---"
+                android:text="@{viewModel.weather.wind_dir}"
                 app:layout_constraintStart_toStartOf="@id/weather_wind_speed"
                 app:layout_constraintTop_toBottomOf="@id/weather_wind_speed" />
 

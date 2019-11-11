@@ -55,6 +55,7 @@ fun bindStatus(statusImageView: ImageView, status: WeatherApiStatus?) {
         WeatherApiStatus.LOADING -> {
             statusImageView.visibility = View.VISIBLE
             statusImageView.setImageResource(R.drawable.loading_animation)
+
         }
         WeatherApiStatus.ERROR -> {
             statusImageView.visibility = View.VISIBLE
@@ -65,9 +66,23 @@ fun bindStatus(statusImageView: ImageView, status: WeatherApiStatus?) {
         }
     }
 }
-
 */
 
+@BindingAdapter("weatherApiStatus")
+fun bindStatus(view: View, status: WeatherApiStatus?) {
+    when (status) {
+        WeatherApiStatus.LOADING -> {
+            view.visibility = View.VISIBLE
+        }
+        WeatherApiStatus.ERROR -> {
+            //statusImageView.visibility = View.VISIBLE
+            view.visibility = View.GONE
+        }
+        WeatherApiStatus.DONE -> {
+            view.visibility = View.GONE
+        }
+    }
+}
 @BindingAdapter("weatherApiTextStatus")
 fun bindTextStatus(statusTextView: TextView, status: String?) {
     statusTextView.text = status?.toLowerCase()

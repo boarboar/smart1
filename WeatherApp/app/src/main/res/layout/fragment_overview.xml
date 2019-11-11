@@ -70,7 +70,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginLeft="16dp"
-                android:text="---.-º"
+                android:text="@{viewModel.weather.temp}"
                 android:textSize="24sp"
                 app:layout_constraintLeft_toRightOf="@id/weather_icon"
                 app:layout_constraintStart_toEndOf="@+id/weather_icon"

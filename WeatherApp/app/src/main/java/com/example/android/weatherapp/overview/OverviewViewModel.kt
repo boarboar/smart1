@@ -5,12 +5,20 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.android.weatherapp.R
+import com.example.android.weatherapp.domain.Weather
+import com.example.android.weatherapp.domain.WeatherForecast
+import com.example.android.weatherapp.network.WeatherServiceApi
 import kotlinx.coroutines.*
 
 enum class WeatherApiStatus { LOADING, ERROR, DONE }
 
 class OverviewViewModel : ViewModel() {
 
+    companion object {
+        private val CITYCODE = "193312,Ru"
+    }
+
+    private val wservice : WeatherServiceApi by lazy  { WeatherServiceApi.obtain() }
     private val _test = MutableLiveData<String>()
     val test: LiveData<String>
         get() = _test
@@ -21,6 +29,12 @@ class OverviewViewModel : ViewModel() {
     private val _status = MutableLiveData<WeatherApiStatus>()
     val status: LiveData<WeatherApiStatus>
         get() = _status
+
+    private val _weather = MutableLiveData<Weather>()
+    val weather: LiveData<Weather>
+        get() = _weather
+
+    private val forecast = MutableLiveData<WeatherForecast>()
 
     override fun onCleared() {
         super.onCleared()
@@ -34,11 +48,11 @@ class OverviewViewModel : ViewModel() {
 
     private fun getWeatherForecast() {
         coroutineScope.launch {
-            //var getPropertiesDeferred = MarsApi.retrofitService.getProperties(filter.value)
+            var getWeatherDeferred = wservice.getWeather(CITYCODE)
             try {
                 _status.value = WeatherApiStatus.LOADING
                 _test.value = "LOADING"
-                //var listResult = getPropertiesDeferred.await()
+                _weather.value = getWeatherDeferred.await()
                 delay(5_000)
                 _status.value = WeatherApiStatus.DONE
                 _test.value = "DONE"

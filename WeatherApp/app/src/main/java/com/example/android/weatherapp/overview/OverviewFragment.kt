@@ -30,6 +30,8 @@ class OverviewFragment : Fragment() {
         // Giving the binding access to the OverviewViewModel
         binding.viewModel = viewModel
 
+        binding.weatherForecastList.adapter = ForecastAdapter()
+
         //setHasOptionsMenu(true)
 
         return binding.root

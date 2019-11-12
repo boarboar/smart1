@@ -24,8 +24,13 @@ import androidx.core.net.toUri
 import androidx.databinding.BindingAdapter
 import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.RecyclerView
+import com.example.android.weatherapp.domain.WeatherForecastItem
+import com.example.android.weatherapp.domain.WeatherWeather
+import com.example.android.weatherapp.overview.ForecastAdapter
 
 import com.example.android.weatherapp.overview.WeatherApiStatus
+import com.squareup.picasso.Picasso
+import java.util.ArrayList
 
 /*
 @BindingAdapter("imageUrl")
@@ -68,6 +73,22 @@ fun bindStatus(statusImageView: ImageView, status: WeatherApiStatus?) {
 }
 */
 
+@BindingAdapter("listForecastData")
+fun bindRecyclerView(recyclerView: RecyclerView, data: ArrayList<WeatherForecastItem>?) {
+    val adapter = recyclerView.adapter as ForecastAdapter
+    adapter.submitList(data)
+}
+
+@BindingAdapter("weatherImage")
+fun bindImage(imgView: ImageView, wa : ArrayList<WeatherWeather>?) {
+    wa?.let {
+        if(wa.size>0) {
+            Picasso.get().load("http://openweathermap.org/img/w/${wa[0].iconCode}.png")
+                .into(imgView)
+        }
+    }
+}
+
 @BindingAdapter("weatherApiStatus")
 fun bindStatus(view: View, status: WeatherApiStatus?) {
     when (status) {
@@ -83,6 +104,7 @@ fun bindStatus(view: View, status: WeatherApiStatus?) {
         }
     }
 }
+
 @BindingAdapter("weatherApiTextStatus")
 fun bindTextStatus(statusTextView: TextView, status: String?) {
     statusTextView.text = status?.toLowerCase()

@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.android.weatherapp.R
 import com.example.android.weatherapp.domain.Weather
 import com.example.android.weatherapp.domain.WeatherForecast
+import com.example.android.weatherapp.domain.WeatherForecastItem
 import com.example.android.weatherapp.network.WeatherServiceApi
 import kotlinx.coroutines.*
 
@@ -34,7 +35,12 @@ class OverviewViewModel : ViewModel() {
     val weather: LiveData<Weather>
         get() = _weather
 
-    private val forecast = MutableLiveData<WeatherForecast>()
+    //private val _forecast = MutableLiveData<WeatherForecast>()
+    private val _forecastList = MutableLiveData<ArrayList<WeatherForecastItem>>()
+
+    val forecastItemList: LiveData<ArrayList<WeatherForecastItem>>
+        get() = _forecastList
+
 
     override fun onCleared() {
         super.onCleared()
@@ -49,10 +55,14 @@ class OverviewViewModel : ViewModel() {
     private fun getWeatherForecast() {
         coroutineScope.launch {
             var getWeatherDeferred = wservice.getWeather(CITYCODE)
+            var getWeatherForecastDeferred = wservice.getWeatherForecast(CITYCODE)
             try {
                 _status.value = WeatherApiStatus.LOADING
                 _test.value = "LOADING"
                 _weather.value = getWeatherDeferred.await()
+                val forecastResult = getWeatherForecastDeferred.await()
+                _forecastList.value = forecastResult.forecastList
+
                 delay(5_000)
                 _status.value = WeatherApiStatus.DONE
                 _test.value = "DONE"

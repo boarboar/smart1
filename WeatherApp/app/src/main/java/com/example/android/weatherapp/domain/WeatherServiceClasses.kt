@@ -100,5 +100,5 @@ data class WeatherForecastItem(
 data class WeatherForecast(
         @SerializedName("cod") val cod: Int,
         @SerializedName("city") val city: WeatherForecastCity,
-        @SerializedName("list") val forecast: ArrayList<WeatherForecastItem>
+        @SerializedName("list") val forecastList: ArrayList<WeatherForecastItem>
 )

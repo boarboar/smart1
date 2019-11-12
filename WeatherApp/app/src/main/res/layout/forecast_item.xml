@@ -3,7 +3,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <data></data>
+    <data>
+        <variable
+            name="forecast"
+            type="com.example.android.weatherapp.domain.WeatherForecastItem" />
+    </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -17,7 +21,7 @@
             android:layout_marginStart="16dp"
             android:layout_marginLeft="16dp"
             android:layout_marginTop="16dp"
-            android:text="---.-º"
+            android:text="@{forecast.main.tempString}"
             android:textSize="18sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -42,6 +46,7 @@
             android:layout_marginLeft="16dp"
             app:layout_constraintBottom_toBottomOf="@id/forecast_item_time"
             app:layout_constraintStart_toEndOf="@+id/forecast_item_time"
+            app:weatherImage="@{forecast.weather}"
             tools:src="@mipmap/ic_launcher" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

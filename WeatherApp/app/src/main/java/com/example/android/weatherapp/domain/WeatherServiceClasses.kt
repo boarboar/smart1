@@ -1,5 +1,6 @@
 package com.example.android.weatherapp.domain
 
+import com.example.android.weatherapp.utils.DateUtils
 import com.google.gson.annotations.SerializedName
 
 
@@ -81,6 +82,14 @@ data class Weather(
         get() = wind.speedString
     val wind_dir : String
         get() = wind.dir
+    val sunrise : String
+        get() = DateUtils.convertTimeShort(sys.sunrise * 1000)
+    val sunset : String
+        get() = DateUtils.convertTimeShort(sys.sunset * 1000)
+    val at : String
+        get() = DateUtils.convertTimeShort(dt * 1000)
+    val name_trim : String
+        get() = name.trim { it in "123456780 "}
 }
 
 
@@ -95,7 +104,10 @@ data class WeatherForecastItem(
         @SerializedName("main") val main: WeatherMain,
         @SerializedName("wind") val wind: WeatherWind,
         @SerializedName("weather") val weather: ArrayList<WeatherWeather>
-)
+) {
+    val at : String
+        get() = DateUtils.convertTimeShort(dt * 1000)
+}
 
 data class WeatherForecast(
         @SerializedName("cod") val cod: Int,

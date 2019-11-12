@@ -21,8 +21,8 @@ class OverviewViewModel : ViewModel() {
 
     private val wservice : WeatherServiceApi by lazy  { WeatherServiceApi.obtain() }
     private val _test = MutableLiveData<String>()
-    val test: LiveData<String>
-        get() = _test
+    //val test: LiveData<String>
+    //    get() = _test
 
     private var viewModelJob = Job()
     private val coroutineScope = CoroutineScope(viewModelJob + Dispatchers.Main )
@@ -48,7 +48,7 @@ class OverviewViewModel : ViewModel() {
     }
 
     init {
-        _test.value = "NONE"
+        //_test.value = "NONE"
         getWeatherForecast()
     }
 
@@ -58,18 +58,17 @@ class OverviewViewModel : ViewModel() {
             var getWeatherForecastDeferred = wservice.getWeatherForecast(CITYCODE)
             try {
                 _status.value = WeatherApiStatus.LOADING
-                _test.value = "LOADING"
+                //_test.value = "LOADING"
                 _weather.value = getWeatherDeferred.await()
                 val forecastResult = getWeatherForecastDeferred.await()
                 _forecastList.value = forecastResult.forecastList
-
-                delay(5_000)
+                delay(1_000) // to show spinner
                 _status.value = WeatherApiStatus.DONE
-                _test.value = "DONE"
+                //_test.value = "DONE"
                 //_properties.value = listResult
             } catch (e: Exception) {
                 _status.value = WeatherApiStatus.ERROR
-                _test.value = "ERROR"
+                //_test.value = "ERROR"
             }
         }
     }

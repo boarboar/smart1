@@ -88,6 +88,8 @@ data class Weather(
         get() = DateUtils.convertTimeShort(sys.sunset * 1000)
     val at : String
         get() = DateUtils.convertTimeShort(dt * 1000)
+    val at_long : String
+        get() = DateUtils.convertDateTime(dt * 1000)
     val name_trim : String
         get() = name.trim { it in "123456780 "}
 }

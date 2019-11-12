@@ -55,7 +55,7 @@ class OverviewViewModel : ViewModel() {
     private fun getWeatherForecast() {
         coroutineScope.launch {
             var getWeatherDeferred = wservice.getWeather(CITYCODE)
-            var getWeatherForecastDeferred = wservice.getWeatherForecast(CITYCODE)
+            var getWeatherForecastDeferred = wservice.getWeatherForecast(CITYCODE, cnt=6)
             try {
                 _status.value = WeatherApiStatus.LOADING
                 //_test.value = "LOADING"

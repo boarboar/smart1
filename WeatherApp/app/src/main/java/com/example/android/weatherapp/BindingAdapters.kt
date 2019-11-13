@@ -24,58 +24,25 @@ import androidx.core.net.toUri
 import androidx.databinding.BindingAdapter
 import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.RecyclerView
+import com.example.android.weatherapp.domain.Sensor
 import com.example.android.weatherapp.domain.WeatherForecastItem
 import com.example.android.weatherapp.domain.WeatherWeather
 import com.example.android.weatherapp.overview.ForecastAdapter
+import com.example.android.weatherapp.overview.SensorAdapter
 
 import com.example.android.weatherapp.overview.WeatherApiStatus
 import com.squareup.picasso.Picasso
 import java.util.ArrayList
 
-/*
-@BindingAdapter("imageUrl")
-fun bindImage(imgView: ImageView, imgUrl: String?) {
-    imgUrl?.let {
-        val imgUri = imgUrl.toUri().buildUpon().scheme("https").build()
-        Glide.with(imgView.context)
-                .load(imgUri)
-                .apply(RequestOptions()
-                        .placeholder(R.drawable.loading_animation)
-                        .error(R.drawable.ic_broken_image))
-                .into(imgView)
-    }
-}
-
-@BindingAdapter("listData")
-fun bindRecyclerView(recyclerView: RecyclerView, data: List<MarsProperty>?) {
-    val adapter = recyclerView.adapter as PhotoGridAdapter
-    adapter.submitList(data)
-}
-*/
-
-/*
-@BindingAdapter("weatherApiStatus")
-fun bindStatus(statusImageView: ImageView, status: WeatherApiStatus?) {
-    when (status) {
-        WeatherApiStatus.LOADING -> {
-            statusImageView.visibility = View.VISIBLE
-            statusImageView.setImageResource(R.drawable.loading_animation)
-
-        }
-        WeatherApiStatus.ERROR -> {
-            statusImageView.visibility = View.VISIBLE
-            statusImageView.setImageResource(R.drawable.ic_connection_error)
-        }
-        WeatherApiStatus.DONE -> {
-            statusImageView.visibility = View.GONE
-        }
-    }
-}
-*/
-
 @BindingAdapter("listForecastData")
 fun bindRecyclerView(recyclerView: RecyclerView, data: ArrayList<WeatherForecastItem>?) {
     val adapter = recyclerView.adapter as ForecastAdapter
+    adapter.submitList(data)
+}
+
+@BindingAdapter("listSensors")
+fun bindRecyclerSensorView(recyclerView: RecyclerView, data: ArrayList<Sensor>?) {
+    val adapter = recyclerView.adapter as SensorAdapter
     adapter.submitList(data)
 }
 

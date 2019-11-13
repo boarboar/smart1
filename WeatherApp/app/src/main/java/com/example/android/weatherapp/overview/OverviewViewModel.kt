@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.android.weatherapp.R
+import com.example.android.weatherapp.domain.Sensor
 import com.example.android.weatherapp.domain.Weather
 import com.example.android.weatherapp.domain.WeatherForecast
 import com.example.android.weatherapp.domain.WeatherForecastItem
@@ -20,7 +21,8 @@ class OverviewViewModel : ViewModel() {
     }
 
     private val wservice : WeatherServiceApi by lazy  { WeatherServiceApi.obtain() }
-    private val _test = MutableLiveData<String>()
+
+    //private val _test = MutableLiveData<String>()
     //val test: LiveData<String>
     //    get() = _test
 
@@ -37,10 +39,13 @@ class OverviewViewModel : ViewModel() {
 
     //private val _forecast = MutableLiveData<WeatherForecast>()
     private val _forecastList = MutableLiveData<ArrayList<WeatherForecastItem>>()
-
     val forecastItemList: LiveData<ArrayList<WeatherForecastItem>>
         get() = _forecastList
 
+
+    private val _sensorList = MutableLiveData<ArrayList<Sensor>>()
+    val sensorList: LiveData<ArrayList<Sensor>>
+        get() = _sensorList
 
     override fun onCleared() {
         super.onCleared()
@@ -50,6 +55,13 @@ class OverviewViewModel : ViewModel() {
     init {
         //_test.value = "NONE"
         getWeatherForecast()
+
+        _sensorList.value = arrayListOf(
+            Sensor(1, "Window"),
+            Sensor(2, "Balcony"),
+            Sensor(3, "Bathroom"))
+
+
     }
 
     private fun getWeatherForecast() {
@@ -73,4 +85,7 @@ class OverviewViewModel : ViewModel() {
         }
     }
 
+    fun updateForecast() {
+        getWeatherForecast()
+    }
 }

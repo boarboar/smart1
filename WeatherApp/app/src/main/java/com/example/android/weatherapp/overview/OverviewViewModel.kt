@@ -1,8 +1,10 @@
 package com.example.android.weatherapp.overview
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.*
 import com.example.android.weatherapp.R
+import com.example.android.weatherapp.database.DbSensor
 import com.example.android.weatherapp.database.asDomainModel
 import com.example.android.weatherapp.database.getDatabase
 import com.example.android.weatherapp.domain.Sensor
@@ -13,10 +15,12 @@ import com.example.android.weatherapp.network.WeatherServiceApi
 import kotlinx.coroutines.*
 
 enum class WeatherApiStatus { LOADING, ERROR, DONE }
+enum class DbStatus { LOADING, ERROR, DONE }
 
 class OverviewViewModel(application: Application) : AndroidViewModel(application) {
 
     companion object {
+        private const val tag = "OverviewViewModel"
         private val CITYCODE = "193312,Ru"
     }
 
@@ -35,6 +39,10 @@ class OverviewViewModel(application: Application) : AndroidViewModel(application
     private val _status = MutableLiveData<WeatherApiStatus>()
     val status: LiveData<WeatherApiStatus>
         get() = _status
+
+    private val _db_status = MutableLiveData<DbStatus>()
+    val db_status: LiveData<DbStatus>
+        get() = _db_status
 
     private val _weather = MutableLiveData<Weather>()
     val weather: LiveData<Weather>
@@ -74,9 +82,18 @@ class OverviewViewModel(application: Application) : AndroidViewModel(application
             Sensor(3, "Bathroom"))
 */
 
-        _sensorList =  Transformations.map(database.weatherDao.getSensors()) {
+
+            try {
+                _db_status.value = DbStatus.LOADING
+                _sensorList = Transformations.map(database.weatherDao.getSensors()) {
                     it.asDomainModel()
                 }
+                _db_status.value = DbStatus.DONE
+            } catch (t: Throwable) {
+                _db_status.value = DbStatus.ERROR
+                val msg = t.message ?: "Unknown DB error"
+                Log.e(tag, "DB error: $msg")
+            }
 
     }
 
@@ -96,6 +113,8 @@ class OverviewViewModel(application: Application) : AndroidViewModel(application
                 //_properties.value = listResult
             } catch (e: Exception) {
                 _status.value = WeatherApiStatus.ERROR
+                val msg = e.message ?: "Unknown network error"
+                Log.e(tag, "NET error: $msg")
                 //_test.value = "ERROR"
             }
         }
@@ -103,5 +122,25 @@ class OverviewViewModel(application: Application) : AndroidViewModel(application
 
     fun updateForecast() {
         getWeatherForecast()
+    }
+
+    private suspend fun populateDb() {
+        withContext(Dispatchers.IO) {
+            try {
+                database.weatherDao.insert(DbSensor(1, "room"))
+                database.weatherDao.insert(DbSensor(2, "balcony"))
+                database.weatherDao.insert(DbSensor(3, "bath"))
+            } catch (t: Throwable) {
+                val msg = t.message ?: "Unknown DB error"
+                Log.e(tag, "DB error: $msg")
+            }
+        }
+    }
+
+    fun onPopulate() {
+        coroutineScope.launch {
+            populateDb()
+            getSensors()
+        }
     }
 }

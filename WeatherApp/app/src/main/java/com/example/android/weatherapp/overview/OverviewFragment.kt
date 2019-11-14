@@ -47,7 +47,12 @@ class OverviewFragment : Fragment() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        viewModel.updateForecast()
+        when (item.itemId) {
+            //R.id.action_settings -> startActivity<SettingsActivity>()
+            R.id.refresh -> viewModel.updateForecast()
+            R.id.populate_sensors -> viewModel.onPopulate()
+            
+        }
         return true
     }
 

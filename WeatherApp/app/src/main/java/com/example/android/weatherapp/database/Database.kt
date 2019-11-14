@@ -8,6 +8,8 @@ import androidx.room.*
 interface WeatherDao {
     @Query("select * from dbsensor")
     fun getSensors(): LiveData<List<DbSensor>>
+    @Insert
+    fun insert(night : DbSensor)
     //@Insert(onConflict = OnConflictStrategy.REPLACE)
     //fun insertAll(vararg videos: DatabaseVideo)
 }

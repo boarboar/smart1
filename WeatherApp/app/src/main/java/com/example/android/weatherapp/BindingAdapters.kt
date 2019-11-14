@@ -27,6 +27,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.android.weatherapp.domain.Sensor
 import com.example.android.weatherapp.domain.WeatherForecastItem
 import com.example.android.weatherapp.domain.WeatherWeather
+import com.example.android.weatherapp.overview.DbStatus
 import com.example.android.weatherapp.overview.ForecastAdapter
 import com.example.android.weatherapp.overview.SensorAdapter
 
@@ -67,6 +68,22 @@ fun bindStatus(view: View, status: WeatherApiStatus?) {
             view.visibility = View.GONE
         }
         WeatherApiStatus.DONE -> {
+            view.visibility = View.GONE
+        }
+    }
+}
+
+@BindingAdapter("dbStatus")
+fun bindDbStatus(view: View, status: DbStatus?) {
+    when (status) {
+        DbStatus.LOADING -> {
+            view.visibility = View.VISIBLE
+        }
+        DbStatus.ERROR -> {
+            //statusImageView.visibility = View.VISIBLE
+            view.visibility = View.GONE
+        }
+        DbStatus.DONE -> {
             view.visibility = View.GONE
         }
     }

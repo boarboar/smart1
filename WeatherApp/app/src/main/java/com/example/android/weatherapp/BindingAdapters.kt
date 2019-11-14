@@ -41,7 +41,7 @@ fun bindRecyclerView(recyclerView: RecyclerView, data: ArrayList<WeatherForecast
 }
 
 @BindingAdapter("listSensors")
-fun bindRecyclerSensorView(recyclerView: RecyclerView, data: ArrayList<Sensor>?) {
+fun bindRecyclerSensorView(recyclerView: RecyclerView, data: List<Sensor>?) {
     val adapter = recyclerView.adapter as SensorAdapter
     adapter.submitList(data)
 }

@@ -1,10 +1,10 @@
 package com.example.android.weatherapp.overview
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import android.app.Application
+import androidx.lifecycle.*
 import com.example.android.weatherapp.R
+import com.example.android.weatherapp.database.asDomainModel
+import com.example.android.weatherapp.database.getDatabase
 import com.example.android.weatherapp.domain.Sensor
 import com.example.android.weatherapp.domain.Weather
 import com.example.android.weatherapp.domain.WeatherForecast
@@ -14,7 +14,7 @@ import kotlinx.coroutines.*
 
 enum class WeatherApiStatus { LOADING, ERROR, DONE }
 
-class OverviewViewModel : ViewModel() {
+class OverviewViewModel(application: Application) : AndroidViewModel(application) {
 
     companion object {
         private val CITYCODE = "193312,Ru"
@@ -28,6 +28,9 @@ class OverviewViewModel : ViewModel() {
 
     private var viewModelJob = Job()
     private val coroutineScope = CoroutineScope(viewModelJob + Dispatchers.Main )
+    private val database = getDatabase(application)
+
+    // all data should be moved to Repository (todo)
 
     private val _status = MutableLiveData<WeatherApiStatus>()
     val status: LiveData<WeatherApiStatus>
@@ -43,9 +46,12 @@ class OverviewViewModel : ViewModel() {
         get() = _forecastList
 
 
-    private val _sensorList = MutableLiveData<ArrayList<Sensor>>()
-    val sensorList: LiveData<ArrayList<Sensor>>
+    //private var _sensorList = MutableLiveData<List<Sensor>>()
+    lateinit private var _sensorList: LiveData<List<Sensor>>
+    val sensorList: LiveData<List<Sensor>>
         get() = _sensorList
+
+
 
     override fun onCleared() {
         super.onCleared()
@@ -56,11 +62,21 @@ class OverviewViewModel : ViewModel() {
         //_test.value = "NONE"
         getWeatherForecast()
 
+        getSensors()
+
+        }
+
+    private fun getSensors() {
+/*
         _sensorList.value = arrayListOf(
             Sensor(1, "Window"),
             Sensor(2, "Balcony"),
             Sensor(3, "Bathroom"))
+*/
 
+        _sensorList =  Transformations.map(database.weatherDao.getSensors()) {
+                    it.asDomainModel()
+                }
 
     }
 

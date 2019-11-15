@@ -16,7 +16,7 @@ class ForecastAdapter(/*val onClickListener: OnClickListener*/) : ListAdapter<We
         }
 
         override fun areContentsTheSame(oldItem: WeatherForecastItem, newItem: WeatherForecastItem): Boolean {
-            return oldItem== newItem
+            return oldItem == newItem
         }
     }
 

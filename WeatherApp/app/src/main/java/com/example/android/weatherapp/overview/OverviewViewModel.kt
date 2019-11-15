@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.lifecycle.*
 import com.example.android.weatherapp.R
 import com.example.android.weatherapp.database.DbSensor
+import com.example.android.weatherapp.database.DbSensorData
 import com.example.android.weatherapp.database.asDomainModel
 import com.example.android.weatherapp.database.getDatabase
 import com.example.android.weatherapp.domain.Sensor
@@ -88,6 +89,7 @@ class OverviewViewModel(application: Application) : AndroidViewModel(application
                 _sensorList = Transformations.map(database.weatherDao.getSensors()) {
                     it.asDomainModel()
                 }
+                // here Sensors should be coupled with SensorData
                 _db_status.value = DbStatus.DONE
             } catch (t: Throwable) {
                 _db_status.value = DbStatus.ERROR
@@ -130,6 +132,15 @@ class OverviewViewModel(application: Application) : AndroidViewModel(application
                 database.weatherDao.insert(DbSensor(1, "room", System.currentTimeMillis()))
                 database.weatherDao.insert(DbSensor(2, "balcony", System.currentTimeMillis()))
                 database.weatherDao.insert(DbSensor(3, "bath", System.currentTimeMillis()))
+            } catch (t: Throwable) {
+                val msg = t.message ?: "Unknown DB error"
+                Log.e(tag, "DB error: $msg")
+            }
+
+            try {
+                database.weatherDao.insert_data(DbSensorData(0,1, System.currentTimeMillis(), -100, 3500, -1, -1))
+                database.weatherDao.insert_data(DbSensorData(0,2, System.currentTimeMillis(), 100, 3400, -1, -1))
+                database.weatherDao.insert_data(DbSensorData(0,3, System.currentTimeMillis(), 250, 3500, 850, 1))
             } catch (t: Throwable) {
                 val msg = t.message ?: "Unknown DB error"
                 Log.e(tag, "DB error: $msg")

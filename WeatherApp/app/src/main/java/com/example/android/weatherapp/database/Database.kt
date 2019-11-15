@@ -13,18 +13,32 @@ val MIGRATION_1_2: Migration = object : Migration(1, 2) {
     }
 }
 
+val MIGRATION_2_3: Migration = object : Migration(2, 3) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("CREATE TABLE 'dbsensordata' ( " +
+                "'_id' INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,"+
+                "'sensor_id' INTEGER NOT NULL,"+
+                "'timestamp' INTEGER NOT NULL,"+
+                "'temp' INTEGER NOT NULL,"+
+                "'vcc' INTEGER NOT NULL,"+
+                "'hum' INTEGER NOT NULL,"+
+                "'dhum' INTEGER NOT NULL)")
+    }
+}
 
 @Dao
 interface WeatherDao {
     @Query("select * from dbsensor")
     fun getSensors(): LiveData<List<DbSensor>>
     @Insert
-    fun insert(night : DbSensor)
+    fun insert(sensor : DbSensor)
+    @Insert
+    fun insert_data(sensor_data : DbSensorData)
     //@Insert(onConflict = OnConflictStrategy.REPLACE)
     //fun insertAll(vararg videos: DatabaseVideo)
 }
 
-@Database(entities = [DbSensor::class], version = 2)
+@Database(entities = [DbSensor::class, DbSensorData::class], version = 3)
 abstract class WeatherDatabase : RoomDatabase() {
     abstract val weatherDao: WeatherDao
 }
@@ -37,7 +51,7 @@ fun getDatabase(context: Context): WeatherDatabase {
             INSTANCE = Room.databaseBuilder(context.applicationContext,
                 WeatherDatabase::class.java,
                 "weather")
-                .addMigrations(MIGRATION_1_2)
+                .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
                 .build()
         }
     }

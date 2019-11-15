@@ -30,7 +30,9 @@ class OverviewFragment : Fragment() {
         binding.viewModel = viewModel
 
         binding.weatherForecastList.adapter = ForecastAdapter()
+        //binding.weatherForecastList.setHasFixedSize(true)
         binding.sensorsGrid.adapter = SensorAdapter()
+        binding.sensorsGrid.setHasFixedSize(true)
 
         setHasOptionsMenu(true)
 

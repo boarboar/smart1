@@ -8,14 +8,16 @@ import com.example.android.weatherapp.domain.Sensor
 data class DbSensor(
     @PrimaryKey
     val id: Int,
-    val description: String
+    val description: String,
+    val updated: Long
     )
 
 fun List<DbSensor>.asDomainModel(): List<Sensor> {
     return map {
         Sensor (
             id = it.id,
-            description = it.description
+            description = it.description,
+            updated = it.updated
         )
     }
 }

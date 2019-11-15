@@ -127,9 +127,9 @@ class OverviewViewModel(application: Application) : AndroidViewModel(application
     private suspend fun populateDb() {
         withContext(Dispatchers.IO) {
             try {
-                database.weatherDao.insert(DbSensor(1, "room"))
-                database.weatherDao.insert(DbSensor(2, "balcony"))
-                database.weatherDao.insert(DbSensor(3, "bath"))
+                database.weatherDao.insert(DbSensor(1, "room", System.currentTimeMillis()))
+                database.weatherDao.insert(DbSensor(2, "balcony", System.currentTimeMillis()))
+                database.weatherDao.insert(DbSensor(3, "bath", System.currentTimeMillis()))
             } catch (t: Throwable) {
                 val msg = t.message ?: "Unknown DB error"
                 Log.e(tag, "DB error: $msg")

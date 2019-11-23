@@ -4,14 +4,8 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.*
 import com.example.android.weatherapp.R
-import com.example.android.weatherapp.database.DbSensor
-import com.example.android.weatherapp.database.DbSensorData
-import com.example.android.weatherapp.database.asDomainModel
-import com.example.android.weatherapp.database.getDatabase
-import com.example.android.weatherapp.domain.Sensor
-import com.example.android.weatherapp.domain.Weather
-import com.example.android.weatherapp.domain.WeatherForecast
-import com.example.android.weatherapp.domain.WeatherForecastItem
+import com.example.android.weatherapp.database.*
+import com.example.android.weatherapp.domain.*
 import com.example.android.weatherapp.network.WeatherServiceApi
 import kotlinx.coroutines.*
 
@@ -60,7 +54,9 @@ class OverviewViewModel(application: Application) : AndroidViewModel(application
     val sensorList: LiveData<List<Sensor>>
         get() = _sensorList
 
-
+    lateinit private var _sensorDataList: LiveData<List<SensorData>>
+    val sensorDataList: LiveData<List<SensorData>>
+        get() = _sensorDataList
 
     override fun onCleared() {
         super.onCleared()
@@ -76,20 +72,32 @@ class OverviewViewModel(application: Application) : AndroidViewModel(application
         }
 
     private fun getSensors() {
-/*
-        _sensorList.value = arrayListOf(
-            Sensor(1, "Window"),
-            Sensor(2, "Balcony"),
-            Sensor(3, "Bathroom"))
-*/
-
-
             try {
                 _db_status.value = DbStatus.LOADING
-                _sensorList = Transformations.map(database.weatherDao.getSensors()) {
-                    it.asDomainModel()
+                val sdata = database.weatherDao.getSensorsData()
+
+                /*
+                _sensorDataList = Transformations.map(database.weatherDao.getSensorsData()) {
+                    it.asSensorData()
                 }
+                */
+
+                _sensorList = Transformations.map(database.weatherDao.getSensors()) {
+                    it.asSensorWithData(sdata.value)
+                }
+
+                /*
                 // here Sensors should be coupled with SensorData
+                _sensorList.value?.let {
+                    for(s in it) {
+                        val sid = s.id
+                        sensorDataList.value?.let {
+                            s.data = it.find { it.sensor_id == sid }
+                        }
+                    }
+                }
+                */
+
                 _db_status.value = DbStatus.DONE
             } catch (t: Throwable) {
                 _db_status.value = DbStatus.ERROR
@@ -127,6 +135,14 @@ class OverviewViewModel(application: Application) : AndroidViewModel(application
     }
 
     private suspend fun populateDb() {
+
+        /*
+        _sensorList.value = arrayListOf(
+            Sensor(1, "Window"),
+            Sensor(2, "Balcony"),
+            Sensor(3, "Bathroom"))
+*/
+
         withContext(Dispatchers.IO) {
             try {
                 database.weatherDao.insert(DbSensor(1, "room", System.currentTimeMillis()))

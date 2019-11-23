@@ -36,6 +36,8 @@ interface WeatherDao {
     fun insert_data(sensor_data : DbSensorData)
     //@Insert(onConflict = OnConflictStrategy.REPLACE)
     //fun insertAll(vararg videos: DatabaseVideo)
+    @Query("select * from dbsensordata")
+    fun getSensorsData(): LiveData<List<DbSensorData>>
 }
 
 @Database(entities = [DbSensor::class, DbSensorData::class], version = 3)

@@ -35,10 +35,11 @@
             android:layout_marginStart="16dp"
             android:layout_marginLeft="16dp"
             android:layout_marginTop="16dp"
-            android:text="---.-º"
+            android:text="@{sensor.temp}"
             android:textSize="24sp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/item_location" />
+            app:layout_constraintTop_toBottomOf="@id/item_location"
+            tools:text="---.-º"/>
 
         <TextView
             android:id="@+id/item_time"

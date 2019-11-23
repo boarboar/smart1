@@ -2,11 +2,13 @@ package com.example.android.weatherapp.domain
 
 import com.example.android.weatherapp.utils.DateUtils
 
-data class Sensor(val id: Int, val description: String, val updated: Long=0) {
+data class Sensor(val id: Short, val description: String, val updated: Long=0, val data: SensorData? = null) {
     val at : String
         get() = DateUtils.convertTimeShort(updated * 1000)
-    // add latest data here
-}
+    val temp : String
+        get() = data?.toString() ?: "---"
+  }
+
 
 data class SensorData(
     val sensor_id: Short,

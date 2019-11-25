@@ -32,12 +32,30 @@ interface WeatherDao {
     fun getSensors(): LiveData<List<DbSensor>>
     @Insert
     fun insert(sensor : DbSensor)
+
     @Insert
     fun insert_data(sensor_data : DbSensorData)
+
     //@Insert(onConflict = OnConflictStrategy.REPLACE)
     //fun insertAll(vararg videos: DatabaseVideo)
+
     @Query("select * from dbsensordata")
     fun getSensorsData(): LiveData<List<DbSensorData>>
+
+    @Query("select * from dbsensordata where sensor_id = :id LIMIT 1")
+    //fun getOneSensorData(id : Int): LiveData<List<DbSensorData>>
+    fun getOneSensorData(id : Int): DbSensorData
+
+    @Query("""
+        select * from dbsensor left join dbsensordata on dbsensor.id=dbsensordata.sensor_id where 
+          dbsensordata._id in 
+          (select _id from dbsensordata sd where dbsensor.id=sd.sensor_id order by timestamp desc limit 1)  
+          """
+    )
+    fun getSensorsWithData(): LiveData<List<DbSensorWithData>>
+
+    // SUBQUERY!!!
+
 }
 
 @Database(entities = [DbSensor::class, DbSensorData::class], version = 3)

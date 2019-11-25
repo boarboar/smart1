@@ -1,5 +1,9 @@
 package com.example.android.weatherapp.database
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Transformations
+import androidx.lifecycle.Transformations.map
+import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.example.android.weatherapp.domain.Sensor
@@ -12,17 +16,6 @@ data class DbSensor(
     val description: String,
     val updated: Long
     )
-
-fun List<DbSensor>.asSensor(): List<Sensor> {
-    return map {
-        Sensor (
-            id = it.id.toShort(),
-            description = it.description,
-            updated = it.updated
-        )
-    }
-    // couple with sensordata here
-}
 
 @Entity
 data class DbSensorData(
@@ -37,6 +30,33 @@ data class DbSensorData(
 )
 
 
+// combine
+
+@Entity
+data class DbSensorWithData(
+    @PrimaryKey
+    val id: Int,
+    val description: String,
+    val updated: Long,
+    @Embedded
+    val sdata: DbSensorData
+)
+
+
+fun List<DbSensorWithData>.asSensor(): List<Sensor> {
+    return map {
+        Sensor (
+            id = it.id.toShort(),
+            description = it.description,
+            updated = it.updated,
+            data = it.sdata
+        )
+    }
+    // couple with sensordata here
+}
+
+
+/*
 fun List<DbSensorData>.asSensorData(): List<SensorData> {
     return map {
         SensorData (
@@ -49,7 +69,10 @@ fun List<DbSensorData>.asSensorData(): List<SensorData> {
         )
     }
 }
+*/
 
+
+/*
 fun List<DbSensor>.asSensorWithData(datas : List<DbSensorData>?): List<Sensor> {
     return map {
         val sid = it.id
@@ -68,6 +91,36 @@ fun List<DbSensor>.asSensorWithData(datas : List<DbSensorData>?): List<Sensor> {
                     dhum = sens_data.dhum.toShort()
                 )
             }
+        )
+    }
+    // couple with sensordata here
+}
+*/
+
+fun List<DbSensor>.asSensorWithData2(database: WeatherDatabase): List<Sensor> {
+    return map {
+        //val sdata = database.weatherDao.getOneSensorData(it.id)
+        Sensor (
+            id = it.id.toShort(),
+            description = it.description,
+            updated = it.updated,
+            //_data = database.weatherDao.getOneSensorData(it.id)
+            data = database.weatherDao.getOneSensorData(it.id)
+            //_data = database.weatherDao.getSensorsData()
+            /*
+            _data = Transformations.map(sdata) {
+                dbdata ->
+                SensorData (
+                    sensor_id = dbdata.sensor_id.toShort(),
+                    timestamp = dbdata.timestamp.toLong(),
+                    temp = dbdata.temp.toShort(),
+                    vcc = dbdata.vcc.toShort(),
+                    hum = dbdata.hum.toShort(),
+                    dhum = dbdata.dhum.toShort()
+                )
+            }
+            */
+
         )
     }
     // couple with sensordata here

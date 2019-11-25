@@ -54,9 +54,9 @@ class OverviewViewModel(application: Application) : AndroidViewModel(application
     val sensorList: LiveData<List<Sensor>>
         get() = _sensorList
 
-    lateinit private var _sensorDataList: LiveData<List<SensorData>>
-    val sensorDataList: LiveData<List<SensorData>>
-        get() = _sensorDataList
+    //lateinit private var _sensorDataList: LiveData<List<SensorData>>
+    //val sensorDataList: LiveData<List<SensorData>>
+    //    get() = _sensorDataList
 
     override fun onCleared() {
         super.onCleared()
@@ -74,17 +74,29 @@ class OverviewViewModel(application: Application) : AndroidViewModel(application
     private fun getSensors() {
             try {
                 _db_status.value = DbStatus.LOADING
-                val sdata = database.weatherDao.getSensorsData()
 
-                /*
-                _sensorDataList = Transformations.map(database.weatherDao.getSensorsData()) {
-                    it.asSensorData()
+                _sensorList = Transformations.map(database.weatherDao.getSensorsWithData()) {
+                    it.asSensor()
                 }
-                */
 
+                //val sdata = database.weatherDao.getSensorsData()
+
+
+                //_sensorDataList = Transformations.map(database.weatherDao.getSensorsData()) {
+                 //   it.asSensorData()
+                //}
+
+/*
                 _sensorList = Transformations.map(database.weatherDao.getSensors()) {
                     it.asSensorWithData(sdata.value)
                 }
+                _sensorList = Transformations.map(database.weatherDao.getSensors()) {
+                    it.asSensorWithData1(_sensorDataList.value)
+                }
+*/
+                //_sensorList = Transformations.map(database.weatherDao.getSensors()) {
+                //    it.asSensorWithData2(database)
+                //}
 
                 /*
                 // here Sensors should be coupled with SensorData

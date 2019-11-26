@@ -5,7 +5,6 @@ import androidx.lifecycle.LiveData
 import androidx.room.*
 import androidx.sqlite.db.SupportSQLiteDatabase
 import androidx.room.migration.Migration
-import android.icu.lang.UCharacter.GraphemeClusterBreak.V
 
 val MIGRATION_1_2: Migration = object : Migration(1, 2) {
     override fun migrate(database: SupportSQLiteDatabase) {
@@ -47,15 +46,24 @@ interface WeatherDao {
     //fun getOneSensorData(id : Int): LiveData<List<DbSensorData>>
     fun getOneSensorData(id : Int): DbSensorData
 
+//    @Query("""
+//        select * from dbsensor left outer join dbsensordata on (dbsensor.id=dbsensordata.sensor_id) where
+//          dbsensordata._id in
+//          (select _id from dbsensordata sd where dbsensor.id=sd.sensor_id order by timestamp desc limit 1)
+//          """
+//    )
     @Query("""
-        select * from dbsensor left join dbsensordata on dbsensor.id=dbsensordata.sensor_id where 
-          dbsensordata._id in 
-          (select _id from dbsensordata sd where dbsensor.id=sd.sensor_id order by timestamp desc limit 1)  
+        select * from dbsensor left outer join dbsensordata on (
+        dbsensor.id=dbsensordata.sensor_id and dbsensordata._id in 
+          (select _id from dbsensordata sd where dbsensor.id=sd.sensor_id order by timestamp desc limit 1) 
+          ) 
           """
     )
     fun getSensorsWithData(): LiveData<List<DbSensorWithData>>
 
-    // SUBQUERY!!!
+    @Query("DELETE FROM dbsensordata where sensor_id=:id")
+    fun deleteSensorData(id : Int)
+
 
 }
 

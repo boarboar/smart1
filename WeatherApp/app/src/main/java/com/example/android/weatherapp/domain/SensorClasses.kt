@@ -1,10 +1,5 @@
 package com.example.android.weatherapp.domain
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
-import com.example.android.weatherapp.database.DbSensorData
-import com.example.android.weatherapp.overview.DbStatus
 import com.example.android.weatherapp.utils.DateUtils
 
 data class Sensor(val id: Short, val description: String, val updated: Long=0,
@@ -13,7 +8,7 @@ data class Sensor(val id: Short, val description: String, val updated: Long=0,
     val at : String
         get() = DateUtils.convertDateTime(updated)
     val temp : String
-        get() = data?.temp.toString() ?: "---"
+        get() = data?.temp?.toString() ?: "---"
 
     //fun equalData(other : Sensor) = id==other.id && description==other.description && updated==other.updated
   }

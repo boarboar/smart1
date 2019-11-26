@@ -54,6 +54,7 @@ class OverviewFragment : Fragment() {
             R.id.refresh -> viewModel.updateForecast()
             R.id.populate_sensors -> viewModel.onPopulate()
             R.id.update_sensors -> viewModel.onUpdate()
+            R.id.delete_sensor_data -> viewModel.onDeleteSensorData()
         }
         return true
     }

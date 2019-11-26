@@ -1,8 +1,5 @@
 package com.example.android.weatherapp.database
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.Transformations
-import androidx.lifecycle.Transformations.map
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -42,13 +39,14 @@ data class DbSensorWithData(
     val description: String,
     val updated: Long,
     @Embedded
-    val sdata: DbSensorData
+    val sdata: DbSensorData?
 )
 {
     fun toSensor() = Sensor(id.toShort(),
         description = description,
         updated = updated,
-        data = sdata.toSensorData())
+        data = sdata?.toSensorData() //?: SensorData(0,0,0,0,0,0)
+     )
 }
 
 fun List<DbSensorWithData>.asSensor(): List<Sensor> {

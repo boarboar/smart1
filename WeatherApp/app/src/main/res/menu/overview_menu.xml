@@ -10,4 +10,7 @@
     <item
         android:id="@+id/update_sensors"
         android:title="Update sensors" />
+    <item
+        android:id="@+id/delete_sensor_data"
+        android:title="Delete sensor data" />
 </menu>

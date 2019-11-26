@@ -143,7 +143,7 @@ class OverviewViewModel(application: Application) : AndroidViewModel(application
     }
 
     private suspend fun updateSensorsDb() {
-
+        Log.i(tag, "Update sens test")
         withContext(Dispatchers.IO) {
             try {
                 database.weatherDao.update(DbSensor(1, "room", System.currentTimeMillis()))
@@ -152,6 +152,20 @@ class OverviewViewModel(application: Application) : AndroidViewModel(application
                 database.weatherDao.insert_data(DbSensorData(0,1, System.currentTimeMillis(), 155, 3500, -1, -1))
                 //database.weatherDao.insert_data(DbSensorData(0,2, System.currentTimeMillis(), 100, 3400, -1, -1))
                 //database.weatherDao.insert_data(DbSensorData(0,3, System.currentTimeMillis(), 250, 3500, 850, 1))
+
+                database.weatherDao.insert(DbSensor(4, "WC", System.currentTimeMillis()))
+            } catch (t: Throwable) {
+                val msg = t.message ?: "Unknown DB error"
+                Log.e(tag, "DB error: $msg")
+            }
+        }
+    }
+
+    private suspend fun deleteSensorDataDb() {
+        Log.i(tag, "Delete sens data test")
+        withContext(Dispatchers.IO) {
+            try {
+                database.weatherDao.deleteSensorData(3)
             } catch (t: Throwable) {
                 val msg = t.message ?: "Unknown DB error"
                 Log.e(tag, "DB error: $msg")
@@ -169,6 +183,12 @@ class OverviewViewModel(application: Application) : AndroidViewModel(application
     fun onUpdate() {
         coroutineScope.launch {
             updateSensorsDb()
+        }
+    }
+
+    fun onDeleteSensorData() {
+        coroutineScope.launch {
+            deleteSensorDataDb()
         }
     }
 }

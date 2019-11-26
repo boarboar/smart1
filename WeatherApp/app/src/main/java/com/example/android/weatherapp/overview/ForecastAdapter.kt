@@ -12,7 +12,8 @@ class ForecastAdapter(/*val onClickListener: OnClickListener*/) : ListAdapter<We
 
     companion object DiffCallback : DiffUtil.ItemCallback<WeatherForecastItem>() {
         override fun areItemsTheSame(oldItem: WeatherForecastItem, newItem: WeatherForecastItem): Boolean {
-            return oldItem === newItem
+            //return oldItem === newItem
+            return oldItem.dt === newItem.dt
         }
 
         override fun areContentsTheSame(oldItem: WeatherForecastItem, newItem: WeatherForecastItem): Boolean {

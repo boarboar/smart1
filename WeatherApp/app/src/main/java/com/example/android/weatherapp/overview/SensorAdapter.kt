@@ -13,11 +13,12 @@ class SensorAdapter(/*val onClickListener: OnClickListener*/) : ListAdapter<Sens
 
     companion object DiffCallback : DiffUtil.ItemCallback<Sensor>() {
         override fun areItemsTheSame(oldItem: Sensor, newItem: Sensor): Boolean {
-            return oldItem === newItem
+            return oldItem.id === newItem.id
         }
 
         override fun areContentsTheSame(oldItem: Sensor, newItem: Sensor): Boolean {
             return oldItem == newItem
+            //return oldItem.equalData(newItem)
         }
     }
 

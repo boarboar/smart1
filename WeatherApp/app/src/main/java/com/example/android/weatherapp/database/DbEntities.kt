@@ -28,6 +28,9 @@ data class DbSensorData(
     val hum: Int,
     val dhum: Int
 )
+{
+    fun toSensorData() = SensorData(sensor_id.toShort(), timestamp, temp.toShort(), vcc.toShort(), hum.toShort(), dhum.toShort())
+}
 
 
 // combine
@@ -41,14 +44,13 @@ data class DbSensorWithData(
     @Embedded
     val sdata: DbSensorData
 )
+{
+    fun toSensor() = Sensor(id.toShort(),
+        description = description,
+        updated = updated,
+        data = sdata.toSensorData())
+}
 
 fun List<DbSensorWithData>.asSensor(): List<Sensor> {
-    return map {
-        Sensor (
-            id = it.id.toShort(),
-            description = it.description,
-            updated = it.updated,
-            data = it.sdata
-        )
-    }
+    return map { it.toSensor() }
 }

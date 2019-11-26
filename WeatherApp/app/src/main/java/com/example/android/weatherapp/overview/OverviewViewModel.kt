@@ -149,7 +149,7 @@ class OverviewViewModel(application: Application) : AndroidViewModel(application
                 database.weatherDao.update(DbSensor(1, "room", System.currentTimeMillis()))
                 //database.weatherDao.insert(DbSensor(2, "balcony", System.currentTimeMillis()))
                 //database.weatherDao.insert(DbSensor(3, "bath", System.currentTimeMillis()))
-                database.weatherDao.insert_data(DbSensorData(0,1, System.currentTimeMillis(), 150, 3500, -1, -1))
+                database.weatherDao.insert_data(DbSensorData(0,1, System.currentTimeMillis(), 155, 3500, -1, -1))
                 //database.weatherDao.insert_data(DbSensorData(0,2, System.currentTimeMillis(), 100, 3400, -1, -1))
                 //database.weatherDao.insert_data(DbSensorData(0,3, System.currentTimeMillis(), 250, 3500, 850, 1))
             } catch (t: Throwable) {

@@ -8,13 +8,14 @@ import com.example.android.weatherapp.overview.DbStatus
 import com.example.android.weatherapp.utils.DateUtils
 
 data class Sensor(val id: Short, val description: String, val updated: Long=0,
-                  //val _data: LiveData<List<DbSensorData>> = MutableLiveData<List<DbSensorData>>()
-    val data : DbSensorData? = null
+                  val data : SensorData? = null
 ) {
     val at : String
         get() = DateUtils.convertDateTime(updated)
     val temp : String
         get() = data?.temp.toString() ?: "---"
+
+    //fun equalData(other : Sensor) = id==other.id && description==other.description && updated==other.updated
   }
 
 

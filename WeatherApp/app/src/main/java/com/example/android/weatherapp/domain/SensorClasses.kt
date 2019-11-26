@@ -12,27 +12,10 @@ data class Sensor(val id: Short, val description: String, val updated: Long=0,
     val data : DbSensorData? = null
 ) {
     val at : String
-        get() = DateUtils.convertTimeShort(updated * 1000)
+        get() = DateUtils.convertDateTime(updated)
     val temp : String
         get() = data?.temp.toString() ?: "---"
-    //val data: LiveData<List<DbSensorData>>
-    //    get() = _data
-
-    //var sdata: LiveData<SensorData> = MutableLiveData<SensorData>()
-
-    //val temp : String
-    //    get() = Transformations.map(_data) { it.temp.toString() }
-
-    //val temp = Transformations.map(_data) { it[0].sensor_id.toString() }
-
-    //val temp : LiveData<String> = MutableLiveData<String> ("---")
-        //get() = Transformations.map(_data) { "test" }
-
-
-    //val temp : String
-    //    get() = "KKK"
   }
-
 
 
 data class SensorData(

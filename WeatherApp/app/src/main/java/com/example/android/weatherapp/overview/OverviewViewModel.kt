@@ -43,13 +43,11 @@ class OverviewViewModel(application: Application) : AndroidViewModel(application
     val weather: LiveData<Weather>
         get() = _weather
 
-    //private val _forecast = MutableLiveData<WeatherForecast>()
     private val _forecastList = MutableLiveData<ArrayList<WeatherForecastItem>>()
     val forecastItemList: LiveData<ArrayList<WeatherForecastItem>>
         get() = _forecastList
 
 
-    //private var _sensorList = MutableLiveData<List<Sensor>>()
     lateinit private var _sensorList: LiveData<List<Sensor>>
     val sensorList: LiveData<List<Sensor>>
         get() = _sensorList
@@ -78,38 +76,6 @@ class OverviewViewModel(application: Application) : AndroidViewModel(application
                 _sensorList = Transformations.map(database.weatherDao.getSensorsWithData()) {
                     it.asSensor()
                 }
-
-                //val sdata = database.weatherDao.getSensorsData()
-
-
-                //_sensorDataList = Transformations.map(database.weatherDao.getSensorsData()) {
-                 //   it.asSensorData()
-                //}
-
-/*
-                _sensorList = Transformations.map(database.weatherDao.getSensors()) {
-                    it.asSensorWithData(sdata.value)
-                }
-                _sensorList = Transformations.map(database.weatherDao.getSensors()) {
-                    it.asSensorWithData1(_sensorDataList.value)
-                }
-*/
-                //_sensorList = Transformations.map(database.weatherDao.getSensors()) {
-                //    it.asSensorWithData2(database)
-                //}
-
-                /*
-                // here Sensors should be coupled with SensorData
-                _sensorList.value?.let {
-                    for(s in it) {
-                        val sid = s.id
-                        sensorDataList.value?.let {
-                            s.data = it.find { it.sensor_id == sid }
-                        }
-                    }
-                }
-                */
-
                 _db_status.value = DbStatus.DONE
             } catch (t: Throwable) {
                 _db_status.value = DbStatus.ERROR
@@ -176,10 +142,33 @@ class OverviewViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
+    private suspend fun updateSensorsDb() {
+
+        withContext(Dispatchers.IO) {
+            try {
+                database.weatherDao.update(DbSensor(1, "room", System.currentTimeMillis()))
+                //database.weatherDao.insert(DbSensor(2, "balcony", System.currentTimeMillis()))
+                //database.weatherDao.insert(DbSensor(3, "bath", System.currentTimeMillis()))
+                database.weatherDao.insert_data(DbSensorData(0,1, System.currentTimeMillis(), 150, 3500, -1, -1))
+                //database.weatherDao.insert_data(DbSensorData(0,2, System.currentTimeMillis(), 100, 3400, -1, -1))
+                //database.weatherDao.insert_data(DbSensorData(0,3, System.currentTimeMillis(), 250, 3500, 850, 1))
+            } catch (t: Throwable) {
+                val msg = t.message ?: "Unknown DB error"
+                Log.e(tag, "DB error: $msg")
+            }
+        }
+    }
+
     fun onPopulate() {
         coroutineScope.launch {
             populateDb()
-            getSensors()
+            //getSensors()
+        }
+    }
+
+    fun onUpdate() {
+        coroutineScope.launch {
+            updateSensorsDb()
         }
     }
 }

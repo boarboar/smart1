@@ -32,10 +32,11 @@ interface WeatherDao {
     fun getSensors(): LiveData<List<DbSensor>>
     @Insert
     fun insert(sensor : DbSensor)
+    @Update
+    fun update(sensor : DbSensor)
 
     @Insert
     fun insert_data(sensor_data : DbSensorData)
-
     //@Insert(onConflict = OnConflictStrategy.REPLACE)
     //fun insertAll(vararg videos: DatabaseVideo)
 

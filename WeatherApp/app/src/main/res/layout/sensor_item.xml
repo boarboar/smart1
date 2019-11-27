@@ -11,18 +11,19 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="107dp"
+        android:layout_height="wrap_content"
+
         tools:context="com.example.android.weatherapp.MainActivity">
 
         <TextView
             android:id="@+id/item_location"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginLeft="16dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginStart="@dimen/margin"
+            android:layout_marginLeft="@dimen/margin"
+            android:layout_marginTop="@dimen/margin"
             android:text="@{sensor.description}"
-            android:textSize="24sp"
+            android:textSize="@dimen/size_large"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Location"
@@ -32,37 +33,40 @@
             android:id="@+id/item_temp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginLeft="16dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginStart="@dimen/margin"
+            android:layout_marginLeft="@dimen/margin"
+            android:layout_marginTop="@dimen/margin"
             android:text="@{sensor.tempString}"
-            android:textSize="24sp"
+            android:textSize="@dimen/size_large"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/item_location"
+            app:layout_constraintBottom_toBottomOf="parent"
             tools:text="---.-º"/>
 
         <TextView
             android:id="@+id/item_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginRight="16dp"
+            android:layout_marginEnd="@dimen/margin"
+            android:layout_marginRight="@dimen/margin"
             android:text="@{sensor.updatedAt}"
+            android:textSize="@dimen/size_small"
+            app:layout_constraintBottom_toBottomOf="@id/item_location"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="--:--"/>
+            app:layout_constraintBaseline_toBaselineOf="@id/item_location"
+            tools:text="--:--" />
 
         <TextView
             android:id="@+id/item_vcc"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginRight="16dp"
+            android:layout_marginTop="@dimen/margin"
+            android:layout_marginEnd="@dimen/margin"
+            android:layout_marginRight="@dimen/margin"
+            android:textSize="@dimen/size_small"
             android:text="@{sensor.vccString}"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/item_time"
+            app:layout_constraintTop_toBottomOf="@id/item_time"
             tools:text="--.-v"
             />
 
@@ -70,12 +74,14 @@
             android:id="@+id/item_ha"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginRight="16dp"
+            android:layout_marginTop="@dimen/margin"
+            android:layout_marginEnd="@dimen/margin"
+            android:layout_marginRight="@dimen/margin"
+            android:layout_marginBottom="@dimen/margin"
+            android:textSize="@dimen/size_small"
             android:text="@{sensor.humString}"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/item_vcc"
+            app:layout_constraintTop_toBottomOf="@id/item_vcc"
             tools:text="--%"
             />
 
@@ -83,13 +89,13 @@
             android:id="@+id/item_hd"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginRight="16dp"
+            android:layout_marginEnd="@dimen/margin"
+            android:layout_marginRight="@dimen/margin"
+            android:textSize="@dimen/size_small"
             android:text="@{sensor.dhumString}"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/item_ha"
             app:layout_constraintTop_toTopOf="@id/item_ha"
-            tooltext="!"/>
+            tooltext="(!)"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

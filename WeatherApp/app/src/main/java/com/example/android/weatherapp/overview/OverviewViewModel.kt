@@ -10,7 +10,7 @@ import com.example.android.weatherapp.network.WeatherServiceApi
 import kotlinx.coroutines.*
 
 enum class WeatherApiStatus { LOADING, ERROR, DONE }
-enum class DbStatus { LOADING, ERROR, DONE }
+enum class DbStatus { LOADING, ERROR, DONE, START }
 
 class OverviewViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -63,6 +63,8 @@ class OverviewViewModel(application: Application) : AndroidViewModel(application
 
     init {
         //_test.value = "NONE"
+        _db_status.value = DbStatus.DONE
+
         getWeatherForecast()
 
         getSensors()
@@ -71,12 +73,19 @@ class OverviewViewModel(application: Application) : AndroidViewModel(application
 
     private fun getSensors() {
             try {
-                _db_status.value = DbStatus.LOADING
-
                 _sensorList = Transformations.map(database.weatherDao.getSensorsWithData()) {
                     it.asSensor()
+                    /*
+                    _db_status.value = DbStatus.LOADING
+                    Log.e(tag, "start loading sensors...")
+                    val res = it.asSensor()
+                    Thread.sleep(1_000) // just for test
+                    _db_status.value = DbStatus.DONE
+                    Log.e(tag, "complete loading sensors.")
+                    res
+                     */
                 }
-                _db_status.value = DbStatus.DONE
+                //_db_status.value = DbStatus.DONE
             } catch (t: Throwable) {
                 _db_status.value = DbStatus.ERROR
                 val msg = t.message ?: "Unknown DB error"
@@ -152,8 +161,8 @@ class OverviewViewModel(application: Application) : AndroidViewModel(application
                 database.weatherDao.insert_data(DbSensorData(0,1, System.currentTimeMillis(), 155, 3500, -1, -1))
                 //database.weatherDao.insert_data(DbSensorData(0,2, System.currentTimeMillis(), 100, 3400, -1, -1))
                 //database.weatherDao.insert_data(DbSensorData(0,3, System.currentTimeMillis(), 250, 3500, 850, 1))
-
-                database.weatherDao.insert(DbSensor(4, "WC", System.currentTimeMillis()))
+                database.weatherDao.insert_data(DbSensorData(0,3, System.currentTimeMillis(), 254, 3567, 950, 1))
+                //database.weatherDao.insert(DbSensor(4, "WC", System.currentTimeMillis()))
             } catch (t: Throwable) {
                 val msg = t.message ?: "Unknown DB error"
                 Log.e(tag, "DB error: $msg")

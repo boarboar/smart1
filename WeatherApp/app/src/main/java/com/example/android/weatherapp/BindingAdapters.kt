@@ -17,6 +17,7 @@
 
 package com.example.android.weatherapp
 
+import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
@@ -77,14 +78,17 @@ fun bindStatus(view: View, status: WeatherApiStatus?) {
 fun bindDbStatus(view: View, status: DbStatus?) {
     when (status) {
         DbStatus.LOADING -> {
+            //Log.e("BIND", "sensor progress ON")
             view.visibility = View.VISIBLE
         }
         DbStatus.ERROR -> {
             //statusImageView.visibility = View.VISIBLE
             view.visibility = View.GONE
+            //Log.e("BIND", "sensor progress OFF")
         }
         DbStatus.DONE -> {
             view.visibility = View.GONE
+            //Log.e("BIND", "sensor progress OFF")
         }
     }
 }

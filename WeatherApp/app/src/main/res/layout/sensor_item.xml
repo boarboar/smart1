@@ -35,7 +35,7 @@
             android:layout_marginStart="16dp"
             android:layout_marginLeft="16dp"
             android:layout_marginTop="16dp"
-            android:text="@{sensor.temp}"
+            android:text="@{sensor.tempString}"
             android:textSize="24sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/item_location"
@@ -48,7 +48,7 @@
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
             android:layout_marginRight="16dp"
-            android:text="@{sensor.at}"
+            android:text="@{sensor.updatedAt}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="--:--"/>
@@ -60,9 +60,11 @@
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
             android:layout_marginRight="16dp"
-            android:text="--.-v"
+            android:text="@{sensor.vccString}"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/item_time" />
+            app:layout_constraintTop_toTopOf="@id/item_time"
+            tools:text="--.-v"
+            />
 
         <TextView
             android:id="@+id/item_ha"
@@ -71,9 +73,11 @@
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
             android:layout_marginRight="16dp"
-            android:text="--%"
+            android:text="@{sensor.humString}"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/item_vcc" />
+            app:layout_constraintTop_toTopOf="@id/item_vcc"
+            tools:text="--%"
+            />
 
         <TextView
             android:id="@+id/item_hd"
@@ -82,9 +86,10 @@
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
             android:layout_marginRight="16dp"
-            android:text="-"
+            android:text="@{sensor.dhumString}"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/item_ha" />
+            app:layout_constraintTop_toTopOf="@id/item_ha"
+            tooltext="!"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

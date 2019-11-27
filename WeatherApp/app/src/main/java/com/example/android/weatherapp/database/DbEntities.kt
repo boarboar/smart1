@@ -1,5 +1,6 @@
 package com.example.android.weatherapp.database
 
+import androidx.room.ColumnInfo
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -18,7 +19,9 @@ data class DbSensor(
 data class DbSensorData(
     @PrimaryKey(autoGenerate = true)
     val _id: Int,
+    @ColumnInfo(index = true)
     val sensor_id: Int, // should be indexed
+    @ColumnInfo(index = true)
     val timestamp: Long,
     val temp: Int,
     val vcc: Int,

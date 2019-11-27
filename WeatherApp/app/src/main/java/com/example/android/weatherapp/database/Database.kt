@@ -25,6 +25,15 @@ val MIGRATION_2_3: Migration = object : Migration(2, 3) {
     }
 }
 
+val MIGRATION_3_4: Migration = object : Migration(3, 4) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("CREATE INDEX idx_sensor_id ON dbsensordata (sensor_id);"+
+                "CREATE INDEX idx_timestamp ON dbsensordata (timestamp);"
+        )
+    }
+}
+
+
 @Dao
 interface WeatherDao {
     @Query("select * from dbsensor")
@@ -67,7 +76,7 @@ interface WeatherDao {
 
 }
 
-@Database(entities = [DbSensor::class, DbSensorData::class], version = 3)
+@Database(entities = [DbSensor::class, DbSensorData::class], version = 4)
 abstract class WeatherDatabase : RoomDatabase() {
     abstract val weatherDao: WeatherDao
 }
@@ -80,7 +89,7 @@ fun getDatabase(context: Context): WeatherDatabase {
             INSTANCE = Room.databaseBuilder(context.applicationContext,
                 WeatherDatabase::class.java,
                 "weather")
-                .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
+                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
                 .build()
         }
     }

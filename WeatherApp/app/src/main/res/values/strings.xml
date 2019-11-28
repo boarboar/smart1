@@ -1,5 +1,5 @@
 <resources>
     <string name="app_name">WeatherApp</string>
-    <string name="sun_rise_set">Восход %1$s    Закат %2$s</string>
+    <string name="sun_rise_set">Восход %1$s,    Закат %2$s</string>
     <string name="weather_info">Погода в г. %1$s на %2$s</string>
 </resources>

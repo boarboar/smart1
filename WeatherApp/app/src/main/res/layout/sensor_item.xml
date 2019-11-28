@@ -12,7 +12,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-
+        android:background="@drawable/border"
         tools:context="com.example.android.weatherapp.MainActivity">
 
         <TextView
@@ -36,6 +36,7 @@
             android:layout_marginStart="@dimen/margin"
             android:layout_marginLeft="@dimen/margin"
             android:layout_marginTop="@dimen/margin"
+            android:layout_marginBottom="@dimen/margin"
             android:text="@{sensor.tempString}"
             android:textSize="@dimen/size_large"
             app:layout_constraintStart_toStartOf="parent"
@@ -78,12 +79,12 @@
             android:layout_marginEnd="@dimen/margin"
             android:layout_marginRight="@dimen/margin"
             android:layout_marginBottom="@dimen/margin"
-            android:textSize="@dimen/size_small"
             android:text="@{sensor.humString}"
+            android:textSize="@dimen/size_small"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/item_vcc"
-            tools:text="--%"
-            />
+            tools:text="--%" />
 
         <TextView
             android:id="@+id/item_hd"

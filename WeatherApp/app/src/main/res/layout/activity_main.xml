@@ -12,7 +12,9 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:theme="@style/ThemeOverlay.MaterialComponents.Dark.ActionBar"
-            android:background="?attr/colorPrimaryDark">
+            android:background="?attr/colorPrimaryDark"
+            app:titleTextAppearance="@style/Toolbar.TitleText"
+            >
             <!--        <ImageView-->
             <!--            android:id="@+id/hero_image"-->
             <!--            android:layout_width="150dp"-->

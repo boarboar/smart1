@@ -8,6 +8,9 @@ import com.example.android.weatherapp.database.*
 import com.example.android.weatherapp.domain.*
 import com.example.android.weatherapp.network.WeatherServiceApi
 import kotlinx.coroutines.*
+import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.concurrent.schedule
 
 enum class WeatherApiStatus { LOADING, ERROR, DONE }
 enum class DbStatus { LOADING, ERROR, DONE, START }
@@ -17,6 +20,7 @@ class OverviewViewModel(application: Application) : AndroidViewModel(application
     companion object {
         private const val tag = "OverviewViewModel"
         private val CITYCODE = "193312,Ru"
+        private val FORECAST_REFRESH_TIMEOUT_MIN =  1L
     }
 
     private val wservice : WeatherServiceApi by lazy  { WeatherServiceApi.obtain() }
@@ -52,23 +56,15 @@ class OverviewViewModel(application: Application) : AndroidViewModel(application
     val sensorList: LiveData<List<Sensor>>
         get() = _sensorList
 
-    //lateinit private var _sensorDataList: LiveData<List<SensorData>>
-    //val sensorDataList: LiveData<List<SensorData>>
-    //    get() = _sensorDataList
-
     override fun onCleared() {
         super.onCleared()
         viewModelJob.cancel()
     }
 
     init {
-        //_test.value = "NONE"
         _db_status.value = DbStatus.DONE
-
-        getWeatherForecast()
-
+        Timer().schedule(400, 1000*60*FORECAST_REFRESH_TIMEOUT_MIN) { getWeatherForecast() }
         getSensors()
-
         }
 
     private fun getSensors() {
@@ -100,19 +96,15 @@ class OverviewViewModel(application: Application) : AndroidViewModel(application
             var getWeatherForecastDeferred = wservice.getWeatherForecast(CITYCODE, cnt=6)
             try {
                 _status.value = WeatherApiStatus.LOADING
-                //_test.value = "LOADING"
                 _weather.value = getWeatherDeferred.await()
                 val forecastResult = getWeatherForecastDeferred.await()
                 _forecastList.value = forecastResult.forecastList
                 delay(1_000) // to show spinner
                 _status.value = WeatherApiStatus.DONE
-                //_test.value = "DONE"
-                //_properties.value = listResult
             } catch (e: Exception) {
                 _status.value = WeatherApiStatus.ERROR
                 val msg = e.message ?: "Unknown network error"
                 Log.e(tag, "NET error: $msg")
-                //_test.value = "ERROR"
             }
         }
     }

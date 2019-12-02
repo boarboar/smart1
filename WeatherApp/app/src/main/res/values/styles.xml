@@ -8,6 +8,14 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="Toolbar.TitleText" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
+        <item name="android:textSize">@dimen/size_medium</item>
+        <item name="android:textColorPrimary">#121212</item>
+        <item name="android:textColorSecondary">#121212</item>
+        <item name="actionMenuTextColor">#121212</item>
+        <item name="titleTextColor">#121212</item>
+    </style>
+
 <!--    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">-->
 <!--        &lt;!&ndash; Customize your theme here. &ndash;&gt;-->
 <!--        <item name="colorPrimary">@color/colorPrimary</item>-->
@@ -16,3 +24,5 @@
 <!--    </style>-->
 
 </resources>
+
+

@@ -12,8 +12,8 @@
         <item name="android:textSize">@dimen/size_medium</item>
         <item name="android:textColorPrimary">#121212</item>
         <item name="android:textColorSecondary">#121212</item>
-        <item name="actionMenuTextColor">#121212</item>
-        <item name="titleTextColor">#121212</item>
+        <item name="android:actionMenuTextColor">#121212</item>
+
     </style>
 
 <!--    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">-->

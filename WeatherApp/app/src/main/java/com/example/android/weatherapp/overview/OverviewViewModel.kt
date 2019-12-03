@@ -20,7 +20,7 @@ class OverviewViewModel(application: Application) : AndroidViewModel(application
     companion object {
         private const val tag = "OverviewViewModel"
         private val CITYCODE = "193312,Ru"
-        private val FORECAST_REFRESH_TIMEOUT_MIN =  1L
+        private val FORECAST_REFRESH_TIMEOUT_MIN =  15L
     }
 
     private val wservice : WeatherServiceApi by lazy  { WeatherServiceApi.obtain() }

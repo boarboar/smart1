@@ -5,6 +5,14 @@ import com.example.android.weatherapp.utils.DateUtils
 data class Sensor(val id: Short, val description: String, val updated: Long=0,
                   val data : SensorData? = null
 ) {
+
+    companion object {
+        const val VCC_LOW_1000 = 3500
+        const val VCC_LOW_DHT11_1000 = 2900
+        const val MEAS_OUTDATED_PERIOD = 1000L * 60L * 46L // 46 min
+        const val MEAS_OBSOLETE_PERIOD = 1000L * 60L * 60L * 4L// 4hrs
+    }
+
     val at : String
         get() = if(updated>0) DateUtils.convertDateTime(updated) else "---"
 
@@ -21,6 +29,9 @@ data class Sensor(val id: Short, val description: String, val updated: Long=0,
         get() = data?.hum?.let {if(it>0) (it/10.0F).toString()+"%" else ""} ?: ""
     val dhumString : String
         get() = data?.dhum?.let {if(it.toInt()==SensorData.DHUM_VALS.LEAK.value) "!" else ""} ?: ""
+
+    val isVccLow : Boolean
+        get () = data?.vcc?.let { it< VCC_LOW_1000 } ?: false
 
     //fun equalData(other : Sensor) = id==other.id && description==other.description && updated==other.updated
   }

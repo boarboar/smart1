@@ -25,6 +25,7 @@ import androidx.core.net.toUri
 import androidx.databinding.BindingAdapter
 import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.RecyclerView
+import com.example.android.weatherapp.WeatherApplication.Companion.ctx
 import com.example.android.weatherapp.domain.Sensor
 import com.example.android.weatherapp.domain.WeatherForecastItem
 import com.example.android.weatherapp.domain.WeatherWeather
@@ -33,6 +34,8 @@ import com.example.android.weatherapp.overview.ForecastAdapter
 import com.example.android.weatherapp.overview.SensorAdapter
 
 import com.example.android.weatherapp.overview.WeatherApiStatus
+import com.example.android.weatherapp.utils.resolveColor
+import com.example.android.weatherapp.utils.resolveColorAttr
 import com.squareup.picasso.Picasso
 import java.util.ArrayList
 
@@ -97,3 +100,15 @@ fun bindDbStatus(view: View, status: DbStatus?) {
 fun bindTextStatus(statusTextView: TextView, status: String?) {
     statusTextView.text = status?.toLowerCase()
 }
+
+@BindingAdapter("sensorVccColor")
+fun bindSensorVccColor(vccTextView: TextView, sensor: Sensor?) {
+    sensor?.let {
+        vccTextView.setTextColor(
+            if (it.isVccLow)
+                ctx.resolveColor(android.R.color.holo_orange_light)
+            else ctx.resolveColorAttr(android.R.attr.textColorPrimary)
+        )
+    }
+}
+

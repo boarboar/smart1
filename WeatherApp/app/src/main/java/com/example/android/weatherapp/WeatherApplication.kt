@@ -1,16 +1,25 @@
 package com.example.android.weatherapp
 
 import android.app.Application
+import android.content.Context
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.example.android.weatherapp.work.RefreshDataWorker
+import com.jakewharton.threetenabp.AndroidThreeTen
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 
 class WeatherApplication : Application() {
+
+    companion object {
+        val tag = "WeatherApplication"
+        lateinit var ctx: Context
+
+    }
+
     val applicationScope = CoroutineScope(Dispatchers.Default)
     /**
      * onCreate is called before the first screen is shown to the user.
@@ -20,6 +29,8 @@ class WeatherApplication : Application() {
      */
     override fun onCreate() {
         super.onCreate()
+        ctx = applicationContext
+        AndroidThreeTen.init(this)
         delayedInit()
     }
 

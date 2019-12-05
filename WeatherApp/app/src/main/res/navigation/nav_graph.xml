@@ -6,5 +6,18 @@
     <fragment
         android:id="@+id/overviewFragment"
         android:name="com.example.android.weatherapp.overview.OverviewFragment"
-        android:label="OverviewFragment" />
+        android:label="OverviewFragment" >
+        <action
+            android:id="@+id/action_overviewFragment_to_sensorFragment"
+            app:destination="@+id/sensorFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/sensorFragment"
+        android:name="com.example.android.weatherapp.sensorview.SensorFragment"
+        android:label="SensorFragment">
+        <argument
+            android:name="selectedSensor"
+            app:argType="com.example.android.weatherapp.domain.Sensor" />
+        />
+    </fragment>
 </navigation>

@@ -9,7 +9,7 @@ import com.example.android.weatherapp.databinding.SensorItemBinding
 import com.example.android.weatherapp.domain.Sensor
 
 
-class SensorAdapter(/*val onClickListener: OnClickListener*/) : ListAdapter<Sensor, SensorAdapter.SensorViewHolder>(DiffCallback) {
+class SensorAdapter(val onClickListener: OnClickListener) : ListAdapter<Sensor, SensorAdapter.SensorViewHolder>(DiffCallback) {
 
     companion object DiffCallback : DiffUtil.ItemCallback<Sensor>() {
         override fun areItemsTheSame(oldItem: Sensor, newItem: Sensor): Boolean {
@@ -29,11 +29,11 @@ class SensorAdapter(/*val onClickListener: OnClickListener*/) : ListAdapter<Sens
     override fun onBindViewHolder(holder: SensorAdapter.SensorViewHolder, position: Int) {
         val sensor = getItem(position)
         holder.bind(sensor)
-        /*
+
         holder.itemView.setOnClickListener {
-            onClickListener.onClick(marsProperty)
+            onClickListener.onClick(sensor)
         }
-        */
+
     }
 
     class SensorViewHolder(private var binding: SensorItemBinding):
@@ -43,9 +43,9 @@ class SensorAdapter(/*val onClickListener: OnClickListener*/) : ListAdapter<Sens
             binding.executePendingBindings()
         }
     }
-/*
-    class OnClickListener(val clickListener: (marsProperty: MarsProperty) -> Unit) {
-        fun onClick(marsProperty:MarsProperty) = clickListener(marsProperty)
+
+    class OnClickListener(val clickListener: (sensor: Sensor) -> Unit) {
+        fun onClick(sensor: Sensor) = clickListener(sensor)
     }
-*/
+
 }

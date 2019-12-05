@@ -5,6 +5,8 @@ import android.os.Bundle
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.Toolbar
+import androidx.navigation.findNavController
+import androidx.navigation.ui.NavigationUI
 import com.example.android.weatherapp.utils.DateUtils
 import java.util.*
 import kotlin.concurrent.schedule
@@ -50,22 +52,23 @@ class MainActivity : AppCompatActivity() {
     *
     * Delegate this to Navigation.
     */
-    /*
-    override fun onSupportNavigateUp()
-            =
-        NavigationUI.navigateUp(findNavController(R.id.nav_host_fragment), binding.drawerLayout)
-    */
+
+    override fun onSupportNavigateUp(): Boolean {
+        val navController = this.findNavController(R.id.nav_host_fragment)
+        return navController.navigateUp()
+    }
     /**
      * Setup Navigation for this Activity
      */
     private fun setupNavigation() {
         // first find the nav controller
-        //val navController = findNavController(R.id.nav_host_fragment)
+        val navController = findNavController(R.id.nav_host_fragment)
 
 
         //setSupportActionBar(findViewById(R.id.toolbar))
         setSupportActionBar(toolbar)
 
+        NavigationUI.setupActionBarWithNavController(this, navController)
         // then setup the action bar, tell it about the DrawerLayout
         //setupActionBarWithNavController(navController, binding.drawerLayout)
 

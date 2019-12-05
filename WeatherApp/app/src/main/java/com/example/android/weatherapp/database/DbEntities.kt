@@ -31,23 +31,22 @@ data class DbSensorData(
 {
     fun toSensorData() = SensorData(sensor_id.toShort(), timestamp, temp.toShort(), vcc.toShort(), hum.toShort(), dhum.toShort())
 }
+// todo - add validated field
 
 
 // combine
 
 @Entity
 data class DbSensorWithData(
-    @PrimaryKey
-    val id: Int,
-    val description: String,
-    val updated: Long,
+    @Embedded
+    val s: DbSensor?,
     @Embedded
     val sdata: DbSensorData?
 )
 {
-    fun toSensor() = Sensor(id.toShort(),
-        description = description,
-        updated = updated,
+    fun toSensor() = Sensor(s?.id?.toShort() ?: 0,
+        description = s?.description ?: "",
+        updated = s?.updated ?: 0,
         data = sdata?.toSensorData() //?: SensorData(0,0,0,0,0,0)
      )
 }

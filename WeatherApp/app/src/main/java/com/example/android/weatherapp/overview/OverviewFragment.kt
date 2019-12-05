@@ -3,8 +3,11 @@ package com.example.android.weatherapp.overview
 import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
+import com.example.android.weatherapp.MainActivity
 import com.example.android.weatherapp.R
 import com.example.android.weatherapp.databinding.FragmentOverviewBinding
 
@@ -33,22 +36,22 @@ class OverviewFragment : Fragment() {
         binding.weatherForecastList.adapter = ForecastAdapter()
         //binding.weatherForecastList.setHasFixedSize(true)
 
-//        binding.weatherForecastList.addItemDecoration( DividerItemDecoration(
-//            binding.sensorsGrid.getContext(), DividerItemDecoration.VERTICAL))
+        binding.sensorsGrid.adapter = SensorAdapter(SensorAdapter.OnClickListener {
+            viewModel.displaySensorDetails(it)
+        })
 
+        viewModel.navigateToSelectedSensor.observe(this, Observer {
+            if ( null != it ) {
+                //this.findNavController().navigate(OverviewFragmentDirections.actionShowDetail(it))
+                this.findNavController().navigate(OverviewFragmentDirections.actionOverviewFragmentToSensorFragment(it))
+                viewModel.displaySensorDetailsComplete()
+            }
+        })
 
-        binding.sensorsGrid.adapter = SensorAdapter()
         binding.sensorsGrid.setHasFixedSize(true)
 
-//        binding.sensorsGrid.addItemDecoration( DividerItemDecoration(
-//            binding.sensorsGrid.getContext(), DividerItemDecoration.VERTICAL))
-//
-//        binding.sensorsGrid.addItemDecoration( DividerItemDecoration(
-//            binding.sensorsGrid.getContext(), DividerItemDecoration.HORIZONTAL))
-
-
         setHasOptionsMenu(true)
-
+        (activity as MainActivity).toolbarTitle = ""
         return binding.root
     }
 

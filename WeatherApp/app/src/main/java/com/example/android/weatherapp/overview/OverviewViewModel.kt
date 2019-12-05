@@ -56,6 +56,13 @@ class OverviewViewModel(application: Application) : AndroidViewModel(application
     val sensorList: LiveData<List<Sensor>>
         get() = _sensorList
 
+    private val _navigateToSelectedSensor = MutableLiveData<Sensor>()
+
+    val navigateToSelectedSensor: LiveData<Sensor>
+        get() = _navigateToSelectedSensor
+
+
+
     override fun onCleared() {
         super.onCleared()
         viewModelJob.cancel()
@@ -66,6 +73,15 @@ class OverviewViewModel(application: Application) : AndroidViewModel(application
         Timer().schedule(400, 1000*60*FORECAST_REFRESH_TIMEOUT_MIN) { getWeatherForecast() }
         getSensors()
         }
+
+
+    fun displaySensorDetails(sensor: Sensor) {
+        _navigateToSelectedSensor.value = sensor
+    }
+
+    fun displaySensorDetailsComplete() {
+        _navigateToSelectedSensor.value = null
+    }
 
     private fun getSensors() {
             try {
@@ -147,7 +163,10 @@ class OverviewViewModel(application: Application) : AndroidViewModel(application
         Log.i(tag, "Update sens test")
         withContext(Dispatchers.IO) {
             try {
-                database.weatherDao.update(DbSensor(1, "room", System.currentTimeMillis()))
+                database.weatherDao.update(DbSensor(1, "SENSOR1", System.currentTimeMillis()))
+                database.weatherDao.update(DbSensor(2, "SENSOR2", System.currentTimeMillis()))
+                database.weatherDao.update(DbSensor(3, "SENSOR3", 0))
+                database.weatherDao.update(DbSensor(4, "SENSOR4", 0))
                 //database.weatherDao.insert(DbSensor(2, "balcony", System.currentTimeMillis()))
                 //database.weatherDao.insert(DbSensor(3, "bath", System.currentTimeMillis()))
                 database.weatherDao.insert_data(DbSensorData(0,1, System.currentTimeMillis(), 155, 3500, -1, -1))

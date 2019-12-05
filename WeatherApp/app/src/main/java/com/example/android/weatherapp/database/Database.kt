@@ -69,6 +69,7 @@ interface WeatherDao {
           """
     )
     fun getSensorsWithData(): LiveData<List<DbSensorWithData>>
+    // todo - filter validated only
 
     @Query("DELETE FROM dbsensordata where sensor_id=:id")
     fun deleteSensorData(id : Int)

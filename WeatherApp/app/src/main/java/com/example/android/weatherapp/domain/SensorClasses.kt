@@ -1,10 +1,13 @@
 package com.example.android.weatherapp.domain
 
+import android.os.Parcelable
 import com.example.android.weatherapp.utils.DateUtils
+import kotlinx.android.parcel.Parcelize
 
+@Parcelize
 data class Sensor(val id: Short, val description: String, val updated: Long=0,
                   val data : SensorData? = null
-) {
+) : Parcelable {
 
     companion object {
         const val VCC_LOW_1000 = 3500
@@ -36,7 +39,7 @@ data class Sensor(val id: Short, val description: String, val updated: Long=0,
     //fun equalData(other : Sensor) = id==other.id && description==other.description && updated==other.updated
   }
 
-
+@Parcelize
 data class SensorData(
     val sensor_id: Short,
     val timestamp: Long,
@@ -44,7 +47,7 @@ data class SensorData(
     val vcc: Short,
     val hum: Short,
     val dhum: Short
-) {
+) : Parcelable {
     enum class DHUM_VALS(val value: Int) {
         NOTSET(0), LEAK(1), NORM(2)
     }

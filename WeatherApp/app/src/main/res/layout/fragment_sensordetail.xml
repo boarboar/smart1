@@ -10,11 +10,9 @@
             type="com.example.android.weatherapp.domain.Sensor" />
     </data>
 
-
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
         android:background="@color/colorPrimarySurround"
         tools:context="com.example.android.weatherapp.MainActivity">
 
@@ -22,25 +20,13 @@
             android:id="@+id/item_location"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="40dp"
             android:text="@{sensor.description}"
             android:textSize="@dimen/size_large"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
             tools:text="Location" />
 
-        <com.google.android.material.tabs.TabLayout
-            android:id="@+id/sensor_tabs"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-
-        <androidx.viewpager.widget.ViewPager
-            android:id="@+id/viewpager"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1">
-
-        </androidx.viewpager.widget.ViewPager>
-
-
-    </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </layout>

@@ -34,8 +34,18 @@ class RefreshDataWorker(appContext: Context, params: WorkerParameters):
                 Log.i(WORK_NAME, "Refresh sensor $sensId")
 
             }
+
+            val count = database.weatherDao.getSensorDataCount()
+            Log.i(WORK_NAME, "Total data records in DB: $count")
+
             Result.success()
         } catch (e: HttpException) {
+            val msg = e.message ?: "Unknown HTTP error"
+            Log.e(WORK_NAME, "HTTP error: $msg")
+            Result.failure()
+        } catch (t: Throwable) {
+            val msg = t.message ?: "Unknown DB error"
+            Log.e(WORK_NAME, "DB error: $msg")
             Result.failure()
         }
 

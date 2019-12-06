@@ -4,10 +4,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.example.android.weatherapp.MainActivity
 import com.example.android.weatherapp.databinding.FragmentSensorBinding
 import com.example.android.weatherapp.domain.Sensor
+import kotlinx.android.synthetic.main.fragment_sensor.*
 
 class SensorFragment : Fragment() {
 
@@ -22,8 +24,13 @@ class SensorFragment : Fragment() {
         // Allows Data Binding to Observe LiveData with the lifecycle of this Fragment
         binding.setLifecycleOwner(this)
         //binding.sensor = Sensor(777, "Something")
-        binding.sensor = SensorFragmentArgs.fromBundle(arguments!!).selectedSensor
+        val sensor = SensorFragmentArgs.fromBundle(arguments!!).selectedSensor
+        binding.sensor = sensor
         //setHasOptionsMenu(true)
+
+        binding.viewpager.adapter = SensorPagerAdapter(childFragmentManager, sensor)
+        //binding.viewpager.currentItem = 0
+        binding.sensorTabs.setupWithViewPager(binding.viewpager)
         (activity as MainActivity).toolbarTitle = ""
         return binding.root
     }

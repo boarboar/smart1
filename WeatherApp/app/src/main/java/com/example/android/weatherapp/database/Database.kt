@@ -74,6 +74,8 @@ interface WeatherDao {
     @Query("DELETE FROM dbsensordata where sensor_id=:id")
     fun deleteSensorData(id : Int)
 
+    @Query("select count(*) from dbsensordata")
+    fun getSensorDataCount(): Int
 
 }
 

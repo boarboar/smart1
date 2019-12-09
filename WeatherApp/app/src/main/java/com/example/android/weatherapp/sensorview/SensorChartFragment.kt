@@ -5,18 +5,18 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.example.android.weatherapp.databinding.FragmentSensordetailBinding
+import com.example.android.weatherapp.databinding.FragmentSensorchartBinding
 
-class SensorDetailFragment : SensorBaseFragment() {
+class SensorChartFragment : SensorBaseFragment() {
 
-    override val ftag = "Detail frag"
+    override val ftag = "Sensor chart frag"
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
         Log.v(ftag, "[ ON VIEW CREATED ]")
 
-        val binding = FragmentSensordetailBinding.inflate(inflater)
+        val binding = FragmentSensorchartBinding.inflate(inflater)
         binding.setLifecycleOwner(this)
         binding.sensor = sensor
         //setHasOptionsMenu(true)
@@ -24,3 +24,5 @@ class SensorDetailFragment : SensorBaseFragment() {
         return binding.root
     }
 }
+
+

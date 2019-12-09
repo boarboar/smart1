@@ -21,7 +21,7 @@ data class WeatherMain(
     val humString : String
         get() = humidity.toString()+"%"
     val presString : String
-        get() = pressure_mm.toString()+" mm"
+        get() = pressure_mm.toString()+" мм"
 }
 
 data class WeatherWeather(
@@ -55,7 +55,7 @@ data class WeatherWind(
         get() = (speed_f).toInt()
 
     val speedString : String
-        get() = (speed_f).toInt().toString()+" m/c"
+        get() = (speed_f).toInt().toString()+" м/с"
 }
 
 data class WeatherSys(

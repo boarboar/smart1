@@ -32,9 +32,12 @@ data class Sensor(val id: Short, val description: String, val updated: Long=0,
         get() = data?.hum?.let {if(it>0) (it/10.0F).toString()+"%" else ""} ?: ""
     val dhumString : String
         get() = data?.dhum?.let {if(it.toInt()==SensorData.DHUM_VALS.LEAK.value) "!" else ""} ?: ""
-
+    val dhumVal : String
+        get() = data?.dhum?.let {it.toString()} ?: ""
     val isVccLow : Boolean
         get () = data?.vcc?.let { it< VCC_LOW_1000 } ?: false
+    val idString : String
+        get() = id.toString()
 
     //fun equalData(other : Sensor) = id==other.id && description==other.description && updated==other.updated
   }

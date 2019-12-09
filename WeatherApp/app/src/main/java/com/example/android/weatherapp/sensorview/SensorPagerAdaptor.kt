@@ -20,20 +20,11 @@ class SensorPagerAdapter(fm: FragmentManager, val sensor: Sensor) : FragmentPage
     }
 
     override fun getItem(position: Int): Fragment {
-        //return SensorBaseFragment.newInstance(SensorDetailFragment(), idx)
-
-//        return when(position) {
-//            0 -> SensorDetailFragment.newInstance(SensorDetailFragment(), sensor)
-//            1 -> SensorDetailFragment.newInstance(SensorDetailFragment(), sensor)
-//            else -> SensorDetailFragment.newInstance(SensorDetailFragment(), sensor)
-//        }
-
         Log.v("SENSORPAGEADAPTER", "getItem $position for ${sensor.description}")
-
         return when(position) {
             0 -> SensorBaseFragment.newInstance(SensorDetailFragment(), sensor)
-            1 -> SensorBaseFragment.newInstance(SensorDetailFragment(), sensor)
-            else -> SensorBaseFragment.newInstance(SensorDetailFragment(), sensor)
+            1 -> SensorBaseFragment.newInstance(SensorLogFragment(), sensor)
+            else -> SensorBaseFragment.newInstance(SensorChartFragment(), sensor)
         }
     }
 

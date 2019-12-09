@@ -27,10 +27,14 @@
             tools:text="Location" />
 
         <com.google.android.material.tabs.TabLayout
+            app:tabTextAppearance="@style/MineCustomTabText"
             android:id="@+id/sensor_tabs"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
+            android:layout_height="wrap_content"
+            app:tabMode="fixed"
+            app:tabGravity="fill"
+            app:tabMaxWidth="0dp"
+            />
 
         <androidx.viewpager.widget.ViewPager
             android:id="@+id/viewpager"

@@ -77,24 +77,24 @@ fun bindStatus(view: View, status: WeatherApiStatus?) {
     }
 }
 
-@BindingAdapter("dbStatus")
-fun bindDbStatus(view: View, status: DbStatus?) {
-    when (status) {
-        DbStatus.LOADING -> {
-            //Log.e("BIND", "sensor progress ON")
-            view.visibility = View.VISIBLE
-        }
-        DbStatus.ERROR -> {
-            //statusImageView.visibility = View.VISIBLE
-            view.visibility = View.GONE
-            //Log.e("BIND", "sensor progress OFF")
-        }
-        DbStatus.DONE -> {
-            view.visibility = View.GONE
-            //Log.e("BIND", "sensor progress OFF")
-        }
-    }
-}
+//@BindingAdapter("dbStatus")
+//fun bindDbStatus(view: View, status: DbStatus?) {
+//    when (status) {
+//        DbStatus.LOADING -> {
+//            //Log.e("BIND", "sensor progress ON")
+//            view.visibility = View.VISIBLE
+//        }
+//        DbStatus.ERROR -> {
+//            //statusImageView.visibility = View.VISIBLE
+//            view.visibility = View.GONE
+//            //Log.e("BIND", "sensor progress OFF")
+//        }
+//        DbStatus.DONE -> {
+//            view.visibility = View.GONE
+//            //Log.e("BIND", "sensor progress OFF")
+//        }
+//    }
+//}
 
 @BindingAdapter("weatherApiTextStatus")
 fun bindTextStatus(statusTextView: TextView, status: String?) {

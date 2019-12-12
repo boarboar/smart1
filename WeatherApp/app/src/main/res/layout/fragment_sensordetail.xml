@@ -5,9 +5,16 @@
 
     <data>
 
+<!--        <variable-->
+<!--            name="sensor"-->
+<!--            type="com.example.android.weatherapp.domain.Sensor" />-->
+
         <variable
-            name="sensor"
-            type="com.example.android.weatherapp.domain.Sensor" />
+            name="viewModel"
+            type="com.example.android.weatherapp.sensorview.SensorDetailViewModel" />
+
+
+
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -35,7 +42,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/margin"
             android:layout_marginRight="@dimen/margin"
-            android:text="@{sensor.description}"
+            android:text="@{viewModel.sensor.description}"
             android:textSize="@dimen/size_medium"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/item_location_title"
@@ -60,7 +67,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/margin"
             android:layout_marginRight="@dimen/margin"
-            android:text="@{sensor.idString}"
+            android:text="@{viewModel.sensor.idString}"
             android:textSize="@dimen/size_medium"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/item_id_title"
@@ -85,7 +92,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/margin"
             android:layout_marginRight="@dimen/margin"
-            android:text="@{sensor.updatedAt}"
+            android:text="@{viewModel.sensor.updatedAt}"
             android:textSize="@dimen/size_medium"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/item_upd_at_title"
@@ -110,7 +117,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/margin"
             android:layout_marginRight="@dimen/margin"
-            android:text="@{sensor.tempString}"
+            android:text="@{viewModel.sensor.tempString}"
             android:textSize="@dimen/size_medium"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/item_temp_title"
@@ -135,7 +142,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/margin"
             android:layout_marginRight="@dimen/margin"
-            android:text="@{sensor.vccString}"
+            android:text="@{viewModel.sensor.vccString}"
             android:textSize="@dimen/size_medium"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/item_vcc_title"
@@ -160,7 +167,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/margin"
             android:layout_marginRight="@dimen/margin"
-            android:text="@{sensor.humString}"
+            android:text="@{viewModel.sensor.humString}"
             android:textSize="@dimen/size_medium"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/item_hum_title"
@@ -185,7 +192,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/margin"
             android:layout_marginRight="@dimen/margin"
-            android:text="@{sensor.dhumVal}"
+            android:text="@{viewModel.sensor.dhumVal}"
             android:textSize="@dimen/size_medium"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/item_dhum_title"

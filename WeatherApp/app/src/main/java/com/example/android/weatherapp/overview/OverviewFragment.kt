@@ -42,8 +42,8 @@ class OverviewFragment : Fragment() {
 
         viewModel.navigateToSelectedSensor.observe(this, Observer {
             if ( null != it ) {
-                //this.findNavController().navigate(OverviewFragmentDirections.actionShowDetail(it))
                 this.findNavController().navigate(OverviewFragmentDirections.actionOverviewFragmentToSensorFragment(it))
+                //this.findNavController().navigate(OverviewFragmentDirections.actionOverviewFragmentToSensorFragment(it.id))
                 viewModel.displaySensorDetailsComplete()
             }
         })

@@ -29,7 +29,6 @@ import com.example.android.weatherapp.WeatherApplication.Companion.ctx
 import com.example.android.weatherapp.domain.Sensor
 import com.example.android.weatherapp.domain.WeatherForecastItem
 import com.example.android.weatherapp.domain.WeatherWeather
-import com.example.android.weatherapp.overview.DbStatus
 import com.example.android.weatherapp.overview.ForecastAdapter
 import com.example.android.weatherapp.overview.SensorAdapter
 

@@ -18,7 +18,7 @@ class SensorChartFragment : SensorBaseFragment() {
 
         val binding = FragmentSensorchartBinding.inflate(inflater)
         binding.setLifecycleOwner(this)
-        binding.sensor = sensor
+        //binding.sensor = sensor
         //setHasOptionsMenu(true)
 
         return binding.root

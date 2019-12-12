@@ -18,6 +18,6 @@
         <argument
             android:name="selectedSensor"
             app:argType="com.example.android.weatherapp.domain.Sensor" />
-        />
     </fragment>
 </navigation>
+

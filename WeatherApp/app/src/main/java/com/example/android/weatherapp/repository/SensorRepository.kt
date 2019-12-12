@@ -25,6 +25,11 @@ class SensorRepository(appContext: Context) {
         const val tag = "SensorRepository"
     }
 
+    lateinit private var _currentSensor: LiveData<Sensor>
+
+    val currentSensor: LiveData<Sensor>
+        get() = _currentSensor
+
     var sensorList: LiveData<List<Sensor>> =
         try {
             Transformations.map(database.weatherDao.getSensorsWithData()) {
@@ -35,6 +40,21 @@ class SensorRepository(appContext: Context) {
             val msg = t.message ?: "Unknown DB error"
             Log.e(tag, "DB error: $msg")
             MutableLiveData<List<Sensor>>()
+        }
+
+
+    fun getOneSensor(id : Int) : LiveData<Sensor> =
+        if (::_currentSensor.isInitialized && _currentSensor?.value?.id == id.toShort()) _currentSensor
+        else try {
+            Log.i(tag, "Loading sensor $id")
+            _currentSensor = Transformations.map(database.weatherDao.getOneSensorWithData(id)) {
+                it?.toSensor()
+            }
+            _currentSensor
+        } catch (t: Throwable) {
+            val msg = t.message ?: "Unknown DB error"
+            Log.e(tag, "DB error: $msg")
+            MutableLiveData<Sensor>()
         }
 
 

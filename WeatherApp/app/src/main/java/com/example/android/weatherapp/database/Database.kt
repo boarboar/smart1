@@ -71,6 +71,17 @@ interface WeatherDao {
     fun getSensorsWithData(): LiveData<List<DbSensorWithData>>
     // todo - filter validated only
 
+    @Query("""
+        select * from dbsensor left outer join dbsensordata on (
+        dbsensor.id=dbsensordata.sensor_id and dbsensordata._id in 
+          (select _id from dbsensordata sd where dbsensor.id=sd.sensor_id order by timestamp desc limit 1) 
+          ) where dbsensor.id = :id limit 1
+          """
+    )
+    fun getOneSensorWithData(id : Int): LiveData<DbSensorWithData?>
+    // todo - filter validated only
+
+
     @Query("DELETE FROM dbsensordata where sensor_id=:id")
     fun deleteSensorData(id : Int)
 

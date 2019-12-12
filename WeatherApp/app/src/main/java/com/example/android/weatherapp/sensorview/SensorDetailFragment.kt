@@ -5,6 +5,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.ViewModelProviders
+import com.example.android.weatherapp.MainActivity
 import com.example.android.weatherapp.databinding.FragmentSensordetailBinding
 
 class SensorDetailFragment : SensorBaseFragment() {
@@ -18,7 +20,14 @@ class SensorDetailFragment : SensorBaseFragment() {
 
         val binding = FragmentSensordetailBinding.inflate(inflater)
         binding.setLifecycleOwner(this)
-        binding.sensor = sensor
+        //binding.sensor = sensor
+        // replace with repository and access currentSensor !!!
+
+        val viewModelFactory = SensorDetailViewModelFactory(sensorId, (activity as MainActivity).application)
+
+        binding.viewModel = ViewModelProviders.of(
+            this, viewModelFactory).get(SensorDetailViewModel::class.java)
+
         //setHasOptionsMenu(true)
 
         return binding.root

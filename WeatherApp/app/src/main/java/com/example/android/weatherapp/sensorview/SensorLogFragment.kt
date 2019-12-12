@@ -18,7 +18,7 @@ class SensorLogFragment : SensorBaseFragment() {
 
         val binding = FragmentSensorlogBinding.inflate(inflater)
         binding.setLifecycleOwner(this)
-        binding.sensor = sensor
+        //binding.sensor = sensor
         //setHasOptionsMenu(true)
 
         return binding.root

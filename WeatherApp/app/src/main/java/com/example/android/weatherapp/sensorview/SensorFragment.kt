@@ -1,6 +1,7 @@
 package com.example.android.weatherapp.sensorview
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,10 +10,13 @@ import androidx.fragment.app.Fragment
 import com.example.android.weatherapp.MainActivity
 import com.example.android.weatherapp.databinding.FragmentSensorBinding
 import com.example.android.weatherapp.domain.Sensor
+import com.example.android.weatherapp.repository.getSensorRepository
 import kotlinx.android.synthetic.main.fragment_sensor.*
 
 class SensorFragment : Fragment() {
-
+    companion object {
+        const val tag = "SensorFragment"
+    }
 
     /**
      * Inflates the layout with Data Binding, sets its lifecycle owner to the OverviewFragment
@@ -20,11 +24,16 @@ class SensorFragment : Fragment() {
      */
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
+
+        Log.v(tag, "[ ON CREATE ]")
+
         val binding = FragmentSensorBinding.inflate(inflater)
         // Allows Data Binding to Observe LiveData with the lifecycle of this Fragment
         binding.setLifecycleOwner(this)
         //binding.sensor = Sensor(777, "Something")
         val sensor = SensorFragmentArgs.fromBundle(arguments!!).selectedSensor
+        //val sensorId : Int = SensorFragmentArgs.fromBundle(arguments!!).selectedSensorId
+        //val sensor = getSensorRepository().getOneSensor(sensorId)
         binding.sensor = sensor
         //setHasOptionsMenu(true)
 
@@ -54,5 +63,15 @@ class SensorFragment : Fragment() {
 //        }
 //        return true
 //    }
+
+    override fun onPause() {
+        super.onPause()
+        Log.v(tag, "[ ON PAUSE ]")
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.v(tag, "[ ON DESTROY ]")
+    }
 
 }

@@ -25,22 +25,23 @@ class SensorFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
-        Log.v(tag, "[ ON CREATE ]")
+        Log.v(SensorFragment.tag, "[ ON CREATE ]")
+        val sensor = SensorFragmentArgs.fromBundle(arguments!!).selectedSensor
+        (activity as MainActivity).sensorDescr = sensor.description
 
         val binding = FragmentSensorBinding.inflate(inflater)
         // Allows Data Binding to Observe LiveData with the lifecycle of this Fragment
         binding.setLifecycleOwner(this)
         //binding.sensor = Sensor(777, "Something")
-        val sensor = SensorFragmentArgs.fromBundle(arguments!!).selectedSensor
         //val sensorId : Int = SensorFragmentArgs.fromBundle(arguments!!).selectedSensorId
         //val sensor = getSensorRepository().getOneSensor(sensorId)
-        binding.sensor = sensor
+        //binding.sensor = sensor
+
         //setHasOptionsMenu(true)
 
         binding.viewpager.adapter = SensorPagerAdapter(childFragmentManager, sensor)
         //binding.viewpager.currentItem = 0
         binding.sensorTabs.setupWithViewPager(binding.viewpager)
-        (activity as MainActivity).toolbarTitle = ""
         return binding.root
     }
 
@@ -65,13 +66,14 @@ class SensorFragment : Fragment() {
 //    }
 
     override fun onPause() {
-        super.onPause()
-        Log.v(tag, "[ ON PAUSE ]")
+        (activity as MainActivity).sensorDescr = null
+            super.onPause()
+        Log.v(SensorFragment.tag, "[ ON PAUSE ]")
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        Log.v(tag, "[ ON DESTROY ]")
+        Log.v(SensorFragment.tag, "[ ON DESTROY ]")
     }
 
 }

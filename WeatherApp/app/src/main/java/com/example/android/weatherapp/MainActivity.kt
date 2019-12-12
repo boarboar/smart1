@@ -23,6 +23,11 @@ class MainActivity : AppCompatActivity() {
             toolbar.title = value
         }
 
+    var sensorDescr : String? = null
+        set(value) {
+            synchronized(this) { field = value }
+            toolbarTitle = ""
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,7 +46,14 @@ class MainActivity : AppCompatActivity() {
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)  // request keeps on
 
         Timer().schedule(100, 1000){// Time
-            runOnUiThread { toolbarTitle = "${DateUtils.convertDateTime(System.currentTimeMillis())}" }
+            runOnUiThread {
+                toolbarTitle = "${DateUtils.convertDateTime(System.currentTimeMillis())}"
+                synchronized(this) {
+                    sensorDescr?.let {
+                        toolbarTitle += " [$sensorDescr] "
+                    }
+                }
+            }
         }
 
         toolbarTitle = "Hi!"
@@ -76,6 +88,7 @@ class MainActivity : AppCompatActivity() {
         //binding.navigationView.setupWithNavController(navController)
 
     }
+
 }
 
 

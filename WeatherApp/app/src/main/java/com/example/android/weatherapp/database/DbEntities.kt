@@ -54,3 +54,7 @@ data class DbSensorWithData(
 fun List<DbSensorWithData>.asSensor(): List<Sensor> {
     return map { it.toSensor() }
 }
+
+fun List<DbSensorData>.asSensorData(): List<SensorData> {
+    return map { it.toSensorData() }
+}

@@ -46,7 +46,7 @@ abstract class SensorBaseFragment : Fragment() {
         } ?: MutableLiveData<Sensor>()
         */
         sensorId =  arguments?.getInt(ARG_SENSOR_ID) ?: 0
-        Log.v(ftag, "[ ON BASE FRAG CREATE ]")
+        //Log.v(ftag, "[ ON BASE FRAG CREATE ]")
     }
 
 //    override fun onSaveInstanceState(outState: Bundle) {

@@ -54,4 +54,9 @@ data class SensorData(
     enum class DHUM_VALS(val value: Int) {
         NOTSET(0), LEAK(1), NORM(2)
     }
+
+    val at : String
+        get() = if(timestamp>0) DateUtils.convertDateTime(timestamp) else "---"
+    val asString : String
+        get() = "$temp $vcc" // for test
 }

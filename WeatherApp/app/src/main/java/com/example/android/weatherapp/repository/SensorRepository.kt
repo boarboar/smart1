@@ -8,7 +8,9 @@ import androidx.lifecycle.Transformations
 import com.example.android.weatherapp.database.DbSensor
 import com.example.android.weatherapp.database.DbSensorData
 import com.example.android.weatherapp.database.asSensor
+import com.example.android.weatherapp.database.asSensorData
 import com.example.android.weatherapp.domain.Sensor
+import com.example.android.weatherapp.domain.SensorData
 import com.example.android.weatherapp.overview.OverviewViewModel
 import com.example.android.weatherapp.work.RefreshDataWorker
 import com.example.android.weatherapp.work.nextInt
@@ -27,8 +29,13 @@ class SensorRepository(appContext: Context) {
 
     lateinit private var _currentSensor: LiveData<Sensor>
 
-    val currentSensor: LiveData<Sensor>
-        get() = _currentSensor
+//    val currentSensor: LiveData<Sensor>
+//        get() = _currentSensor
+
+    lateinit private var _currentSensorDataList: LiveData<List<SensorData>>
+
+//    val currentSensorDataList: LiveData<List<SensorData>>
+//        get() = _currentSensorDataList
 
     var sensorList: LiveData<List<Sensor>> =
         try {
@@ -57,6 +64,22 @@ class SensorRepository(appContext: Context) {
             MutableLiveData<Sensor>()
         }
 
+    fun getCurrentSensorData(id : Int) : LiveData<List<SensorData>> =
+        // this is WRONG!!!  Id makes no sence, comparison with sensor.id will always be true;
+        // needs to discard the list when sensor is changed and reread it if discarded!!!!
+        if (::_currentSensor.isInitialized && _currentSensor?.value?.id == id.toShort() && ::_currentSensorDataList.isInitialized)
+            _currentSensorDataList
+        else try {
+            Log.i(tag, "Loading sensor $id")
+            _currentSensorDataList =Transformations.map(database.weatherDao.getSensorData(id)) {
+                it.asSensorData() }
+            _currentSensorDataList
+        } catch (t: Throwable) {
+            val msg = t.message ?: "Unknown DB error"
+            Log.e(tag, "DB error: $msg")
+            MutableLiveData<List<SensorData>>()
+            _currentSensorDataList
+        }
 
     suspend fun refreshSensorData(): Boolean =
         withContext(Dispatchers.IO) {

@@ -4,17 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-
-<!--        <variable-->
-<!--            name="sensor"-->
-<!--            type="com.example.android.weatherapp.domain.Sensor" />-->
-
         <variable
             name="viewModel"
             type="com.example.android.weatherapp.sensorview.SensorDetailViewModel" />
-
-
-
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

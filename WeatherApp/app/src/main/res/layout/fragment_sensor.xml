@@ -3,12 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <data>
+<!--    <data>-->
 
-        <variable
-            name="sensor"
-            type="com.example.android.weatherapp.domain.Sensor" />
-    </data>
+<!--        <variable-->
+<!--            name="sensor"-->
+<!--            type="com.example.android.weatherapp.domain.Sensor" />-->
+<!--    </data>-->
 
 
     <LinearLayout
@@ -18,13 +18,13 @@
         android:background="@color/colorPrimarySurround"
         tools:context="com.example.android.weatherapp.MainActivity">
 
-        <TextView
-            android:id="@+id/item_location"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@{sensor.description}"
-            android:textSize="@dimen/size_large"
-            tools:text="Location" />
+<!--        <TextView-->
+<!--            android:id="@+id/item_location"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="@{sensor.description}"-->
+<!--            android:textSize="@dimen/size_large"-->
+<!--            tools:text="Location" />-->
 
         <com.google.android.material.tabs.TabLayout
             app:tabTextAppearance="@style/MineCustomTabText"

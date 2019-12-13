@@ -32,7 +32,8 @@ class SensorRepository(appContext: Context) {
 //    val currentSensor: LiveData<Sensor>
 //        get() = _currentSensor
 
-    lateinit private var _currentSensorDataList: LiveData<List<SensorData>>
+    lateinit private var _sensorDataList: LiveData<List<SensorData>>
+    private var _sensorDataId = 0
 
 //    val currentSensorDataList: LiveData<List<SensorData>>
 //        get() = _currentSensorDataList
@@ -53,6 +54,7 @@ class SensorRepository(appContext: Context) {
     fun getOneSensor(id : Int) : LiveData<Sensor> =
         if (::_currentSensor.isInitialized && _currentSensor?.value?.id == id.toShort()) _currentSensor
         else try {
+            //_currentSensorDataListValid = false
             Log.i(tag, "Loading sensor $id")
             _currentSensor = Transformations.map(database.weatherDao.getOneSensorWithData(id)) {
                 it?.toSensor()
@@ -64,21 +66,40 @@ class SensorRepository(appContext: Context) {
             MutableLiveData<Sensor>()
         }
 
-    fun getCurrentSensorData(id : Int) : LiveData<List<SensorData>> =
-        // this is WRONG!!!  Id makes no sence, comparison with sensor.id will always be true;
-        // needs to discard the list when sensor is changed and reread it if discarded!!!!
-        if (::_currentSensor.isInitialized && _currentSensor?.value?.id == id.toShort() && ::_currentSensorDataList.isInitialized)
-            _currentSensorDataList
+//    fun getCurrentSensorData() : LiveData<List<SensorData>> =
+//        if (!::_currentSensor.isInitialized || _currentSensor.value == null)  {
+//            Log.w(tag, "Attempt to load sensor data for not inited sensor")
+//            _currentSensorDataList = MutableLiveData<List<SensorData>>()
+//            _currentSensorDataList
+//        }
+//        else if (::_currentSensorDataList.isInitialized && _currentSensorDataListValid)
+//            _currentSensorDataList
+//        else try {
+//            val sensor : Sensor= _currentSensor.value as Sensor
+//            Log.i(tag, "Loading sensor data ${sensor.id}")
+//            _currentSensorDataList =Transformations.map(database.weatherDao.getSensorData(sensor.id.toInt())) {
+//                it.asSensorData() }
+//            _currentSensorDataList
+//        } catch (t: Throwable) {
+//            val msg = t.message ?: "Unknown DB error"
+//            Log.e(tag, "DB error: $msg")
+//            _currentSensorDataList = MutableLiveData<List<SensorData>>()
+//            _currentSensorDataList
+//        }
+
+    fun getSensorData(id : Int) : LiveData<List<SensorData>> =
+        if (::_sensorDataList.isInitialized && _sensorDataId==id)
+            _sensorDataList
         else try {
-            Log.i(tag, "Loading sensor $id")
-            _currentSensorDataList =Transformations.map(database.weatherDao.getSensorData(id)) {
+            Log.i(tag, "Loading sensor data ${id}")
+            _sensorDataList =Transformations.map(database.weatherDao.getSensorData(id)) {
                 it.asSensorData() }
-            _currentSensorDataList
+            _sensorDataList
         } catch (t: Throwable) {
             val msg = t.message ?: "Unknown DB error"
             Log.e(tag, "DB error: $msg")
-            MutableLiveData<List<SensorData>>()
-            _currentSensorDataList
+            _sensorDataList = MutableLiveData<List<SensorData>>()
+            _sensorDataList
         }
 
     suspend fun refreshSensorData(): Boolean =

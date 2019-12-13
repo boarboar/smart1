@@ -27,12 +27,14 @@ import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.RecyclerView
 import com.example.android.weatherapp.WeatherApplication.Companion.ctx
 import com.example.android.weatherapp.domain.Sensor
+import com.example.android.weatherapp.domain.SensorData
 import com.example.android.weatherapp.domain.WeatherForecastItem
 import com.example.android.weatherapp.domain.WeatherWeather
 import com.example.android.weatherapp.overview.ForecastAdapter
 import com.example.android.weatherapp.overview.SensorAdapter
 
 import com.example.android.weatherapp.overview.WeatherApiStatus
+import com.example.android.weatherapp.sensorview.SensorDataAdapter
 import com.example.android.weatherapp.utils.resolveColor
 import com.example.android.weatherapp.utils.resolveColorAttr
 import com.squareup.picasso.Picasso
@@ -47,6 +49,12 @@ fun bindRecyclerView(recyclerView: RecyclerView, data: ArrayList<WeatherForecast
 @BindingAdapter("listSensors")
 fun bindRecyclerSensorView(recyclerView: RecyclerView, data: List<Sensor>?) {
     val adapter = recyclerView.adapter as SensorAdapter
+    adapter.submitList(data)
+}
+
+@BindingAdapter("listSensorData")
+fun bindRecyclerSensorDataView(recyclerView: RecyclerView, data: List<SensorData>?) {
+    val adapter = recyclerView.adapter as SensorDataAdapter
     adapter.submitList(data)
 }
 

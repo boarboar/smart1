@@ -66,6 +66,19 @@ class SensorRepository(appContext: Context) {
             MutableLiveData<Sensor>()
         }
 
+    suspend fun deleteSensor(id : Int) : Boolean =
+        withContext(Dispatchers.IO) {
+            try {
+                Log.i(tag, "Delete sensor $id")
+                database.weatherDao.deleteSensor(id)
+                true
+            } catch (t: Throwable) {
+                val msg = t.message ?: "Unknown DB error"
+                Log.e(tag, "DB error: $msg")
+                false
+            }
+        }
+
 //    fun getCurrentSensorData() : LiveData<List<SensorData>> =
 //        if (!::_currentSensor.isInitialized || _currentSensor.value == null)  {
 //            Log.w(tag, "Attempt to load sensor data for not inited sensor")

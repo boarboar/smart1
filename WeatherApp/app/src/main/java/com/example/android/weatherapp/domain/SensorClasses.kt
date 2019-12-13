@@ -19,23 +19,35 @@ data class Sensor(val id: Short, val description: String, val updated: Long=0,
     val at : String
         get() = if(updated>0) DateUtils.convertDateTime(updated) else "---"
 
+//    val updatedAt : String
+//        get() = data?.timestamp?.let {DateUtils.convertDateTime(it)} ?: "---"
+//    val tempString : String
+//        get() = data?.temp?.let {(it/10.0F).toString()+"º"} ?: "---"
+//    val vccString : String
+//        get() = data?.vcc?.let {((it/10)/100.0F).toString()+"v"} ?: "---"
+//    val humString : String
+//        get() = data?.hum?.let {if(it>0) (it/10.0F).toString()+"%" else ""} ?: ""
+//    val dhumString : String
+//        get() = data?.dhum?.let {if(it.toInt()==SensorData.DHUM_VALS.LEAK.value) "!" else ""} ?: ""
+//    val dhumVal : String
+//        get() = data?.dhum?.let {it.toString()} ?: ""
+//    val isVccLow : Boolean
+//        get () = data?.vcc?.let { it< VCC_LOW_1000 } ?: false
+//
     val updatedAt : String
-        get() = data?.timestamp?.let {DateUtils.convertDateTime(it)} ?: "---"
-    //val temp : String
-    //    get() = data?.temp?.toString() ?: "---"
-
+        get() = data?.let {it.at} ?: "---"
     val tempString : String
-        get() = data?.temp?.let {(it/10.0F).toString()+"º"} ?: "---"
+        get() = data?.let {it.tempString} ?: "---"
     val vccString : String
-        get() = data?.vcc?.let {((it/10)/100.0F).toString()+"v"} ?: "---"
+        get() = data?.let {it.vccString} ?: "---"
     val humString : String
-        get() = data?.hum?.let {if(it>0) (it/10.0F).toString()+"%" else ""} ?: ""
+        get() = data?.let {it.humString} ?: ""
     val dhumString : String
-        get() = data?.dhum?.let {if(it.toInt()==SensorData.DHUM_VALS.LEAK.value) "!" else ""} ?: ""
+        get() = data?.let {it.dhumString} ?: ""
     val dhumVal : String
-        get() = data?.dhum?.let {it.toString()} ?: ""
+        get() = data?.let {it.dhumVal} ?: ""
     val isVccLow : Boolean
-        get () = data?.vcc?.let { it< VCC_LOW_1000 } ?: false
+        get () = data?.let { it.isVccLow } ?: false
     val idString : String
         get() = id.toString()
 
@@ -57,6 +69,19 @@ data class SensorData(
 
     val at : String
         get() = if(timestamp>0) DateUtils.convertDateTime(timestamp) else "---"
+    val tempString : String
+        get() = (temp/10.0F).toString()+"º"
+    val vccString : String
+        get() = ((vcc/10)/100.0F).toString()+"v"
+    val humString : String
+        get() = if(hum>0) (hum/10.0F).toString()+"%" else ""
+    val dhumString : String
+        get() = if(dhum.toInt()==DHUM_VALS.LEAK.value) "!" else ""
+    val dhumVal : String
+        get() = dhum.toString()
+    val isVccLow : Boolean
+        get () = vcc< Sensor.VCC_LOW_1000
+
     val asString : String
         get() = "$temp $vcc" // for test
 }

@@ -5,8 +5,15 @@ import androidx.lifecycle.*
 import com.example.android.weatherapp.MainActivity
 import com.example.android.weatherapp.domain.Sensor
 import com.example.android.weatherapp.repository.getSensorRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 
-class SensorDetailViewModel(sensorId : Int, app: Application) : AndroidViewModel(app) {
+class SensorDetailViewModel(val sensorId : Int, val app: Application) : AndroidViewModel(app) {
+
+    private var viewModelJob = Job()
+    private val coroutineScope = CoroutineScope(viewModelJob + Dispatchers.Main )
 
     lateinit private var _sensor : LiveData<Sensor>
 
@@ -15,6 +22,19 @@ class SensorDetailViewModel(sensorId : Int, app: Application) : AndroidViewModel
 
     init {
         _sensor = getSensorRepository(app).getOneSensor(sensorId)
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        viewModelJob.cancel()
+    }
+
+    fun onDeleteSensor() {
+        fun onUpdate() {
+            coroutineScope.launch {
+                getSensorRepository(app).deleteSensor(sensorId)
+            }
+        }
     }
 }
 

@@ -55,6 +55,9 @@ interface WeatherDao {
     //fun getOneSensorData(id : Int): LiveData<List<DbSensorData>>
     fun getOneSensorData(id : Int): DbSensorData
 
+    @Query("DELETE FROM dbsensor where id=:id")
+    fun deleteSensor(id : Int)
+
 //    @Query("""
 //        select * from dbsensor left outer join dbsensordata on (dbsensor.id=dbsensordata.sensor_id) where
 //          dbsensordata._id in

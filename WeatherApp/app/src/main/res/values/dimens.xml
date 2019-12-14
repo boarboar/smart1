@@ -5,6 +5,6 @@
     <dimen name="size_large">48sp</dimen>
     <dimen name="size_medium">30sp</dimen>
     <dimen name="size_small">22sp</dimen>
-    <dimen name="data_cell_width">192dp</dimen>
-    <dimen name="value_cell_width">64dp</dimen>
+    <dimen name="data_cell_width">176dp</dimen>
+    <dimen name="value_cell_width">80dp</dimen>
 </resources>

@@ -7,6 +7,9 @@
 
 #include "sensor_ds.h"
 
+//        val TCP_PORT = 9999
+//        val UDP_PORT = 9998
+        
 #define BUF_SZ 255
 #define SETUP_PIN 0
 #define LED_PIN 12
@@ -18,6 +21,12 @@
 
 #define POWER_PIN 12 // vcc supply for the sensors_cfg
 
+#define RTC_MAGIC 0xDE7B
+
+struct {
+  uint16_t magic;
+  byte data[2];
+} rtcData = {0};
 
 static int16_t ports[CfgDrv::MAX_SENS] = {DATA_BUS_1, DATA_BUS_2};
 
@@ -27,13 +36,15 @@ struct TempData {
   uint8_t magic;
 } tData = {0};
 
-
 ADC_MODE(ADC_VCC);
 
 void setup(void)
 {
   bool isSetup = false;
   bool isCfgValid = false;
+  bool isCfgFromRTC = false;
+  //bool isConnectOK = false;
+  byte ip_digit = 0; 
 
   pinMode(LED_PIN, OUTPUT);
 
@@ -89,15 +100,31 @@ void setup(void)
     Serial.println(F("Restarting..."));
     ESP.deepSleep(1000000L);
   } 
+
+  if (ESP.rtcUserMemoryRead(0, (uint32_t*) &rtcData, sizeof(rtcData))) {    
+    if(RTC_MAGIC==rtcData.magic && rtcData.data[0]>0) {
+        //seq = rtcData.data[1]; 
+        Serial.print("Assuming address from RTC: ");
+        ip_digit = rtcData.data[0];
+        Serial.println(ip_digit);
+        //Serial.print("Seq ");
+        //Serial.println(seq);
+        IPAddress ip(192,168,1,ip_digit); 
+        IPAddress subnet(255,255,255,0);
+        IPAddress gw(192,168,1,1);  
+        WiFi.config(ip, subnet, gw);
+        //isCfgFromRTC = true;
+    }
+  }
+  
+  doBeginConnect();
   
   digitalWrite(POWER_PIN, HIGH); 
   delay(50);    
   CfgDrv::Cfg.sensors_cfg(ports);
   CfgDrv::Cfg.sensors_init();
     
-  
   Serial.println(F("Measuring..."));
-
 
   if(CfgDrv::Cfg.sensors_measure()) {
     Serial.println(F("Bad meas!"));
@@ -112,7 +139,8 @@ void setup(void)
   tData.magic = 37;
   Serial.println(tData.vcc);
 
-  if(doConnect()) {
+  if(doWaitForConnect()) {
+    ip_digit = WiFi.localIP()[3];
     for(int i=0; i<TRIES_TO_SEND; i++) {
       if(!doSendUdp(&tData)) {
         Serial.println(F("Failed to send"));
@@ -121,9 +149,20 @@ void setup(void)
       } else break;
     }
   } else {
-    blink(100, 3);
+    blink(100, 3);   
+    ip_digit=0;
   }
 
+  if(ip_digit != rtcData.data[0]) {    
+    rtcData.magic = RTC_MAGIC;
+    rtcData.data[0] = ip_digit;
+    //rtcData.data[1] = seq+1;
+    Serial.print("Writing to rtc: "); Serial.println(rtcData.data[0]);
+    if (!ESP.rtcUserMemoryWrite(0, (uint32_t*) &rtcData, sizeof(rtcData))) {
+      Serial.println("failed to write rtc");
+    }
+  }
+  
   Serial.print(F("deep sleep for "));
   Serial.print(CfgDrv::Cfg.sleep_min);
   Serial.print(F(" min"));
@@ -143,7 +182,7 @@ void loop(void)
   */
 }
 
-bool doConnect()
+void doBeginConnect()
 {
   const int CONN_COUNT = 60;
   byte mac[6]; 
@@ -156,6 +195,12 @@ bool doConnect()
   }
  
   WiFi.begin(CfgDrv::Cfg.SSID, CfgDrv::Cfg.PWD);
+}
+
+bool doWaitForConnect()
+{
+  const int CONN_COUNT = 60;
+  uint8_t i = 0;
   Serial.print(F("\nConnecting to ")); Serial.print(CfgDrv::Cfg.SSID);
   i = 0;
   while (WiFi.status() != WL_CONNECTED && i++ < CONN_COUNT) {delay(500); Serial.print(".");}

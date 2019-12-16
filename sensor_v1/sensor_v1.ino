@@ -21,11 +21,11 @@
 
 #define POWER_PIN 12 // vcc supply for the sensors_cfg
 
-#define RTC_MAGIC 0xDE7B
+#define RTC_MAGIC 0xDE7B13B7
 
 struct {
-  uint16_t magic;
-  byte data[2];
+  uint32_t magic; // should be 4byte aligned
+  byte data[4];
 } rtcData = {0};
 
 static int16_t ports[CfgDrv::MAX_SENS] = {DATA_BUS_1, DATA_BUS_2};
@@ -54,6 +54,25 @@ void setup(void)
 
   Serial.begin(115200);
   Serial.println();
+
+  if (ESP.rtcUserMemoryRead(0, (uint32_t*) &rtcData, sizeof(rtcData))) {    
+    if(RTC_MAGIC==rtcData.magic && rtcData.data[0]>0) {
+        //seq = rtcData.data[1]; 
+        Serial.print("Assuming address from RTC: ");
+        ip_digit = rtcData.data[0];
+        Serial.println(ip_digit);
+        //Serial.print("Seq ");
+        //Serial.println(seq);
+        IPAddress ip(192,168,1,ip_digit); 
+        IPAddress subnet(255,255,255,0);
+        IPAddress gw(192,168,1,1);  
+        WiFi.config(ip, subnet, gw);
+        //isCfgFromRTC = true;
+    }
+  } else {
+    Serial.println("Failed to read RTC ");
+  }
+  
 
   if(CfgDrv::Cfg.init() && CfgDrv::Cfg.load()) {
     Serial.println(F("Cfg loaded"));
@@ -100,22 +119,6 @@ void setup(void)
     Serial.println(F("Restarting..."));
     ESP.deepSleep(1000000L);
   } 
-
-  if (ESP.rtcUserMemoryRead(0, (uint32_t*) &rtcData, sizeof(rtcData))) {    
-    if(RTC_MAGIC==rtcData.magic && rtcData.data[0]>0) {
-        //seq = rtcData.data[1]; 
-        Serial.print("Assuming address from RTC: ");
-        ip_digit = rtcData.data[0];
-        Serial.println(ip_digit);
-        //Serial.print("Seq ");
-        //Serial.println(seq);
-        IPAddress ip(192,168,1,ip_digit); 
-        IPAddress subnet(255,255,255,0);
-        IPAddress gw(192,168,1,1);  
-        WiFi.config(ip, subnet, gw);
-        //isCfgFromRTC = true;
-    }
-  }
   
   doBeginConnect();
   
@@ -158,7 +161,7 @@ void setup(void)
     rtcData.data[0] = ip_digit;
     //rtcData.data[1] = seq+1;
     Serial.print("Writing to rtc: "); Serial.println(rtcData.data[0]);
-    if (!ESP.rtcUserMemoryWrite(0, (uint32_t*) &rtcData, sizeof(rtcData))) {
+    if (0==ESP.rtcUserMemoryWrite(0, (uint32_t*) &rtcData, sizeof(rtcData))) {
       Serial.println("failed to write rtc");
     }
   }
@@ -193,15 +196,16 @@ void doBeginConnect()
     Serial.print(mac[i],HEX);
     if(i<5) Serial.print(F(":"));
   }
- 
+  Serial.println();
+
   WiFi.begin(CfgDrv::Cfg.SSID, CfgDrv::Cfg.PWD);
 }
 
 bool doWaitForConnect()
 {
   const int CONN_COUNT = 60;
-  uint8_t i = 0;
-  Serial.print(F("\nConnecting to ")); Serial.print(CfgDrv::Cfg.SSID);
+  uint8_t i;
+  Serial.println(F("\nConnecting to ")); Serial.print(CfgDrv::Cfg.SSID);
   i = 0;
   while (WiFi.status() != WL_CONNECTED && i++ < CONN_COUNT) {delay(500); Serial.print(".");}
   Serial.println();

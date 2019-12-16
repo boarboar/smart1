@@ -46,6 +46,8 @@ void setup() {
         WiFi.config(ip, subnet, gw);
 
     }
+  } else {
+    Serial.println("Failed to read RTC ");
   }
  
   WiFi.begin(SSID, "boarboar");
@@ -80,6 +82,8 @@ void setup() {
   rtcData.data[1] = seq+1;
   if (ESP.rtcUserMemoryWrite(0, (uint32_t*) &rtcData, sizeof(rtcData))) {
     Serial.println("Write rtc");
+  } else {
+    Serial.println("Failed to write RTC ");
   }
   Serial.println("Going deep sleep");
   ESP.deepSleep(30000000L);  // 30 sec

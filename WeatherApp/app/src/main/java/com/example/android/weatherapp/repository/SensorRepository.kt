@@ -29,8 +29,8 @@ class SensorRepository(appContext: Context) {
 
     lateinit private var _currentSensor: LiveData<Sensor>
 
-//    val currentSensor: LiveData<Sensor>
-//        get() = _currentSensor
+    val currentSensor: LiveData<Sensor>
+        get() = _currentSensor
 
     lateinit private var _sensorDataList: LiveData<List<SensorData>>
     private var _sensorDataId = 0

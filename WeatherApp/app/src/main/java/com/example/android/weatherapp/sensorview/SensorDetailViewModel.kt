@@ -30,11 +30,10 @@ class SensorDetailViewModel(val sensorId : Int, val app: Application) : AndroidV
     }
 
     fun onDeleteSensor() {
-        fun onUpdate() {
-            coroutineScope.launch {
-                getSensorRepository(app).deleteSensor(sensorId)
-            }
+        coroutineScope.launch {
+            getSensorRepository(app).deleteSensor(sensorId)
         }
+
     }
 }
 

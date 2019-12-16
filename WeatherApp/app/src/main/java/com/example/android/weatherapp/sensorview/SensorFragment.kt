@@ -42,6 +42,12 @@ class SensorFragment : Fragment() {
         binding.viewpager.adapter = SensorPagerAdapter(childFragmentManager, sensor)
         //binding.viewpager.currentItem = 0
         binding.sensorTabs.setupWithViewPager(binding.viewpager)
+
+        (activity as MainActivity).toolbar.setNavigationOnClickListener { activity?.onBackPressed() }
+
+        //(activity as MainActivity).toolbar.setNavigationOnClickListener { fragmentManager?.popBackStack() }
+
+
         return binding.root
     }
 

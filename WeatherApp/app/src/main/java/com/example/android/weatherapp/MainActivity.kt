@@ -56,7 +56,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        toolbarTitle = "Hi!"
+        //toolbarTitle = "Hi!"
     }
 
     /**
@@ -79,6 +79,9 @@ class MainActivity : AppCompatActivity() {
 
         //setSupportActionBar(findViewById(R.id.toolbar))
         setSupportActionBar(toolbar)
+
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setDisplayShowHomeEnabled(true)
 
         NavigationUI.setupActionBarWithNavController(this, navController)
         // then setup the action bar, tell it about the DrawerLayout

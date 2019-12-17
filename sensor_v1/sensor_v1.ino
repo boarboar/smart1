@@ -146,7 +146,8 @@ void setup(void)
     ip_digit = WiFi.localIP()[3];
     delay(50);
     for(int i=0; i<TRIES_TO_SEND; i++) {
-      if(!doSendUdp(&tData)) {
+      bool sendRes = CfgDrv::Cfg.conn_type == CfgDrv::CONN_TCP ? doSend(&tData) : doSendUdp(&tData);
+      if(!sendRes) {
         Serial.println(F("Failed to send"));
         blink(100, 2);
         if(i<TRIES_TO_SEND-1) delay(1000+i*1000);

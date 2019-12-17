@@ -55,7 +55,8 @@ void setup(void)
   Serial.begin(115200);
   Serial.println();
 
-  if (ESP.rtcUserMemoryRead(0, (uint32_t*) &rtcData, sizeof(rtcData))) {    
+  if (ESP.rtcUserMemoryRead(0, (uint32_t*) &rtcData, sizeof(rtcData))) {   
+    Serial.println("Read RTC "); 
     if(RTC_MAGIC==rtcData.magic && rtcData.data[0]>0) {
         //seq = rtcData.data[1]; 
         Serial.print("Assuming address from RTC: ");
@@ -68,9 +69,12 @@ void setup(void)
         IPAddress gw(192,168,1,1);  
         WiFi.config(ip, subnet, gw);
         //isCfgFromRTC = true;
+    } else {
+      rtcData.data[0]=0;
     }
   } else {
     Serial.println("Failed to read RTC ");
+    rtcData.data[0]=0;
   }
   
 
@@ -86,7 +90,7 @@ void setup(void)
 
   if(isCfgValid) {
     Serial.println(F("Press button1 now to enter setup"));
-    delay(2000);  
+    delay(1000);  
     pinMode(SETUP_PIN, INPUT);  
     isSetup = false;  
     if(digitalRead(SETUP_PIN)==LOW) {
@@ -131,7 +135,7 @@ void setup(void)
 
   if(CfgDrv::Cfg.sensors_measure()) {
     Serial.println(F("Bad meas!"));
-    blink(100, 4);
+    blink(50, 4);
   }
 
   digitalWrite(POWER_PIN, LOW); 
@@ -154,7 +158,7 @@ void setup(void)
       } else break;
     }
   } else {
-    blink(100, 3);   
+    blink(50, 3);   
     ip_digit=0;
   }
 
@@ -224,7 +228,7 @@ bool doWaitForConnect()
 
 bool doSend(TempData *pData) {
   WiFiClient client;
-  client.setTimeout(10000); //10s
+  client.setTimeout(3000); //3s
   if (!client.connect(CfgDrv::Cfg.srv_addr, CfgDrv::Cfg.srv_port)) {
       Serial.println("connection failed");
       return false;

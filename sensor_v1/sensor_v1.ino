@@ -144,6 +144,7 @@ void setup(void)
 
   if(doWaitForConnect()) {
     ip_digit = WiFi.localIP()[3];
+    delay(50);
     for(int i=0; i<TRIES_TO_SEND; i++) {
       if(!doSendUdp(&tData)) {
         Serial.println(F("Failed to send"));
@@ -282,7 +283,10 @@ bool doSendUdp(TempData *pData) {
     Serial.println("UDP begin packet failed");
     return false;
   }
-  udp_snd.write(bufout, strlen(bufout));
+  if(strlen(bufout) != udp_snd.write(bufout, strlen(bufout))) {
+    Serial.println("UDP write packet failed");
+    return false;
+  }
   int res = udp_snd.endPacket();
 
   if(res) {

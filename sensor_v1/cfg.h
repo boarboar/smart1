@@ -13,6 +13,7 @@ class CfgDrv {
 public:
   static const int MAX_SENS=2;
   enum SensorTypes { SENSOR_NONE=0, SENSOR_DS18=1, SENSOR_DHT11=2, SENSOR_HUMD=3, SENSOR_INV=4};
+  enum ConnTypes { CONN_TCP=0, CONN_UDP=1};
 
   static CfgDrv Cfg; // singleton
   int16_t init();  
@@ -35,6 +36,7 @@ public:
   uint16_t srv_port;
   uint8_t id;
   uint8_t sleep_min;
+  uint8_t conn_type;
   
 protected:  
 
@@ -51,4 +53,3 @@ protected:
 };
 
 #endif //_UMP_CFG_H_
-

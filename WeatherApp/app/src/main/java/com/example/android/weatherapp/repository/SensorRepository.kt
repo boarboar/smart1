@@ -14,6 +14,7 @@ import com.example.android.weatherapp.domain.SensorData
 import com.example.android.weatherapp.overview.OverviewViewModel
 import com.example.android.weatherapp.work.RefreshDataWorker
 import com.example.android.weatherapp.work.nextInt
+import com.example.android.weatherapp.utils.DateUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
@@ -130,8 +131,11 @@ class SensorRepository(appContext: Context) {
                     )
                     Log.i(tag, "Refresh sensor $sensId")
                 }
-                val count = database.weatherDao.getSensorDataCount()
-                Log.i(tag, "Total data records in DB: $count")
+                //val count = database.weatherDao.getSensorDataCount()
+                val stat = database.weatherDao.getSensorDataStat()
+
+                Log.i(tag, "${stat.count} total data records in DB from  ${DateUtils.convertDate(stat.from)}  to ${DateUtils.convertDate(stat.to)}")
+
                 true
             } catch (e: HttpException) {
                 val msg = e.message ?: "Unknown HTTP error"

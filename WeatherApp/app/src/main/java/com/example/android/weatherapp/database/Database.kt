@@ -91,6 +91,9 @@ interface WeatherDao {
     @Query("select count(*) from dbsensordata")
     fun getSensorDataCount(): Int
 
+    @Query("select count(*) as d_count, min(timestamp) as d_from, max(timestamp) as d_to from dbsensordata")
+    fun getSensorDataStat(): DbDataStat
+
     @Query("select * from dbsensordata where sensor_id=:id order by timestamp desc")
     fun getSensorData(id: Int): LiveData<List<DbSensorData>>
 

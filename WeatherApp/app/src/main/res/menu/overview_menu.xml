@@ -3,14 +3,18 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/refresh"
-        android:title="Refresh" />
+        android:title="TEST-Refresh" />
     <item
         android:id="@+id/populate_sensors"
-        android:title="Populate sensors" />
+        android:title="TEST-Populate sensors" />
     <item
         android:id="@+id/update_sensors"
-        android:title="Update sensors" />
+        android:title="TEST-Update sensors" />
     <item
         android:id="@+id/delete_sensor_data"
-        android:title="Delete sensor data" />
+        android:title="TEST-Delete sensor data" />
+    <item
+        android:id="@+id/add_sensor"
+        android:title="Add new sensor" />
+
 </menu>

@@ -58,3 +58,9 @@ fun List<DbSensorWithData>.asSensor(): List<Sensor> {
 fun List<DbSensorData>.asSensorData(): List<SensorData> {
     return map { it.toSensorData() }
 }
+
+data class DbDataStat(
+    @ColumnInfo(name = "d_count") val count : Int,
+    @ColumnInfo(name = "d_from") val from : Long,
+    @ColumnInfo(name = "d_to") val to : Long
+)

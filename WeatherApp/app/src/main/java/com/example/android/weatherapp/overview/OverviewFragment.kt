@@ -66,11 +66,13 @@ class OverviewFragment : Fragment() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            //R.id.action_settings -> startActivity<SettingsActivity>()
             R.id.refresh -> viewModel.updateForecast()
             R.id.populate_sensors -> viewModel.onPopulate()
             R.id.update_sensors -> viewModel.onUpdate()
             R.id.delete_sensor_data -> viewModel.onDeleteSensorData()
+            R.id.add_sensor -> {
+                this.findNavController().navigate(OverviewFragmentDirections.actionOverviewFragmentToSensorNewDialogFragment())
+            }
         }
         return true
     }

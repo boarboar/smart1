@@ -29,7 +29,7 @@ data class DbSensorData(
     val dhum: Int
 )
 {
-    fun toSensorData() = SensorData(sensor_id.toShort(), timestamp, temp.toShort(), vcc.toShort(), hum.toShort(), dhum.toShort())
+    fun toSensorData() = SensorData(sensor_id, timestamp, temp.toShort(), vcc.toShort(), hum.toShort(), dhum.toShort())
 }
 // todo - add validated field
 
@@ -44,7 +44,7 @@ data class DbSensorWithData(
     val sdata: DbSensorData?
 )
 {
-    fun toSensor() = Sensor(s?.id?.toShort() ?: 0,
+    fun toSensor() = Sensor(s?.id ?: 0,
         description = s?.description ?: "",
         updated = s?.updated ?: 0,
         data = sdata?.toSensorData() //?: SensorData(0,0,0,0,0,0)

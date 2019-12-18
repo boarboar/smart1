@@ -7,6 +7,7 @@ import com.example.android.weatherapp.R
 import com.example.android.weatherapp.database.*
 import com.example.android.weatherapp.domain.*
 import com.example.android.weatherapp.network.WeatherServiceApi
+import com.example.android.weatherapp.repository.SensorRepository
 import com.example.android.weatherapp.repository.getSensorRepository
 import kotlinx.coroutines.*
 import java.util.*
@@ -110,6 +111,16 @@ class OverviewViewModel(application: Application) : AndroidViewModel(application
         getWeatherForecast()
     }
 
+    fun getNewSensor() : Sensor {
+        //var id : Int = 0
+        val id = 0;
+        coroutineScope.launch {
+            sensorRepository.getLastSensorId()
+            Log.e(tag, "DB Result1 =========  $id")
+        }
+        Log.e(tag, "DB Result2 =========  $id")
+        return Sensor(id + 1, "NEWSENSOR")
+    }
 
     fun onPopulate() {
         coroutineScope.launch {

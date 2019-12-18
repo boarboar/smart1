@@ -25,6 +25,10 @@
     <fragment
         android:id="@+id/sensorNewDialogFragment"
         android:name="com.example.android.weatherapp.overview.SensorNewDialogFragment"
-        android:label="SensorNewDialogFragment" />
+        android:label="SensorNewDialogFragment" >
+        <argument
+            android:name="id"
+            app:argType="integer" />
+    </fragment>
 </navigation>
 

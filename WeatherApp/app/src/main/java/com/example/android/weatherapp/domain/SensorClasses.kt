@@ -5,7 +5,7 @@ import com.example.android.weatherapp.utils.DateUtils
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-data class Sensor(val id: Short, val description: String, val updated: Long=0,
+data class Sensor(val id: Int, val description: String, val updated: Long=0,
                   val data : SensorData? = null
 ) : Parcelable {
 
@@ -56,7 +56,7 @@ data class Sensor(val id: Short, val description: String, val updated: Long=0,
 
 @Parcelize
 data class SensorData(
-    val sensor_id: Short,
+    val sensor_id: Int,
     val timestamp: Long,
     val temp: Short,
     val vcc: Short,

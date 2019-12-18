@@ -1,7 +1,10 @@
 package com.example.android.weatherapp.overview
 
+import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.*
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -9,7 +12,9 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.example.android.weatherapp.MainActivity
 import com.example.android.weatherapp.R
+import com.example.android.weatherapp.common_ui.SensorPropDialog
 import com.example.android.weatherapp.databinding.FragmentOverviewBinding
+import com.example.android.weatherapp.domain.Sensor
 
 
 class OverviewFragment : Fragment() {
@@ -71,7 +76,22 @@ class OverviewFragment : Fragment() {
             R.id.update_sensors -> viewModel.onUpdate()
             R.id.delete_sensor_data -> viewModel.onDeleteSensorData()
             R.id.add_sensor -> {
-                this.findNavController().navigate(OverviewFragmentDirections.actionOverviewFragmentToSensorNewDialogFragment())
+                //this.findNavController().navigate(OverviewFragmentDirections.actionOverviewFragmentToSensorNewDialogFragment(88))
+                val sensDlg = SensorPropDialog(activity as Context, viewModel.getNewSensor())
+                sensDlg.create().onCancel{
+                }.onDone{
+//
+//                    if(!it.validate()) {
+//                        Toast.makeText(this, "Check data", Toast.LENGTH_LONG).show()
+//                        false
+//                    } else {
+//                        Log.v(tag, "DOK ${it}")
+//                        presenter.addSensor(it)
+//                        true
+//                    }
+                    true
+                }
+                    .show()
             }
         }
         return true

@@ -53,7 +53,7 @@ class SensorRepository(appContext: Context) {
 
 
     fun getOneSensor(id : Int) : LiveData<Sensor> =
-        if (::_currentSensor.isInitialized && _currentSensor?.value?.id == id.toShort()) _currentSensor
+        if (::_currentSensor.isInitialized && _currentSensor?.value?.id == id) _currentSensor
         else try {
             //_currentSensorDataListValid = false
             Log.i(tag, "Loading sensor $id")
@@ -114,6 +114,19 @@ class SensorRepository(appContext: Context) {
             Log.e(tag, "DB error: $msg")
             _sensorDataList = MutableLiveData<List<SensorData>>()
             _sensorDataList
+        }
+
+    suspend fun getLastSensorId(): Int =
+        withContext(Dispatchers.IO) {
+            try {
+                val res = database.weatherDao.getLastSensorId()
+                Log.e(tag, "DB Result =========  $res")
+                res
+            } catch (t: Throwable) {
+                val msg = t.message ?: "Unknown DB error"
+                Log.e(tag, "DB error: $msg")
+                0
+            }
         }
 
     suspend fun refreshSensorData(): Boolean =

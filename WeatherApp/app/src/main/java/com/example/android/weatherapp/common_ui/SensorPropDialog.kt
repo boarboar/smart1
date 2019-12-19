@@ -63,13 +63,13 @@ class SensorPropDialog(context: Context, var sensor: Sensor?, val isEdit:Boolean
     }
 
     //  done icon
-    private val doneIcon: Button by lazy {
+    private val doneBtn: Button by lazy {
         //dialogView.findViewById<ImageView>(R.id.done_icon)
         dialogView.findViewById<Button>(R.id.done_but)
     }
 
     //  close icon
-    private val closeIcon: Button by lazy {
+    private val closeBtn: Button by lazy {
         //dialogView.findViewById<ImageView>(R.id.close_icon)
         dialogView.findViewById<Button>(R.id.close_but)
     }
@@ -85,8 +85,7 @@ class SensorPropDialog(context: Context, var sensor: Sensor?, val isEdit:Boolean
     }
 
     fun onCancel(func: (() -> Unit)? = null): SensorPropDialog {
-        with(closeIcon) {
-            //setClickListenerToDialogIcon(func)
+        with(closeBtn) {
             setOnClickListener {
                 func?.invoke()
                 dialog?.dismiss()
@@ -95,30 +94,23 @@ class SensorPropDialog(context: Context, var sensor: Sensor?, val isEdit:Boolean
         return this
     }
 
-    fun onDone(func: ((Sensor) -> Boolean)? = null): SensorPropDialog {
-        with(doneIcon) {
-            //setClickListenerToDialogIcon(func)
-
+    fun onDone(func: (Sensor) -> Boolean): SensorPropDialog {
+        with(doneBtn) {
             setOnClickListener {
                 val sens_id = sensorId.text.toString()
                 val sens_loc = sensorLoc.text.toString()
-                // verify TODO
-                //sensor = Sensor(sens_id.toShortOrNull()?:0, sens_loc)
-//                val res: Boolean =
-//                        func?.invoke(Sensor(sens_id.toIntOrNull()?:0, sens_loc)) ?: false
-
-                val res = true
-
+                sensor = Sensor(sens_id.toIntOrNull()?:0, sens_loc)
+                val res = func(Sensor(sens_id.toIntOrNull()?:0, sens_loc))
                 if (res) dialog?.dismiss()
             }
         }
         return this
     }
 
-    //  view click listener as extension function
-    private fun View.setClickListenerToDialogIcon(func: (() -> Unit)?) =
-            setOnClickListener {
-                func?.invoke()
-                dialog?.dismiss()
-            }
+//    //  view click listener as extension function
+//    private fun View.setClickListenerToDialogIcon(func: (() -> Unit)?) =
+//            setOnClickListener {
+//                func?.invoke()
+//                dialog?.dismiss()
+//            }
 }

@@ -51,6 +51,17 @@ class SensorRepository(appContext: Context) {
             MutableLiveData<List<Sensor>>()
         }
 
+    var sensorLastId = 0
+
+    init {
+        // is it legal?
+        sensorList.observeForever {
+            if (null != it) {
+                Log.w(tag, "==== READ ${it.size} sensors")
+                sensorLastId = it.maxBy {it.id}?.id ?: 0
+            }
+        }
+    }
 
     fun getOneSensor(id : Int) : LiveData<Sensor> =
         if (::_currentSensor.isInitialized && _currentSensor?.value?.id == id) _currentSensor
@@ -116,6 +127,7 @@ class SensorRepository(appContext: Context) {
             _sensorDataList
         }
 
+    /*
     suspend fun getLastSensorId(): Int =
         withContext(Dispatchers.IO) {
             try {
@@ -128,6 +140,7 @@ class SensorRepository(appContext: Context) {
                 0
             }
         }
+    */
 
     suspend fun refreshSensorData(): Boolean =
         withContext(Dispatchers.IO) {
@@ -160,6 +173,17 @@ class SensorRepository(appContext: Context) {
                 false
             }
         }
+
+    suspend fun addSensor(sensor : Sensor) {
+        withContext(Dispatchers.IO) {
+            try {
+                database.weatherDao.insert(DbSensor(sensor.id, sensor.description, 0))
+            } catch (t: Throwable) {
+                val msg = t.message ?: "Unknown DB error"
+                Log.e(tag, "DB error: $msg")
+            }
+        }
+    }
 
     suspend fun populateDb() {
 

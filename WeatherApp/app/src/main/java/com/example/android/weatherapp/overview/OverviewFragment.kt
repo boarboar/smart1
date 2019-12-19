@@ -76,20 +76,16 @@ class OverviewFragment : Fragment() {
             R.id.update_sensors -> viewModel.onUpdate()
             R.id.delete_sensor_data -> viewModel.onDeleteSensorData()
             R.id.add_sensor -> {
-                //this.findNavController().navigate(OverviewFragmentDirections.actionOverviewFragmentToSensorNewDialogFragment(88))
                 val sensDlg = SensorPropDialog(activity as Context, viewModel.getNewSensor())
                 sensDlg.create().onCancel{
                 }.onDone{
-//
-//                    if(!it.validate()) {
-//                        Toast.makeText(this, "Check data", Toast.LENGTH_LONG).show()
-//                        false
-//                    } else {
-//                        Log.v(tag, "DOK ${it}")
-//                        presenter.addSensor(it)
-//                        true
-//                    }
-                    true
+                    if(!it.validate()) {
+                        Toast.makeText(activity, "Check sensor data", Toast.LENGTH_LONG).show()
+                        false
+                    } else {
+                        viewModel.addSensor(it)
+                        true
+                    }
                 }
                     .show()
             }

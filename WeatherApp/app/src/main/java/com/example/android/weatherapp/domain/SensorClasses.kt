@@ -52,6 +52,8 @@ data class Sensor(val id: Int, val description: String, val updated: Long=0,
         get() = id.toString()
 
     //fun equalData(other : Sensor) = id==other.id && description==other.description && updated==other.updated
+
+    fun validate() = id>0 && !description.isEmpty()
   }
 
 @Parcelize

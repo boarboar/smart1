@@ -3,6 +3,7 @@ package com.example.android.weatherapp.overview
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.*
+import androidx.lifecycle.Observer
 import com.example.android.weatherapp.R
 import com.example.android.weatherapp.database.*
 import com.example.android.weatherapp.domain.*
@@ -74,11 +75,8 @@ class OverviewViewModel(application: Application) : AndroidViewModel(application
     }
 
     init {
-        //_db_status.value = DbStatus.DONE
         Timer().schedule(400, 1000*60*FORECAST_REFRESH_TIMEOUT_MIN) { getWeatherForecast() }
-        //getSensors()
         }
-
 
     fun displaySensorDetails(sensor: Sensor) {
         _navigateToSelectedSensor.value = sensor
@@ -86,6 +84,12 @@ class OverviewViewModel(application: Application) : AndroidViewModel(application
 
     fun displaySensorDetailsComplete() {
         _navigateToSelectedSensor.value = null
+    }
+
+    fun addSensor(sensor: Sensor) {
+        coroutineScope.launch {
+            sensorRepository.addSensor(sensor)
+        }
     }
 
     private fun getWeatherForecast() {
@@ -112,14 +116,8 @@ class OverviewViewModel(application: Application) : AndroidViewModel(application
     }
 
     fun getNewSensor() : Sensor {
-        //var id : Int = 0
-        val id = 0;
-        coroutineScope.launch {
-            sensorRepository.getLastSensorId()
-            Log.e(tag, "DB Result1 =========  $id")
-        }
-        Log.e(tag, "DB Result2 =========  $id")
-        return Sensor(id + 1, "NEWSENSOR")
+        val id = sensorRepository.sensorLastId + 1
+        return Sensor(id, "SENSOR$id")
     }
 
     fun onPopulate() {

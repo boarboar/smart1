@@ -5,4 +5,11 @@
     <string name="yes">Да</string>
     <string name="no">Нет</string>
     <string name="dialog_sensor_delete">Удалить сенсор %1$s?</string>
+    <string name="temp">Темп</string>
+    <string name="vcc">Vcc</string>
+    <string name="humidity">Влажность</string>
+    <string name="dhumidity">Протечка</string>
+    <string name="intrv_day">День</string>
+    <string name="intrv_week">Неделя</string>
+    <string name="intrv_month">Месяц</string>
 </resources>

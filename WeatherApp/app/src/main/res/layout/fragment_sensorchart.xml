@@ -4,9 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-<!--        <variable-->
-<!--            name="sensor"-->
-<!--            type="com.example.android.weatherapp.domain.Sensor" />-->
+        <variable
+            name="viewModel"
+            type="com.example.android.weatherapp.sensorview.SensorChartViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -15,10 +15,103 @@
         android:background="@color/colorPrimarySurround"
         tools:context="com.example.android.weatherapp.MainActivity">
 
+        <RadioGroup
+            android:id="@+id/radioGroupType"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/margin"
+            android:layout_marginTop="@dimen/margin"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:orientation="horizontal">
+            <RadioButton
+                android:id="@+id/radio_temp"
+                android:layout_weight="1"
+                android:text="@string/temp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/margin"
+                android:textSize="@dimen/size_medium"
+                android:checked="true"
+                />
+            <RadioButton
+                android:id="@+id/radio_vcc"
+                android:layout_weight="1"
+                android:text="@string/vcc"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/margin"
+                android:textSize="@dimen/size_medium"
+                />
+            <RadioButton
+                android:id="@+id/radio_h"
+                android:layout_weight="1"
+                android:text="@string/humidity"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/margin"
+                android:layout_marginRight="@dimen/margin"
+                android:textSize="@dimen/size_medium"
+                />
+        </RadioGroup>
+
+        <RadioGroup
+            android:id="@+id/radioGroupIntrv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/margin"
+            android:layout_marginTop="@dimen/margin"
+            app:layout_constraintLeft_toRightOf="@id/radioGroupType"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:orientation="horizontal">
+            <RadioButton
+                android:id="@+id/radio_day"
+                android:layout_weight="1"
+                android:text="@string/intrv_day"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/margin"
+                android:textSize="@dimen/size_medium"
+                android:checked="true"
+                />
+            <RadioButton
+                android:id="@+id/radio_week"
+                android:layout_weight="1"
+                android:text="@string/intrv_week"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/margin"
+                android:textSize="@dimen/size_medium"
+                />
+            <RadioButton
+                android:id="@+id/radio_month"
+                android:layout_weight="1"
+                android:text="@string/intrv_month"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/margin"
+                android:layout_marginRight="@dimen/margin"
+                android:textSize="@dimen/size_medium"
+                />
+        </RadioGroup>
+
+        <com.example.android.weatherapp.draw.DrawView
+            android:id="@+id/draw_view"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginLeft="@dimen/margin"
+            android:layout_marginRight="@dimen/margin"
+            android:layout_marginTop="@dimen/margin"
+            android:layout_marginBottom="@dimen/margin"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/radioGroupType"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:chartSensorData="@{viewModel.sensorData}"
+        />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
 </layout>
 
-<!--    app:listForecastData="@{viewModel.forecastItemList}"-->
-<!--    tools:listitem="@layout/forecast_item"-->
+

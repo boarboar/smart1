@@ -30,6 +30,7 @@ import com.example.android.weatherapp.domain.Sensor
 import com.example.android.weatherapp.domain.SensorData
 import com.example.android.weatherapp.domain.WeatherForecastItem
 import com.example.android.weatherapp.domain.WeatherWeather
+import com.example.android.weatherapp.draw.DrawView
 import com.example.android.weatherapp.overview.ForecastAdapter
 import com.example.android.weatherapp.overview.SensorAdapter
 
@@ -56,6 +57,15 @@ fun bindRecyclerSensorView(recyclerView: RecyclerView, data: List<Sensor>?) {
 fun bindRecyclerSensorDataView(recyclerView: RecyclerView, data: List<SensorData>?) {
     val adapter = recyclerView.adapter as SensorDataAdapter
     adapter.submitList(data)
+}
+
+@BindingAdapter("chartSensorData")
+fun bindChartDataView(drawView: DrawView, data: List<SensorData>?) {
+    data?.let {
+        drawView.sensHist = it
+        drawView.prepare()
+        drawView.invalidate()
+    }
 }
 
 @BindingAdapter("weatherImage")

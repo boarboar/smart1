@@ -7,7 +7,7 @@ import com.example.android.weatherapp.domain.Sensor
 import com.example.android.weatherapp.domain.SensorData
 import com.example.android.weatherapp.repository.getSensorRepository
 
-class SensorLogViewModel(sensorId : Int, app: Application) : AndroidViewModel(app) {
+class SensorChartViewModel(sensorId : Int, app: Application) : AndroidViewModel(app) {
     lateinit private var _sensorData : LiveData<List<SensorData>>
     val sensorData: LiveData<List<SensorData>>
         get() = _sensorData
@@ -17,13 +17,13 @@ class SensorLogViewModel(sensorId : Int, app: Application) : AndroidViewModel(ap
     }
 }
 
-class SensorLogViewModelFactory(
+class SensorChartViewModelFactory(
     private val sensorId: Int,
     private val application: Application) : ViewModelProvider.Factory {
     @Suppress("unchecked_cast")
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(SensorLogViewModel::class.java)) {
-            return SensorLogViewModel(sensorId, application) as T
+        if (modelClass.isAssignableFrom(SensorChartViewModel::class.java)) {
+            return SensorChartViewModel(sensorId, application) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

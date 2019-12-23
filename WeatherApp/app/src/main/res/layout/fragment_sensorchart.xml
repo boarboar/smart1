@@ -28,30 +28,36 @@
                 android:id="@+id/radio_temp"
                 android:layout_weight="1"
                 android:text="@string/temp"
+                android:textColor="@color/colorPrimary"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/margin"
                 android:textSize="@dimen/size_medium"
                 android:checked="true"
+                android:onClick="@{() -> viewModel.onSetTypeTerm()}"
                 />
             <RadioButton
                 android:id="@+id/radio_vcc"
                 android:layout_weight="1"
                 android:text="@string/vcc"
+                android:textColor="@color/colorPrimary"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/margin"
                 android:textSize="@dimen/size_medium"
+                android:onClick="@{() -> viewModel.onSetTypeVcc()}"
                 />
             <RadioButton
                 android:id="@+id/radio_h"
                 android:layout_weight="1"
                 android:text="@string/humidity"
+                android:textColor="@color/colorPrimary"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/margin"
                 android:layout_marginRight="@dimen/margin"
                 android:textSize="@dimen/size_medium"
+                android:onClick="@{() -> viewModel.onSetTypeHum()}"
                 />
         </RadioGroup>
 
@@ -69,30 +75,36 @@
                 android:id="@+id/radio_day"
                 android:layout_weight="1"
                 android:text="@string/intrv_day"
+                android:textColor="@color/colorPrimary"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/margin"
                 android:textSize="@dimen/size_medium"
                 android:checked="true"
+                android:onClick="@{() -> viewModel.onSetPeriodDay()}"
                 />
             <RadioButton
                 android:id="@+id/radio_week"
                 android:layout_weight="1"
                 android:text="@string/intrv_week"
+                android:textColor="@color/colorPrimary"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/margin"
                 android:textSize="@dimen/size_medium"
+                android:onClick="@{() -> viewModel.onSetPeriodWeek()}"
                 />
             <RadioButton
                 android:id="@+id/radio_month"
                 android:layout_weight="1"
                 android:text="@string/intrv_month"
+                android:textColor="@color/colorPrimary"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/margin"
                 android:layout_marginRight="@dimen/margin"
                 android:textSize="@dimen/size_medium"
+                android:onClick="@{() -> viewModel.onSetPeriodMonth()}"
                 />
         </RadioGroup>
 

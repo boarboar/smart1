@@ -6,12 +6,14 @@ import android.util.AttributeSet
 import android.util.Log
 import android.view.View
 import androidx.core.content.ContextCompat
+import com.example.android.weatherapp.WeatherApplication.Companion.ctx
 import com.example.android.weatherapp.domain.Sensor
 import com.example.android.weatherapp.domain.SensorData
 import com.example.android.weatherapp.utils.DateUtils.Companion.convertDateDOnly
 import com.example.android.weatherapp.utils.DateUtils.Companion.convertTimeHOnly
 import com.example.android.weatherapp.utils.DateUtils.Companion.localDateTimeToMillis
 import com.example.android.weatherapp.utils.DateUtils.Companion.millsToLocalDateTime
+import com.example.android.weatherapp.utils.resolveColorAttr
 import org.threeten.bp.DayOfWeek
 import org.threeten.bp.LocalDateTime
 
@@ -72,9 +74,12 @@ class DrawView(context: Context, attrs: AttributeSet) : View(context, attrs) {
     private var paintText = Paint()
     private var paintTextSmall = Paint()
     private var paintPath = Paint()
-    private val color_green = ContextCompat.getColor(context, android.R.color.holo_green_light)
+    private val color_grid = ctx.resolveColorAttr(android.R.attr.colorAccent)
+    //private val color_grid = ctx.resolveColorAttr(android.R.attr.colorPrimary)
+    //private val color_green = ContextCompat.getColor(context, android.R.color.holo_green_light)
     private val color_red = ContextCompat.getColor(context, android.R.color.holo_red_light)
-    private val color_blue = ContextCompat.getColor(context, android.R.color.holo_blue_light)
+    //private val color_blue = ContextCompat.getColor(context, android.R.color.holo_blue_light)
+    private val color_line = ContextCompat.getColor(context, android.R.color.holo_green_light)
 
     val getTemp = { it: SensorData -> it.temp.toInt() }
     val getVcc = { it: SensorData -> it.vcc.toInt() }
@@ -83,7 +88,7 @@ class DrawView(context: Context, attrs: AttributeSet) : View(context, attrs) {
 
     init {
         paint.apply {
-            color = color_green
+            color = color_grid
             style = Paint.Style.STROKE
             strokeJoin = Paint.Join.ROUND
             strokeCap = Paint.Cap.ROUND
@@ -91,7 +96,7 @@ class DrawView(context: Context, attrs: AttributeSet) : View(context, attrs) {
             isAntiAlias = true
         }
         paintPath.apply {
-            color = color_blue
+            color = color_line
             style = Paint.Style.STROKE
             strokeJoin = Paint.Join.ROUND
             strokeCap = Paint.Cap.ROUND
@@ -99,12 +104,12 @@ class DrawView(context: Context, attrs: AttributeSet) : View(context, attrs) {
             isAntiAlias = true
         }
         paintText.apply {
-            color = color_green
+            color = color_grid
             typeface = Typeface.MONOSPACE
             textSize = resources.displayMetrics.scaledDensity * FONT_SZ
         }
         paintTextSmall.apply {
-            color = color_green
+            color = color_grid
             typeface = Typeface.MONOSPACE
             textSize = resources.displayMetrics.scaledDensity * FONT_SZ_SMALL
         }
@@ -122,7 +127,7 @@ class DrawView(context: Context, attrs: AttributeSet) : View(context, attrs) {
 
         Log.d("Chart", "Type $disp, Priod $dispPeriod")
 
-        paint.color=color_green
+        paint.color=color_grid
         paint.strokeWidth = 4f
         //paint.pathEffect = null
 
@@ -151,16 +156,16 @@ class DrawView(context: Context, attrs: AttributeSet) : View(context, attrs) {
                 canvas.drawText("${(t/10).toFloat()/100F}", 0F, y+td, paintText)
             if(row !=0 && row !=nsteps) {
                 if(disp==DispType.TEMPERATURE) {
-                    paint.color=color_green
+                    paint.color=color_grid
                     paint.strokeWidth = if (t == 0) 4F else 1F
                 }
                 else if(disp==DispType.HUMIDITY) {
                     paint.strokeWidth = 1F
-                    paint.color= if(t==900) color_red else color_green
+                    paint.color= if(t==900) color_red else color_grid
                 }
                 else { // VCC
                     paint.strokeWidth = if(t== Sensor.VCC_LOW_1000) 4F else 1F
-                    paint.color= if(t==Sensor.VCC_LOW_1000) color_red else color_green
+                    paint.color= if(t==Sensor.VCC_LOW_1000) color_red else color_grid
                 }
                 canvas.drawLine(left, y, w, y, paint)
             }
@@ -173,31 +178,31 @@ class DrawView(context: Context, attrs: AttributeSet) : View(context, attrs) {
         var time = timeStart
 
         paint.strokeWidth = 1f
-        paint.color=color_green
+        paint.color=color_grid
 
         for(col in 0..ncols) {
             var date = millsToLocalDateTime(time)
             if(col !=0 && col !=ncols) {
                 paint.color = if(dispPeriod!=DispPeriod.DAY &&
                         (date.dayOfWeek==DayOfWeek.SUNDAY || date.dayOfWeek==DayOfWeek.MONDAY))
-                    color_red else color_green
+                    color_red else color_grid
                 canvas.drawLine(x, top, x, h - bot, paint)
             }
             if(dispPeriod==DispPeriod.DAY)
                 canvas.drawText("${convertTimeHOnly(time)}", x, h,  paintText)
             else {
-                paintText.color = if(date.dayOfWeek==DayOfWeek.SUNDAY) color_red else color_green
+                paintText.color = if(date.dayOfWeek==DayOfWeek.SUNDAY) color_red else color_grid
                 canvas.drawText("${convertDateDOnly(time)}", x, h, paintText)
             }
             x+=dx
             time += colStepSec * 1000
         }
 
-        paint.color=color_green
+        paint.color=color_grid
         //paintText.color = color_blue
         //canvas.drawText("${convertDateTime(timeMin)} .. ${convertDateTime(timeMax)} at ${convertDateTime(timeStart)}", left, h/4, paintText)
         //canvas.drawText("$valMin .. $valMax" , left, h*3/4, paintText)
-        paintText.color = color_green
+        paintText.color = color_grid
 
         val chartw = w-left
         val charth = h -top - bot

@@ -91,6 +91,20 @@ class SensorRepository(appContext: Context) {
             }
         }
 
+    suspend fun updateSensor(sensor : Sensor) : Boolean =
+        withContext(Dispatchers.IO) {
+            try {
+                Log.i(tag, "Update sensor ${sensor.id} ${sensor.description}")
+                database.weatherDao.update(DbSensor(sensor.id, sensor.description, 0))
+                true
+            } catch (t: Throwable) {
+                val msg = t.message ?: "Unknown DB error"
+                Log.e(tag, "DB error: $msg")
+                false
+            }
+        }
+
+
 //    fun getCurrentSensorData() : LiveData<List<SensorData>> =
 //        if (!::_currentSensor.isInitialized || _currentSensor.value == null)  {
 //            Log.w(tag, "Attempt to load sensor data for not inited sensor")

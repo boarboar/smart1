@@ -4,4 +4,7 @@
     <item
         android:id="@+id/delete_sensor"
         android:title="Delete" />
+    <item
+        android:id="@+id/edit_sensor"
+        android:title="Edit" />
 </menu>

@@ -7,10 +7,12 @@ import android.content.DialogInterface
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProviders
 import com.example.android.weatherapp.MainActivity
 import com.example.android.weatherapp.R
+import com.example.android.weatherapp.common_ui.SensorPropDialog
 import com.example.android.weatherapp.databinding.FragmentSensordetailBinding
 import com.example.android.weatherapp.repository.getSensorRepository
 
@@ -58,7 +60,20 @@ class SensorDetailFragment : SensorBaseFragment() {
                 }
                 dialog.show(fragmentManager!!, "DELETE_SENSOR_ALERT")
             }
-            //android.R.id.home -> activity?.onBackPressed()
+            R.id.edit_sensor -> {
+                val sensDlg = SensorPropDialog(activity as Context, getSensorRepository(activity as Context).currentSensor.value, true)
+                sensDlg.create().onCancel{
+                }.onDone{
+                    if(!it.validate()) {
+                        Toast.makeText(activity, "Check sensor data", Toast.LENGTH_LONG).show()
+                        false
+                    } else {
+                        viewModel.onUpdateSensor(it)
+                        true
+                    }
+                }
+                    .show()
+            }
             else -> return false
         }
         return true

@@ -28,11 +28,17 @@ class SensorChartFragment : SensorBaseFragment() {
 
         binding.viewModel = viewModel
 
-//        viewModel.sensorData.observe(this, Observer {
-//            binding.drawView.sensHist = it
-//            binding.drawView.prepare()
-//            binding.drawView.invalidate()
-//        })
+        viewModel.chartDispType.observe(this, Observer {
+            binding.drawView.disp = it
+            binding.drawView.prepare()
+            binding.drawView.invalidate()
+        })
+
+        viewModel.chartDispPeriod.observe(this, Observer {
+            binding.drawView.dispPeriod = it
+            binding.drawView.prepare()
+            binding.drawView.invalidate()
+        })
 
         return binding.root
     }

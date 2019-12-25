@@ -23,6 +23,6 @@ class RefreshDataWorker(appContext: Context, params: WorkerParameters):
     private val sensorRepository = getSensorRepository(appContext)
 
     override suspend fun doWork(): Result {
-         return if(sensorRepository.refreshSensorData()==true) Result.success() else Result.failure()
+         return if(sensorRepository.refreshSensorsData()==true) Result.success() else Result.failure()
     }
 }

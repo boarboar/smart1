@@ -6,6 +6,7 @@ import androidx.room.*
 import androidx.sqlite.db.SupportSQLiteDatabase
 import androidx.room.migration.Migration
 
+/*
 val MIGRATION_1_2: Migration = object : Migration(1, 2) {
     override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL("ALTER TABLE  dbsensor ADD COLUMN updated INTEGER NOT NULL DEFAULT 0")
@@ -33,6 +34,80 @@ val MIGRATION_3_4: Migration = object : Migration(3, 4) {
     }
 }
 
+val MIGRATION_4_5: Migration = object : Migration(4, 5) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("CREATE TABLE 'dbsensorlatestdata' ( " +
+                "'_id' INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,"+
+                "'sensor_id' INTEGER NOT NULL,"+
+                "'timestamp' INTEGER NOT NULL,"+
+                "'temp' INTEGER NOT NULL,"+
+                "'vcc' INTEGER NOT NULL,"+
+                "'hum' INTEGER NOT NULL,"+
+                "'dhum' INTEGER NOT NULL,"+
+                "'d_temp' INTEGER NOT NULL,"+
+                "'d_vcc' INTEGER NOT NULL,"+
+                "'d_hum' INTEGER NOT NULL,"+
+                "'d_ddhum' INTEGER NOT NULL"+
+                ")")
+        database.execSQL("CREATE INDEX idx_sensor_latest_id ON dbsensorlatestdata (sensor_id);")
+
+    }
+}
+
+val MIGRATION_5_6: Migration = object : Migration(5, 6) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("DROP TABLE 'dbsensorlatestdata';")
+
+        database.execSQL("CREATE TABLE 'dbsensorlatestdata' ( " +
+                "'sensor_id' INTEGER PRIMARY KEY NOT NULL,"+
+                "'timestamp' INTEGER NOT NULL,"+
+                "'temp' INTEGER NOT NULL,"+
+                "'vcc' INTEGER NOT NULL,"+
+                "'hum' INTEGER NOT NULL,"+
+                "'dhum' INTEGER NOT NULL,"+
+                "'d_temp' INTEGER NOT NULL,"+
+                "'d_vcc' INTEGER NOT NULL,"+
+                "'d_hum' INTEGER NOT NULL,"+
+                "'d_ddhum' INTEGER NOT NULL"+
+                ")")
+    }
+}
+
+val MIGRATION_6_7: Migration = object : Migration(6, 7) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("DROP TABLE 'dbsensorlatestdata';")
+    }
+}
+
+val MIGRATION_7_8: Migration = object : Migration(7, 8) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("CREATE TABLE 'dbsensorlatestdata' ( " +
+                "'sensor_id' INTEGER PRIMARY KEY NOT NULL,"+
+                "'timestamp' INTEGER NOT NULL,"+
+                "'temp' INTEGER NOT NULL,"+
+                "'vcc' INTEGER NOT NULL,"+
+                "'hum' INTEGER NOT NULL,"+
+                "'dhum' INTEGER NOT NULL,"+
+                "'d_temp' INTEGER NOT NULL,"+
+                "'d_vcc' INTEGER NOT NULL,"+
+                "'d_hum' INTEGER NOT NULL,"+
+                "'d_ddhum' INTEGER NOT NULL"+
+                ")")
+    }
+}
+
+val MIGRATION_8_9: Migration = object : Migration(8, 9) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+    }
+}
+
+val MIGRATION_9_10: Migration = object : Migration(9, 10) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("CREATE UNIQUE INDEX idx_sensor_latest_id ON dbsensorlatestdata (sensor_id);")
+    }
+}
+
+*/
 
 @Dao
 interface WeatherDao {
@@ -45,8 +120,9 @@ interface WeatherDao {
 
     @Insert
     fun insert_data(sensor_data : DbSensorData)
-    //@Insert(onConflict = OnConflictStrategy.REPLACE)
-    //fun insertAll(vararg videos: DatabaseVideo)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insert_latest_data(sensor_latest_data : DbSensorLatestData)
 
     @Query("select * from dbsensordata")
     fun getSensorsData(): LiveData<List<DbSensorData>>
@@ -100,10 +176,12 @@ interface WeatherDao {
     @Query("select * from dbsensordata where sensor_id=:id order by timestamp desc")
     fun getSensorData(id: Int): LiveData<List<DbSensorData>>
 
+    @Query("select * from dbsensorlatestdata where sensor_id=:id")
+    fun getSensorLatestData(id: Int): DbSensorLatestData?
 
 }
 
-@Database(entities = [DbSensor::class, DbSensorData::class], version = 4)
+@Database(entities = [DbSensor::class, DbSensorData::class, DbSensorLatestData::class], version = 1)
 abstract class WeatherDatabase : RoomDatabase() {
     abstract val weatherDao: WeatherDao
 }
@@ -116,7 +194,8 @@ fun getDatabase(context: Context): WeatherDatabase {
             INSTANCE = Room.databaseBuilder(context.applicationContext,
                 WeatherDatabase::class.java,
                 "weather")
-                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
+                //.addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5,
+                //    MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10)
                 .build()
         }
     }

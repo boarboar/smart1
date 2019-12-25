@@ -3,7 +3,6 @@ package com.example.android.weatherapp.sensorview
 import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Context
-import android.content.DialogInterface
 import android.os.Bundle
 import android.util.Log
 import android.view.*
@@ -34,11 +33,8 @@ class SensorDetailFragment : SensorBaseFragment() {
 
         val binding = FragmentSensordetailBinding.inflate(inflater)
         binding.setLifecycleOwner(this)
-
         binding.viewModel = viewModel
-
         setHasOptionsMenu(true)
-
         return binding.root
     }
 

@@ -33,6 +33,29 @@ data class DbSensorData(
 }
 // todo - add validated field
 
+@Entity
+data class DbSensorLatestData(
+    @PrimaryKey
+    val sensor_id: Int, // should be indexed
+    val timestamp: Long,
+    val temp: Int,
+    val vcc: Int,
+    val hum: Int,
+    val dhum: Int,
+    val d_temp: Int,
+    val d_vcc: Int,
+    val d_hum: Int,
+    val d_dhum: Int
+)
+{
+    constructor(data: DbSensorData ) :
+            this(data.sensor_id, data.timestamp, data.temp, data.vcc, data.hum, data.dhum,
+                0,0,0,0)
+    constructor(latest: DbSensorLatestData, data: DbSensorData ) :
+            this(data.sensor_id, data.timestamp, data.temp, data.vcc, data.hum, data.dhum,
+                data.temp-latest.temp,data.vcc-latest.vcc,
+                data.hum-latest.hum, data.dhum-latest.dhum)
+}
 
 // combine
 

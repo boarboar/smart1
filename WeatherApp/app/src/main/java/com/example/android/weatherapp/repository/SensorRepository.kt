@@ -5,10 +5,7 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
-import com.example.android.weatherapp.database.DbSensor
-import com.example.android.weatherapp.database.DbSensorData
-import com.example.android.weatherapp.database.asSensor
-import com.example.android.weatherapp.database.asSensorData
+import com.example.android.weatherapp.database.*
 import com.example.android.weatherapp.domain.Sensor
 import com.example.android.weatherapp.domain.SensorData
 import com.example.android.weatherapp.overview.OverviewViewModel
@@ -156,13 +153,13 @@ class SensorRepository(appContext: Context) {
         }
     */
 
-    suspend fun refreshSensorData(): Boolean =
+    suspend fun refreshSensorsData(): Boolean =
         withContext(Dispatchers.IO) {
             try {
                 Log.i(tag, "REFRESH RUN")
                 val random = Random()
                 for (sensId in 1..3) {
-                    database.weatherDao.insert_data(
+                    refreshSensorData(
                         DbSensorData(
                             0, sensId, System.currentTimeMillis(),
                             random.nextInt(-400..400), random.nextInt(2540..4950),
@@ -187,6 +184,33 @@ class SensorRepository(appContext: Context) {
                 false
             }
         }
+
+    suspend fun refreshSensorData(data : DbSensorData): Boolean =
+        withContext(Dispatchers.IO) {
+            try {
+                database.weatherDao.insert_data(data)
+                val latest = database.weatherDao.getSensorLatestData(data.sensor_id)
+                val latest_update : DbSensorLatestData =
+                    latest?.let {
+                        Log.i(tag, "Sensor ${data.sensor_id} prev latest data is ${latest}")
+                        DbSensorLatestData(it, data)
+                    } ?: DbSensorLatestData(data)
+
+                database.weatherDao.insert_latest_data(latest_update) // insert or update
+
+                Log.i(tag, "Refresh sensor ${data.sensor_id}")
+                true
+            } catch (e: HttpException) {
+                val msg = e.message ?: "Unknown HTTP error"
+                Log.e(tag, "HTTP error: $msg")
+                false
+            } catch (t: Throwable) {
+                val msg = t.message ?: "Unknown DB error"
+                Log.e(tag, "DB error: $msg")
+                false
+            }
+        }
+
 
     suspend fun addSensor(sensor : Sensor) {
         withContext(Dispatchers.IO) {

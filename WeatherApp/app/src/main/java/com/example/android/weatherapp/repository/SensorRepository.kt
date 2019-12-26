@@ -38,7 +38,7 @@ class SensorRepository(appContext: Context) {
 
     var sensorList: LiveData<List<Sensor>> =
         try {
-            Transformations.map(database.weatherDao.getSensorsWithData()) {
+            Transformations.map(database.weatherDao.getSensorsWithLatestData()) {
                 it.asSensor()
             }
             //_db_status.value = DbStatus.DONE
@@ -65,7 +65,7 @@ class SensorRepository(appContext: Context) {
         else try {
             //_currentSensorDataListValid = false
             Log.i(tag, "Loading sensor $id")
-            _currentSensor = Transformations.map(database.weatherDao.getOneSensorWithData(id)) {
+            _currentSensor = Transformations.map(database.weatherDao.getOneSensorWithLatestData(id)) {
                 it?.toSensor()
             }
             _currentSensor
@@ -102,27 +102,6 @@ class SensorRepository(appContext: Context) {
         }
 
 
-//    fun getCurrentSensorData() : LiveData<List<SensorData>> =
-//        if (!::_currentSensor.isInitialized || _currentSensor.value == null)  {
-//            Log.w(tag, "Attempt to load sensor data for not inited sensor")
-//            _currentSensorDataList = MutableLiveData<List<SensorData>>()
-//            _currentSensorDataList
-//        }
-//        else if (::_currentSensorDataList.isInitialized && _currentSensorDataListValid)
-//            _currentSensorDataList
-//        else try {
-//            val sensor : Sensor= _currentSensor.value as Sensor
-//            Log.i(tag, "Loading sensor data ${sensor.id}")
-//            _currentSensorDataList =Transformations.map(database.weatherDao.getSensorData(sensor.id.toInt())) {
-//                it.asSensorData() }
-//            _currentSensorDataList
-//        } catch (t: Throwable) {
-//            val msg = t.message ?: "Unknown DB error"
-//            Log.e(tag, "DB error: $msg")
-//            _currentSensorDataList = MutableLiveData<List<SensorData>>()
-//            _currentSensorDataList
-//        }
-
     fun getSensorData(id : Int) : LiveData<List<SensorData>> =
         if (::_sensorDataList.isInitialized && _sensorDataId==id)
             _sensorDataList
@@ -138,20 +117,6 @@ class SensorRepository(appContext: Context) {
             _sensorDataList
         }
 
-    /*
-    suspend fun getLastSensorId(): Int =
-        withContext(Dispatchers.IO) {
-            try {
-                val res = database.weatherDao.getLastSensorId()
-                Log.e(tag, "DB Result =========  $res")
-                res
-            } catch (t: Throwable) {
-                val msg = t.message ?: "Unknown DB error"
-                Log.e(tag, "DB error: $msg")
-                0
-            }
-        }
-    */
 
     suspend fun refreshSensorsData(): Boolean =
         withContext(Dispatchers.IO) {
@@ -173,6 +138,8 @@ class SensorRepository(appContext: Context) {
 
                 Log.i(tag, "${stat.count} total data records in DB from  ${DateUtils.convertDate(stat.from)}  to ${DateUtils.convertDate(stat.to)}")
 
+                // TODO - cleanup old records
+
                 true
             } catch (e: HttpException) {
                 val msg = e.message ?: "Unknown HTTP error"
@@ -189,6 +156,8 @@ class SensorRepository(appContext: Context) {
         withContext(Dispatchers.IO) {
             try {
                 database.weatherDao.insert_data(data)
+                // TODO - validation, do below only if valid
+
                 val latest = database.weatherDao.getSensorLatestData(data.sensor_id)
                 val latest_update : DbSensorLatestData =
                     latest?.let {
@@ -197,6 +166,8 @@ class SensorRepository(appContext: Context) {
                     } ?: DbSensorLatestData(data)
 
                 database.weatherDao.insert_latest_data(latest_update) // insert or update
+
+                // TODO - sensor update ubtatetstamp (if valid data only)
 
                 Log.i(tag, "Refresh sensor ${data.sensor_id}")
                 true

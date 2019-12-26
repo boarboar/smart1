@@ -134,32 +134,39 @@ interface WeatherDao {
     @Query("DELETE FROM dbsensor where id=:id")
     fun deleteSensor(id : Int)
 
+
 //    @Query("""
-//        select * from dbsensor left outer join dbsensordata on (dbsensor.id=dbsensordata.sensor_id) where
-//          dbsensordata._id in
+//        select * from dbsensor left outer join dbsensordata on (
+//        dbsensor.id=dbsensordata.sensor_id and dbsensordata._id in
 //          (select _id from dbsensordata sd where dbsensor.id=sd.sensor_id order by timestamp desc limit 1)
+//          )
 //          """
 //    )
-    @Query("""
-        select * from dbsensor left outer join dbsensordata on (
-        dbsensor.id=dbsensordata.sensor_id and dbsensordata._id in 
-          (select _id from dbsensordata sd where dbsensor.id=sd.sensor_id order by timestamp desc limit 1) 
-          ) 
-          """
-    )
-    fun getSensorsWithData(): LiveData<List<DbSensorWithData>>
-    // todo - filter validated only
+//    fun getSensorsWithData(): LiveData<List<DbSensorWithData>>
+
+//    @Query("""
+//        select * from dbsensor left outer join dbsensordata on (
+//        dbsensor.id=dbsensordata.sensor_id and dbsensordata._id in
+//          (select _id from dbsensordata sd where dbsensor.id=sd.sensor_id order by timestamp desc limit 1)
+//          ) where dbsensor.id = :id limit 1
+//          """
+//    )
+//    fun getOneSensorWithData(id : Int): LiveData<DbSensorWithData?>
 
     @Query("""
-        select * from dbsensor left outer join dbsensordata on (
-        dbsensor.id=dbsensordata.sensor_id and dbsensordata._id in 
-          (select _id from dbsensordata sd where dbsensor.id=sd.sensor_id order by timestamp desc limit 1) 
-          ) where dbsensor.id = :id limit 1
+        select * from dbsensor left outer join dbsensorlatestdata on (
+        dbsensor.id=dbsensorlatestdata.sensor_id ) 
           """
     )
-    fun getOneSensorWithData(id : Int): LiveData<DbSensorWithData?>
-    // todo - filter validated only
+    fun getSensorsWithLatestData(): LiveData<List<DbSensorWithLatestData>>
 
+
+    @Query("""
+        select * from dbsensor left outer join dbsensorlatestdata on (
+        dbsensor.id=dbsensorlatestdata.sensor_id) where dbsensor.id = :id limit 1
+          """
+    )
+    fun getOneSensorWithLatestData(id : Int): LiveData<DbSensorWithLatestData?>
 
     @Query("DELETE FROM dbsensordata where sensor_id=:id")
     fun deleteSensorData(id : Int)

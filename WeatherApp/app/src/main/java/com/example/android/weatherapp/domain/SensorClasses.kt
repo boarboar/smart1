@@ -19,25 +19,17 @@ data class Sensor(val id: Int, val description: String, val updated: Long=0,
     val at : String
         get() = if(updated>0) DateUtils.convertDateTime(updated) else "---"
 
-//    val updatedAt : String
-//        get() = data?.timestamp?.let {DateUtils.convertDateTime(it)} ?: "---"
-//    val tempString : String
-//        get() = data?.temp?.let {(it/10.0F).toString()+"º"} ?: "---"
-//    val vccString : String
-//        get() = data?.vcc?.let {((it/10)/100.0F).toString()+"v"} ?: "---"
-//    val humString : String
-//        get() = data?.hum?.let {if(it>0) (it/10.0F).toString()+"%" else ""} ?: ""
-//    val dhumString : String
-//        get() = data?.dhum?.let {if(it.toInt()==SensorData.DHUM_VALS.LEAK.value) "!" else ""} ?: ""
-//    val dhumVal : String
-//        get() = data?.dhum?.let {it.toString()} ?: ""
-//    val isVccLow : Boolean
-//        get () = data?.vcc?.let { it< VCC_LOW_1000 } ?: false
-//
     val updatedAt : String
         get() = data?.let {it.at} ?: "---"
     val tempString : String
         get() = data?.let {it.tempString} ?: "---"
+    val tempStringWithDelta : String
+        get() = data?.let {
+            when {
+                it.d_temp>0 -> "${it.tempString} \u21D7"
+                it.d_temp<0 -> "${it.tempString} \u21D8"
+                else -> "${it.tempString}"
+            }} ?: "---"
     val vccString : String
         get() = data?.let {it.vccString} ?: "---"
     val humString : String
@@ -63,7 +55,8 @@ data class SensorData(
     val temp: Short,
     val vcc: Short,
     val hum: Short,
-    val dhum: Short
+    val dhum: Short,
+    val d_temp : Short = 0
 ) : Parcelable {
     enum class DHUM_VALS(val value: Int) {
         NOTSET(0), LEAK(1), NORM(2)
@@ -81,6 +74,8 @@ data class SensorData(
         get() = if(dhum.toInt()==DHUM_VALS.LEAK.value) "!" else ""
     val dhumVal : String
         get() = dhum.toString()
+    val d_tempVal : String
+        get() = when { d_temp>0 -> "U"; d_temp<0 -> "D"; else -> "_" }
     val isVccLow : Boolean
         get () = vcc< Sensor.VCC_LOW_1000
 

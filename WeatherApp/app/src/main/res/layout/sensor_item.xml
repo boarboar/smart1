@@ -37,7 +37,7 @@
             android:layout_marginLeft="@dimen/margin"
             android:layout_marginTop="@dimen/margin"
             android:layout_marginBottom="@dimen/margin"
-            android:text="@{sensor.tempString}"
+            android:text="@{sensor.tempStringWithDelta}"
             android:textSize="@dimen/size_large"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"

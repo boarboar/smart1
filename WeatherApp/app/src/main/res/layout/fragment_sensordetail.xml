@@ -109,7 +109,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/margin"
             android:layout_marginRight="@dimen/margin"
-            android:text="@{viewModel.sensor.tempString}"
+            android:text="@{viewModel.sensor.tempStringWithDelta}"
             android:textSize="@dimen/size_medium"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/item_temp_title"

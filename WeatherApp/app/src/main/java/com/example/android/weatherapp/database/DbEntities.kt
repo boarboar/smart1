@@ -55,6 +55,7 @@ data class DbSensorLatestData(
             this(data.sensor_id, data.timestamp, data.temp, data.vcc, data.hum, data.dhum,
                 data.temp-latest.temp,data.vcc-latest.vcc,
                 data.hum-latest.hum, data.dhum-latest.dhum)
+    fun toSensorData() = SensorData(sensor_id, timestamp, temp.toShort(), vcc.toShort(), hum.toShort(), dhum.toShort(), d_temp.toShort())
 }
 
 // combine
@@ -74,7 +75,22 @@ data class DbSensorWithData(
      )
 }
 
-fun List<DbSensorWithData>.asSensor(): List<Sensor> {
+@Entity
+data class DbSensorWithLatestData(
+    @Embedded
+    val s: DbSensor?,
+    @Embedded
+    val sdata: DbSensorLatestData?
+)
+{
+    fun toSensor() = Sensor(s?.id ?: 0,
+        description = s?.description ?: "",
+        updated = s?.updated ?: 0,
+        data = sdata?.toSensorData() //?: SensorData(0,0,0,0,0,0)
+    )
+}
+
+fun List<DbSensorWithLatestData>.asSensor(): List<Sensor> {
     return map { it.toSensor() }
 }
 

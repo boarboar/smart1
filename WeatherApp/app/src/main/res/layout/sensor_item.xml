@@ -41,6 +41,7 @@
             android:textSize="@dimen/size_large"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:sensorItemColor="@{sensor}"
             tools:text="---.-º"/>
 
         <TextView
@@ -55,6 +56,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBaseline_toBaselineOf="@id/item_location"
+            app:sensorItemColor="@{sensor}"
             tools:text="--:--" />
 
         <TextView
@@ -85,6 +87,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/item_vcc"
+            app:sensorHumColor="@{sensor}"
             tools:text="--%" />
 
         <TextView
@@ -97,6 +100,7 @@
             android:text="@{sensor.dhumString}"
             app:layout_constraintEnd_toStartOf="@id/item_ha"
             app:layout_constraintTop_toTopOf="@id/item_ha"
+            app:sensorDHumColor="@{sensor}"
             tooltext="(!)"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>

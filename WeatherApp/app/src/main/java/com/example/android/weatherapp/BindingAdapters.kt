@@ -118,14 +118,52 @@ fun bindTextStatus(statusTextView: TextView, status: String?) {
     statusTextView.text = status?.toLowerCase()
 }
 
-@BindingAdapter("sensorVccColor")
-fun bindSensorVccColor(vccTextView: TextView, sensor: Sensor?) {
+@BindingAdapter("sensorItemColor")
+fun bindSensorItemColor(textView: TextView, sensor: Sensor?) {
     sensor?.let {
-        vccTextView.setTextColor(
-            if (it.isVccLow)
+        textView.setTextColor(
+            if(it.isObsolete  || it.isOutdated)
+                ctx.resolveColor(android.R.color.darker_gray)
+            else ctx.resolveColorAttr(android.R.attr.textColorPrimary)
+        )
+    }
+}
+
+@BindingAdapter("sensorVccColor")
+fun bindSensorVccColor(textView: TextView, sensor: Sensor?) {
+    sensor?.let {
+        textView.setTextColor(
+            if(it.isObsolete  || it.isOutdated)
+                ctx.resolveColor(android.R.color.darker_gray)
+            else if (it.isVccLow)
                 ctx.resolveColor(android.R.color.holo_orange_light)
             else ctx.resolveColorAttr(android.R.attr.textColorPrimary)
         )
     }
 }
 
+@BindingAdapter("sensorHumColor")
+fun bindSensorHumColor(textView: TextView, sensor: Sensor?) {
+    sensor?.let {
+        textView.setTextColor(
+            if(it.isObsolete  || it.isOutdated)
+                ctx.resolveColor(android.R.color.darker_gray)
+            else if (it.isHumHigh)
+                ctx.resolveColor(android.R.color.holo_red_light)
+            else ctx.resolveColorAttr(android.R.attr.textColorPrimary)
+        )
+    }
+}
+
+@BindingAdapter("sensorDHumColor")
+fun bindSensorDHumColor(textView: TextView, sensor: Sensor?) {
+    sensor?.let {
+        textView.setTextColor(
+            if(it.isObsolete  || it.isOutdated)
+                ctx.resolveColor(android.R.color.darker_gray)
+            else if (it.isLeakage)
+                ctx.resolveColor(android.R.color.holo_red_light)
+            else ctx.resolveColorAttr(android.R.attr.textColorPrimary)
+        )
+    }
+}

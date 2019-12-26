@@ -168,6 +168,18 @@ interface WeatherDao {
     )
     fun getOneSensorWithLatestData(id : Int): LiveData<DbSensorWithLatestData?>
 
+    @Query("UPDATE dbsensor SET updated= :at where id=:id")
+    fun updateSensor(id : Int, at: Long=System.currentTimeMillis())
+
+    @Transaction
+    fun insert_latest_data_and_update_sensor(data : DbSensorLatestData) {
+        insert_latest_data(data)
+        updateSensor(data.sensor_id)
+    }
+
+    @Query("UPDATE dbsensor SET updated=updated-1 where updated < :timeout and updated>0")
+    fun updateOutdated(timeout: Long)
+
     @Query("DELETE FROM dbsensordata where sensor_id=:id")
     fun deleteSensorData(id : Int)
 

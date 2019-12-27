@@ -3,6 +3,7 @@
 # Written by Tushar Dwivedi (2017)
 
 import json
+import time
 from BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
 from optparse import OptionParser
 
@@ -16,13 +17,16 @@ class RequestHandler(BaseHTTPRequestHandler):
         print("self.headers :", self.headers)
         print("<----- Request End -----\n")
         
+        systime = int(round(time.time() * 1000))
+        
         sensors = [
-        {'I': 1, 'T': 205, 'V': 3010, 'H' : 900, 'HD' : 2},
-        {'I': 2, 'T': 215, 'V': 2910, 'H' : 0, 'HD' : 0},
+        {'I': 1, 'T': 205, 'V': 3010, 'H' : 900, 'HD' : 2, 'X' : systime},
+        {'I': 2, 'T': 215, 'V': 2910, 'H' : 0, 'HD' : 0, 'X' : systime},
         ]
 
         self.send_response(200)
-        self.send_header("Set-Cookie", "foo=bar")
+        #self.send_header("Set-Cookie", "foo=bar")
+        #self.send_header('Content-Type', 'application/json')
         self.end_headers()
         self.wfile.write(json.dumps(sensors))
 

@@ -99,11 +99,11 @@ data class SensorData(
 
 data class SensorTransferData(
     @SerializedName("I") val sensor_id: Int,
-    @SerializedName("X") val timestamp: Long,
-    @SerializedName("T") val temp: Short,
-    @SerializedName("V") val vcc: Short,
-    @SerializedName("H") val hum: Short,
-    @SerializedName("DH") val dhum: Short
+    @SerializedName("X") val event_stamp: Long,
+    @SerializedName("T") val temp: Int,
+    @SerializedName("V") val vcc: Int,
+    @SerializedName("H") val hum: Int,
+    @SerializedName("DH") val dhum: Int
 ) {
     val isValid : Boolean
         get() = temp > -500 && temp < 500

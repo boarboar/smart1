@@ -155,8 +155,8 @@ class SensorRepository(appContext: Context) {
                     val latest_update: DbSensorLatestData =
                         latest?.let {
                             //Log.i(tag, "Sensor ${data.sensor_id} prev latest data is ${latest}")
-                            DbSensorLatestData(it, data)
-                        } ?: DbSensorLatestData(data)
+                            DbSensorLatestData(it, sdata)
+                        } ?: DbSensorLatestData(sdata)
                     database.weatherDao.insert_latest_data_and_update_sensor(latest_update) // transaction
                 } else
                     Log.w(tag, "Refresh sensor - invalid data ${sdata}")

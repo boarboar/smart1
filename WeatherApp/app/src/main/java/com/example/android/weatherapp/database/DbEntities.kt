@@ -31,16 +31,16 @@ data class DbSensorData(
 )
 {
     constructor(data: SensorTransferData) :
-            this(0, data.sensor_id, data.timestamp, data.temp.toInt(), data.vcc.toInt(), data.hum.toInt(), data.dhum.toInt())
+            this(0, data.sensor_id, System.currentTimeMillis(), data.temp, data.vcc, data.hum, data.dhum)
     fun toSensorData() = SensorData(sensor_id, timestamp, temp.toShort(), vcc.toShort(), hum.toShort(), dhum.toShort())
 }
-// todo - add validated field
 
 @Entity
 data class DbSensorLatestData(
     @PrimaryKey
     val sensor_id: Int, // should be indexed
     val timestamp: Long,
+    val event_stamp: Long,
     val temp: Int,
     val vcc: Int,
     val hum: Int,
@@ -49,13 +49,14 @@ data class DbSensorLatestData(
     val d_vcc: Int,
     val d_hum: Int,
     val d_dhum: Int
+
 )
 {
-    constructor(data: DbSensorData ) :
-            this(data.sensor_id, data.timestamp, data.temp, data.vcc, data.hum, data.dhum,
+    constructor(data: SensorTransferData ) :
+            this(data.sensor_id, System.currentTimeMillis(), 0, data.temp, data.vcc, data.hum, data.dhum,
                 0,0,0,0)
-    constructor(latest: DbSensorLatestData, data: DbSensorData ) :
-            this(data.sensor_id, data.timestamp, data.temp, data.vcc, data.hum, data.dhum,
+    constructor(latest: DbSensorLatestData, data: SensorTransferData ) :
+            this(data.sensor_id, System.currentTimeMillis(), data.event_stamp, data.temp, data.vcc, data.hum, data.dhum,
                 data.temp-latest.temp,data.vcc-latest.vcc,
                 data.hum-latest.hum, data.dhum-latest.dhum)
     fun toSensorData() = SensorData(sensor_id, timestamp, temp.toShort(), vcc.toShort(), hum.toShort(), dhum.toShort(), d_temp.toShort())

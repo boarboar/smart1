@@ -2,6 +2,7 @@ package com.example.android.weatherapp.domain
 
 import android.os.Parcelable
 import com.example.android.weatherapp.utils.DateUtils
+import com.google.gson.annotations.SerializedName
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
@@ -72,7 +73,6 @@ data class SensorData(
     enum class DHUM_VALS(val value: Int) {
         NOTSET(0), LEAK(1), NORM(2)
     }
-
     val at : String
         get() = if(timestamp>0) DateUtils.convertDateTime(timestamp) else "---"
     val tempString : String
@@ -95,4 +95,16 @@ data class SensorData(
         get () = dhum.toInt()==DHUM_VALS.LEAK.value
     val asString : String
         get() = "$temp $vcc" // for test
+}
+
+data class SensorTransferData(
+    @SerializedName("I") val sensor_id: Int,
+    @SerializedName("X") val timestamp: Long,
+    @SerializedName("T") val temp: Short,
+    @SerializedName("V") val vcc: Short,
+    @SerializedName("H") val hum: Short,
+    @SerializedName("DH") val dhum: Short
+) {
+    val isValid : Boolean
+        get() = temp > -500 && temp < 500
 }

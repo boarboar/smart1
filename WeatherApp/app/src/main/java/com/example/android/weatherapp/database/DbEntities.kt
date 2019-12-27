@@ -6,6 +6,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.example.android.weatherapp.domain.Sensor
 import com.example.android.weatherapp.domain.SensorData
+import com.example.android.weatherapp.domain.SensorTransferData
 
 @Entity
 data class DbSensor(
@@ -29,6 +30,8 @@ data class DbSensorData(
     val dhum: Int
 )
 {
+    constructor(data: SensorTransferData) :
+            this(0, data.sensor_id, data.timestamp, data.temp.toInt(), data.vcc.toInt(), data.hum.toInt(), data.dhum.toInt())
     fun toSensorData() = SensorData(sensor_id, timestamp, temp.toShort(), vcc.toShort(), hum.toShort(), dhum.toShort())
 }
 // todo - add validated field

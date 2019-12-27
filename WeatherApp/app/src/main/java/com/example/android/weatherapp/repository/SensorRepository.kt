@@ -8,6 +8,7 @@ import androidx.lifecycle.Transformations
 import com.example.android.weatherapp.database.*
 import com.example.android.weatherapp.domain.Sensor
 import com.example.android.weatherapp.domain.SensorData
+import com.example.android.weatherapp.domain.SensorTransferData
 import com.example.android.weatherapp.overview.OverviewViewModel
 import com.example.android.weatherapp.work.RefreshDataWorker
 import com.example.android.weatherapp.work.nextInt
@@ -118,26 +119,15 @@ class SensorRepository(appContext: Context) {
         }
 
 
-    suspend fun refreshSensorsData(): Boolean =
+    suspend fun refreshSensorsData(data: List<SensorTransferData>): Boolean =
         withContext(Dispatchers.IO) {
             try {
                 Log.i(tag, "REFRESH RUN")
-                val random = Random()
-                for (sensId in 1..2) {
-                    refreshSensorData(
-                        DbSensorData(
-                            0, sensId, System.currentTimeMillis(),
-                            random.nextInt(-400..400), random.nextInt(2540..4950),
-                            random.nextInt(10..1000), random.nextInt(1..3)
-                        )
-                    )
-                }
-                //val count = database.weatherDao.getSensorDataCount()
-
+                for(d in data)  refreshSensorData(d)
                 // update outdated to refresh UI
                 database.weatherDao.updateOutdated(System.currentTimeMillis()-Sensor.MEAS_OUTDATED_PERIOD)
+                //val count = database.weatherDao.getSensorDataCount()
                 val stat = database.weatherDao.getSensorDataStat()
-
                 Log.i(tag, "${stat.count} total data records in DB from  ${DateUtils.convertDate(stat.from)}  to ${DateUtils.convertDate(stat.to)}")
 
                 // TODO - cleanup old records
@@ -154,24 +144,22 @@ class SensorRepository(appContext: Context) {
             }
         }
 
-    suspend fun refreshSensorData(data : DbSensorData): Boolean =
+    suspend fun refreshSensorData(sdata : SensorTransferData): Boolean =
         withContext(Dispatchers.IO) {
             try {
-                database.weatherDao.insert_data(data)
-                // TODO - validation, do below only if valid
-
-                val latest = database.weatherDao.getSensorLatestData(data.sensor_id)
-                val latest_update : DbSensorLatestData =
-                    latest?.let {
-                        Log.i(tag, "Sensor ${data.sensor_id} prev latest data is ${latest}")
-                        DbSensorLatestData(it, data)
-                    } ?: DbSensorLatestData(data)
-
-//                database.weatherDao.insert_latest_data(latest_update) // insert or update
-//                database.weatherDao.updateSensor(data.sensor_id)
-                database.weatherDao.insert_latest_data_and_update_sensor(latest_update) // transaction
-
-                Log.i(tag, "Refresh sensor ${data.sensor_id}")
+                if(sdata.isValid) {
+                    Log.i(tag, "Refresh sensor ${sdata}")
+                    val data = DbSensorData(sdata)
+                    database.weatherDao.insert_data(data)
+                    val latest = database.weatherDao.getSensorLatestData(data.sensor_id)
+                    val latest_update: DbSensorLatestData =
+                        latest?.let {
+                            //Log.i(tag, "Sensor ${data.sensor_id} prev latest data is ${latest}")
+                            DbSensorLatestData(it, data)
+                        } ?: DbSensorLatestData(data)
+                    database.weatherDao.insert_latest_data_and_update_sensor(latest_update) // transaction
+                } else
+                    Log.w(tag, "Refresh sensor - invalid data ${sdata}")
                 true
             } catch (e: HttpException) {
                 val msg = e.message ?: "Unknown HTTP error"

@@ -148,16 +148,21 @@ class SensorRepository(appContext: Context) {
         withContext(Dispatchers.IO) {
             try {
                 if(sdata.isValid) {
-                    Log.i(tag, "Refresh sensor ${sdata}")
-                    val data = DbSensorData(sdata)
-                    database.weatherDao.insert_data(data)
-                    val latest = database.weatherDao.getSensorLatestData(data.sensor_id)
-                    val latest_update: DbSensorLatestData =
-                        latest?.let {
-                            //Log.i(tag, "Sensor ${data.sensor_id} prev latest data is ${latest}")
-                            DbSensorLatestData(it, sdata)
-                        } ?: DbSensorLatestData(sdata)
-                    database.weatherDao.insert_latest_data_and_update_sensor(latest_update) // transaction
+                    val latest = database.weatherDao.getSensorLatestData(sdata.sensor_id)
+                    if(latest != null && latest.event_stamp == sdata.event_stamp) {
+                        Log.i(tag, "Refresh sensor - old data ${sdata}")
+                    }
+                    else {
+                        Log.i(tag, "Refresh sensor ${sdata}")
+                        val data = DbSensorData(sdata)
+                        database.weatherDao.insert_data(data)
+                        val latest_update: DbSensorLatestData =
+                            latest?.let {
+                                //Log.i(tag, "Sensor ${data.sensor_id} prev latest data is ${latest}")
+                                DbSensorLatestData(it, sdata)
+                            } ?: DbSensorLatestData(sdata)
+                        database.weatherDao.insert_latest_data_and_update_sensor(latest_update) // transaction
+                    }
                 } else
                     Log.w(tag, "Refresh sensor - invalid data ${sdata}")
                 true

@@ -17,6 +17,20 @@ def handle_http(client, client_addr):
     client.close()
     led.value(0)
     gc.collect()
+
+def handle_udp(udp):
+    led.value(1)
+    data,addr = udp.recvfrom(256)
+    print("Recv UDP: %s" % str(data))
+    try :
+        m = ujson.loads(data)
+        print("As meas" % str(m))
+    except ValueError:
+        print('Invalid value!')    
+    except:
+        print('Something else went wrong') 
+    led.value(0)
+    gc.collect()
 	
 def serv(port=80, udpport=9998):
     http = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -30,13 +44,18 @@ def serv(port=80, udpport=9998):
     udp.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     udp.bind(udpaddr)
     print("UDP server started on %s" % str(udpaddr))
-	
+    input = [http,udp]
     while True:
-        r, w, err = select.select((http,), (), (), 1)
+        r, w, err = select.select(input, (), (), 1)
         if r:
             for readable in r:
-                client, client_addr = http.accept()
-                handle_http(client, client_addr)
+                if readable==http:			    
+                    client, client_addr = http.accept()
+                    handle_http(client, client_addr)
+                elif readable==udp:	
+                    handle_udp(udp)                    
+                else:
+                    continue    
 
 print('Main module started')
 print('Connecting to network...')

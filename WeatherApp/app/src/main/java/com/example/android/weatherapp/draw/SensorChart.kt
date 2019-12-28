@@ -13,6 +13,7 @@ import com.example.android.weatherapp.utils.DateUtils.Companion.convertDateDOnly
 import com.example.android.weatherapp.utils.DateUtils.Companion.convertTimeHOnly
 import com.example.android.weatherapp.utils.DateUtils.Companion.localDateTimeToMillis
 import com.example.android.weatherapp.utils.DateUtils.Companion.millsToLocalDateTime
+import com.example.android.weatherapp.utils.resolveColor
 import com.example.android.weatherapp.utils.resolveColorAttr
 import org.threeten.bp.DayOfWeek
 import org.threeten.bp.LocalDateTime
@@ -74,7 +75,8 @@ class DrawView(context: Context, attrs: AttributeSet) : View(context, attrs) {
     private var paintText = Paint()
     private var paintTextSmall = Paint()
     private var paintPath = Paint()
-    private val color_grid = ctx.resolveColorAttr(android.R.attr.colorAccent)
+    //private val color_grid = ctx.resolveColorAttr(android.R.attr.colorAccent) // requires api21
+    private val color_grid = ctx.resolveColor(android.R.color.darker_gray)
     //private val color_grid = ctx.resolveColorAttr(android.R.attr.colorPrimary)
     //private val color_green = ContextCompat.getColor(context, android.R.color.holo_green_light)
     private val color_red = ContextCompat.getColor(context, android.R.color.holo_red_light)

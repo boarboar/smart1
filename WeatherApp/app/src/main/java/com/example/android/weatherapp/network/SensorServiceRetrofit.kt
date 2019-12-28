@@ -10,12 +10,16 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
 object SensorServiceRetrofit {
+
+    //const val BASE_URL = "http://10.0.2.2:8080/"
+    const val BASE_URL = "http://192.168.1.144:80/"
+
     fun obtain(
             readTimeoutInSeconds: Long = 5,
             connectTimeoutInSeconds: Long = 5
     ): Retrofit {
         return Retrofit.Builder()
-                .baseUrl("http://10.0.2.2:8080/")
+                .baseUrl(BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .addCallAdapterFactory(CoroutineCallAdapterFactory())
                 .client(

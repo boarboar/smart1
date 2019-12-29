@@ -1,19 +1,23 @@
 import network
 import time
-import ujson
+import json
 import gc
 import socket,select
 from machine import Pin
 
 def handle_http(client, client_addr):
-    led.value(1)
+
     systime = int(round(time.time() * 1000)) 
     sensors = [
-        {'I': 1, 'T': 205, 'V': 3010, 'H' : 900, 'HD' : 2, 'X' : systime},
-        {'I': 2, 'T': 215, 'V': 2910, 'H' : 0, 'HD' : 0, 'X' : systime},
+        {'I': 1, 'T': 305, 'V': 4010, 'H' : 950, 'HD' : 1, 'X' : systime},
+        {'I': 2, 'T': 315, 'V': 4910, 'H' : 0, 'HD' : 0, 'X' : systime},
         ]
-
-    client.send("HTTP/1.0 200 OK\r\nContent-Type: application/json\r\n\r\n %s" % ujson.dumps(sensors))
+        
+    led.value(1)
+    
+    #client.send("HTTP/1.0 200 OK\r\nContent-Type: application/json\r\n\r\n %s" % json.dumps(sensors))
+    client.send("HTTP/1.0 200 OK\r\nContent-Type: application/json\r\n\r\n ")
+    client.send(json.dumps(sensors))
     client.close()
     led.value(0)
     gc.collect()
@@ -21,10 +25,12 @@ def handle_http(client, client_addr):
 def handle_udp(udp):
     led.value(1)
     data,addr = udp.recvfrom(256)
-    print("Recv UDP: %s" % str(data))
+    sdata = data.decode('utf-8')
+    print("Recv UDP: %s" % sdata)
     try :
-        m = ujson.loads(data)
-        print("As meas" % str(m))
+        m = json.loads(sdata)
+        #print("As meas" % str(m))
+        print("Load ok for sensor %s" % str(m['I']))
     except ValueError:
         print('Invalid value!')    
     except:

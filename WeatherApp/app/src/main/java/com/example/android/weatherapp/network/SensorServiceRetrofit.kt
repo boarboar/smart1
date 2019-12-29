@@ -16,7 +16,7 @@ object SensorServiceRetrofit {
 
     fun obtain(
             readTimeoutInSeconds: Long = 5,
-            connectTimeoutInSeconds: Long = 5
+            connectTimeoutInSeconds: Long = 10
     ): Retrofit {
         return Retrofit.Builder()
                 .baseUrl(BASE_URL)

@@ -4,15 +4,17 @@
     <EditTextPreference
         android:key="sensor_service_url"
         android:defaultValue="10.0.2.2:8080"
-        android:selectAllOnFocus="true"
+        android:summary="URL контроллера"
+        android:title="Sensor API URL"
         android:singleLine="true"
-        android:title="Sensor API URL" />
+        android:selectAllOnFocus="true"
+        />
 
     <EditTextPreference
         android:key="location_code"
         android:defaultValue="193312,Ru"
         android:title="Код города"
-        android:summary="Код города для прогноза"
+        android:summary="Код города для прогноза погоды"
         android:singleLine="true" />
 
 </PreferenceScreen>

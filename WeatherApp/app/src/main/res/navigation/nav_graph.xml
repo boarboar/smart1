@@ -10,6 +10,9 @@
         <action
             android:id="@+id/action_overviewFragment_to_sensorFragment"
             app:destination="@+id/sensorFragment" />
+        <action
+            android:id="@+id/action_overviewFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment" />
     </fragment>
     <fragment
         android:id="@+id/sensorFragment"
@@ -19,5 +22,9 @@
             android:name="selectedSensor"
             app:argType="com.example.android.weatherapp.domain.Sensor" />
     </fragment>
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.example.android.weatherapp.common_ui.SettingsFragment"
+        android:label="SettingsFragment" />
 </navigation>
 

@@ -12,4 +12,5 @@
     <string name="intrv_day">День</string>
     <string name="intrv_week">Неделя</string>
     <string name="intrv_month">Месяц</string>
+    <string name="settings">Настройки</string>
 </resources>

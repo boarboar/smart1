@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <EditTextPreference
+        android:key="sensor_service_url"
+        android:defaultValue="10.0.2.2:8080"
+        android:summary="URL контроллера"
+        android:title="Sensor API URL"
+        android:singleLine="true"
+        android:selectAllOnFocus="true"
+        />
+
+    <EditTextPreference
+        android:key="location_code"
+        android:defaultValue="193312,Ru"
+        android:title="Код города"
+        android:summary="Код города для прогноза погоды"
+        android:singleLine="true" />
+
+</PreferenceScreen>

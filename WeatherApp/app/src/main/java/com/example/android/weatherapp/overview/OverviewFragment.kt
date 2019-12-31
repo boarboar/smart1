@@ -89,6 +89,9 @@ class OverviewFragment : Fragment() {
                 }
                     .show()
             }
+            R.id.settings -> {
+                this.findNavController().navigate(OverviewFragmentDirections.actionOverviewFragmentToSettingsFragment())
+            }
         }
         return true
     }

@@ -4,6 +4,7 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.*
 import androidx.lifecycle.Observer
+import androidx.preference.PreferenceManager
 import com.example.android.weatherapp.R
 import com.example.android.weatherapp.database.*
 import com.example.android.weatherapp.domain.*
@@ -22,15 +23,11 @@ class OverviewViewModel(application: Application) : AndroidViewModel(application
 
     companion object {
         private const val tag = "OverviewViewModel"
-        private val CITYCODE = "193312,Ru"
+        private val DEF_CITYCODE = "193312,Ru"
         private val FORECAST_REFRESH_TIMEOUT_MIN =  15L
     }
 
     private val wservice : WeatherServiceApi by lazy  { WeatherServiceApi.obtain() }
-
-    //private val _test = MutableLiveData<String>()
-    //val test: LiveData<String>
-    //    get() = _test
 
     private var viewModelJob = Job()
     private val coroutineScope = CoroutineScope(viewModelJob + Dispatchers.Main )
@@ -43,10 +40,6 @@ class OverviewViewModel(application: Application) : AndroidViewModel(application
     val status: LiveData<WeatherApiStatus>
         get() = _status
 
-//    private val _db_status = MutableLiveData<DbStatus>()
-//    val db_status: LiveData<DbStatus>
-//        get() = _db_status
-
     private val _weather = MutableLiveData<Weather>()
     val weather: LiveData<Weather>
         get() = _weather
@@ -55,10 +48,6 @@ class OverviewViewModel(application: Application) : AndroidViewModel(application
     val forecastItemList: LiveData<ArrayList<WeatherForecastItem>>
         get() = _forecastList
 
-
-    //lateinit private var _sensorList: LiveData<List<Sensor>>
-    //val sensorList: LiveData<List<Sensor>>
-    //    get() = _sensorList
 
     val sensorList = sensorRepository.sensorList
 
@@ -93,15 +82,19 @@ class OverviewViewModel(application: Application) : AndroidViewModel(application
     }
 
     private fun getWeatherForecast() {
+        val sharedPreferences =
+            PreferenceManager.getDefaultSharedPreferences(getApplication())
+        val citycode = sharedPreferences.getString("location_code", DEF_CITYCODE)
+        Log.w(tag, "Forecast for: $citycode")
         coroutineScope.launch {
-            var getWeatherDeferred = wservice.getWeather(CITYCODE)
-            var getWeatherForecastDeferred = wservice.getWeatherForecast(CITYCODE, cnt=6)
+            var getWeatherDeferred = wservice.getWeather(citycode)
+            var getWeatherForecastDeferred = wservice.getWeatherForecast(citycode, cnt=6)
             try {
                 _status.value = WeatherApiStatus.LOADING
                 _weather.value = getWeatherDeferred.await()
                 val forecastResult = getWeatherForecastDeferred.await()
                 _forecastList.value = forecastResult.forecastList
-                delay(100) // to show spinner
+                //delay(100) // to show spinner
                 _status.value = WeatherApiStatus.DONE
             } catch (e: Exception) {
                 _status.value = WeatherApiStatus.ERROR

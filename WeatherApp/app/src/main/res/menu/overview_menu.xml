@@ -16,5 +16,7 @@
     <item
         android:id="@+id/add_sensor"
         android:title="Add new sensor" />
-
+    <item
+        android:id="@+id/settings"
+        android:title="Настройки" />
 </menu>

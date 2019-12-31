@@ -5,19 +5,11 @@ import gc
 import socket,select
 from machine import Pin
 
-def handle_http(client, client_addr):
-
-    systime = int(round(time.time() * 1000)) 
-    sensors = [
-        {'I': 1, 'T': 305, 'V': 4010, 'H' : 950, 'HD' : 1, 'X' : systime},
-        {'I': 2, 'T': 315, 'V': 4910, 'H' : 0, 'HD' : 0, 'X' : systime},
-        ]
-        
+def handle_http(client, client_addr):    
     led.value(1)
-    
     #client.send("HTTP/1.0 200 OK\r\nContent-Type: application/json\r\n\r\n %s" % json.dumps(sensors))
     client.send("HTTP/1.0 200 OK\r\nContent-Type: application/json\r\n\r\n ")
-    client.send(json.dumps(sensors))
+    client.send(json.dumps(list(sensor_data.values())))
     client.close()
     led.value(0)
     gc.collect()
@@ -27,14 +19,26 @@ def handle_udp(udp):
     data,addr = udp.recvfrom(256)
     sdata = data.decode('utf-8')
     print("Recv UDP: %s" % sdata)
+    
     try :
-        m = json.loads(sdata)
+        sobj = json.loads(sdata)
+        sobj["X"] = int(round(time.time() * 1000))
         #print("As meas" % str(m))
-        print("Load ok for sensor %s" % str(m['I']))
+        #print("Load ok for sensor %s" % str(sobj['I']))
+        id = int(sobj['I'])
+        if id in sensor_data :
+            print("Replace data for %s" % str(id))
+            sensor_data[id] = sobj
+        else :
+            print("New data for %s" % str(id))
+            sensor_data[id] = sobj        
     except ValueError:
         print('Invalid value!')    
-    except:
-        print('Something else went wrong') 
+    except Exception as e:
+        print('Something wrong: %s' % str(e)) 
+        
+    print(json.dumps(sensor_data))
+        
     led.value(0)
     gc.collect()
 	
@@ -82,6 +86,8 @@ print('Connection successful')
 print(sta_if.ifconfig())
 
 gc.collect()
+
+sensor_data = {}
 
 serv()
 

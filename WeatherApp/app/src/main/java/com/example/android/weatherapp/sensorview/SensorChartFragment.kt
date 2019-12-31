@@ -17,7 +17,7 @@ class SensorChartFragment : SensorBaseFragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
-        Log.v(ftag, "[ ON VIEW CREATED ]")
+        //Log.v(ftag, "[ ON VIEW CREATED ]")
 
         val binding = FragmentSensorchartBinding.inflate(inflater)
         binding.setLifecycleOwner(this)

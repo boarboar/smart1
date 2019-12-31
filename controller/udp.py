@@ -10,7 +10,7 @@ def send_tcp():
 
 def send_udp():
     s = socket(AF_INET,SOCK_DGRAM)
-    obj = {'I': 1, 'T': 205, 'V': 3010, 'H' : 900, 'HD' : 2}
+    obj = {'I': 2, 'T': 235, 'V': 3610, 'H' : 777, 'DH' : 2}
     sd = json.dumps(obj)
     s.sendto(sd, ('192.168.1.144',9998))
     s.close()

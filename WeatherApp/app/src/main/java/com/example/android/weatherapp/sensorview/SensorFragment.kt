@@ -32,54 +32,23 @@ class SensorFragment : Fragment() {
         val binding = FragmentSensorBinding.inflate(inflater)
         // Allows Data Binding to Observe LiveData with the lifecycle of this Fragment
         binding.setLifecycleOwner(this)
-        //binding.sensor = Sensor(777, "Something")
-        //val sensorId : Int = SensorFragmentArgs.fromBundle(arguments!!).selectedSensorId
-        //val sensor = getSensorRepository().getOneSensor(sensorId)
-        //binding.sensor = sensor
-
-        //setHasOptionsMenu(true)
-
         binding.viewpager.adapter = SensorPagerAdapter(childFragmentManager, sensor)
-        //binding.viewpager.currentItem = 0
         binding.sensorTabs.setupWithViewPager(binding.viewpager)
 
         (activity as MainActivity).toolbar.setNavigationOnClickListener { activity?.onBackPressed() }
 
-        //(activity as MainActivity).toolbar.setNavigationOnClickListener { fragmentManager?.popBackStack() }
-
-
         return binding.root
     }
-
-    /**
-     * Inflates the overflow menu that contains filtering options.
-     */
-
-//    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-//        inflater.inflate(R.menu.overview_menu, menu)
-//        super.onCreateOptionsMenu(menu, inflater)
-//    }
-//
-//    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-//        when (item.itemId) {
-//            //R.id.action_settings -> startActivity<SettingsActivity>()
-//            R.id.refresh -> viewModel.updateForecast()
-//            R.id.populate_sensors -> viewModel.onPopulate()
-//            R.id.update_sensors -> viewModel.onUpdate()
-//            R.id.delete_sensor_data -> viewModel.onDeleteSensorData()
-//        }
-//        return true
-//    }
 
     override fun onPause() {
         (activity as MainActivity).sensorDescr = null
             super.onPause()
-        Log.v(SensorFragment.tag, "[ ON PAUSE ]")
+        //Log.v(SensorFragment.tag, "[ ON PAUSE ]")
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        Log.v(SensorFragment.tag, "[ ON DESTROY ]")
+        //Log.v(SensorFragment.tag, "[ ON DESTROY ]")
     }
 
 }

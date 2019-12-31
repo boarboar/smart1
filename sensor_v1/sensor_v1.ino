@@ -267,6 +267,7 @@ bool doSendUdp(TempData *pData) {
   
   WiFiUDP udp_snd;
   IPAddress addr;
+  int res = 0;
 
   char bufout[BUF_SZ];
   StaticJsonBuffer<448> jsonBufferOut;
@@ -284,6 +285,7 @@ bool doSendUdp(TempData *pData) {
     Serial.println("bad addr");
     return false;
   }
+ 
   if(!udp_snd.beginPacket(addr, CfgDrv::Cfg.srv_port)) {
     Serial.println("UDP begin packet failed");
     return false;
@@ -292,7 +294,7 @@ bool doSendUdp(TempData *pData) {
     Serial.println("UDP write packet failed");
     return false;
   }
-  int res = udp_snd.endPacket();
+  res = udp_snd.endPacket();
 
   if(res) {
     Serial.print("UDP Sent in "); 
@@ -304,9 +306,13 @@ bool doSendUdp(TempData *pData) {
   Serial.print(addr);
   Serial.print(":");
   Serial.println(CfgDrv::Cfg.srv_port);
- 
-  delay(50);
-   
+
+  yield();
+  delay(200);
+  yield();
+  delay(200);
+  yield();
+
   return res;         
 }
 
@@ -320,33 +326,7 @@ void blink(uint16_t dly, uint16_t n)
   }
 }
 
-/*
-void doSensorInit(void)
+static void udp_sent_callback(void *arg) 
 {
-  for(int i=0; i<CfgDrv::Cfg.MAX_SENS; i++)
-    if(CfgDrv::Cfg.sensors_inst[i]) CfgDrv::Cfg.sensors_inst[i]->init();
+ Serial.println("UDP sent CB");
 }
-
-void doSensorSetup(void)
-{
-  for(int i=0; i<CfgDrv::Cfg.MAX_SENS; i++)
-    if(CfgDrv::Cfg.sensors_inst[i]) CfgDrv::Cfg.sensors_inst[i]->cfg();
-}
-
-int16_t doSensorMeasure()
-{
-  int16_t rc=0, rci;
-  for(int i=0; i<CfgDrv::Cfg.MAX_SENS; i++)
-    if(CfgDrv::Cfg.sensors_inst[i]) {
-      rci=CfgDrv::Cfg.sensors_inst[i]->measure();
-      if(rci) rc=rci;
-    }
-  return rc;  
-}
-
-void doSensorJson(JsonObject &json)
-{
-  for(int i=0; i<CfgDrv::Cfg.MAX_SENS; i++)
-    if(CfgDrv::Cfg.sensors_inst[i]) CfgDrv::Cfg.sensors_inst[i]->toJson(json);
-}
-*/

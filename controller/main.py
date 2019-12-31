@@ -15,6 +15,7 @@ def handle_http(client, client_addr):
     gc.collect()
 
 def handle_udp(udp):
+    global mc
     led.value(1)
     data,addr = udp.recvfrom(256)
     sdata = data.decode('utf-8')
@@ -31,13 +32,16 @@ def handle_udp(udp):
             sensor_data[id] = sobj
         else :
             print("New data for %s" % str(id))
-            sensor_data[id] = sobj        
+            sensor_data[id] = sobj    
+  
+        mc = mc + 1    
+        print(json.dumps(sensor_data))
+        print("avg duration between msgs: %s s" % str(int( round((time.time()-start_time)/mc) )))
+    
     except ValueError:
         print('Invalid value!')    
     except Exception as e:
         print('Something wrong: %s' % str(e)) 
-        
-    print(json.dumps(sensor_data))
         
     led.value(0)
     gc.collect()
@@ -88,6 +92,10 @@ print(sta_if.ifconfig())
 gc.collect()
 
 sensor_data = {}
+
+start_time = time.time()
+mc = 0   
+        
 
 serv()
 

@@ -168,7 +168,7 @@ int16_t CfgDrv::setup()
   srv_port = readInt("Server port", srv_port, true); 
   id = readInt("Sensor ID", id, true);
   sleep_min = readInt("Sleep (min)", sleep_min, true);
-  conn_type = readInt("Conn type (0-tcp, 1-udp)", sleep_min, false);
+  conn_type = readInt("Conn type (0-tcp, 1-udp)", conn_type, false);
   Serial.print(F("Sensors setup, "));
   Serial.println(sthelp);
   for(int i=0; i<MAX_SENS; i++) {     

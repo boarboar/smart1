@@ -51,9 +51,9 @@ def handle_tcp(client, client_addr):
     try :
         data = client.recv(1024)
         if data:
-            #sdata = data.decode('utf-8')
-            print("Recv TCP: %s" % data)
-            handle_msg(data)
+            sdata = data.decode('utf-8')
+            print("Recv TCP: %s" % sdata)
+            handle_msg(sdata)
     except Exception as e:
         print('TCP handler error: %s' % str(e)) 
     led.value(0)

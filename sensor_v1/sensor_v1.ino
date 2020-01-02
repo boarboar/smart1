@@ -149,8 +149,14 @@ void setup(void)
   if(doWaitForConnect()) {
     ip_digit = WiFi.localIP()[3];
     delay(50);
+    yield();
     for(int i=0; i<TRIES_TO_SEND; i++) {
       bool sendRes = CfgDrv::Cfg.conn_type == CfgDrv::CONN_TCP ? doSend(&tData) : doSendUdp(&tData);
+      if(sendRes) rtcData.data[1]=0;
+      else rtcData.data[1]++;
+      delay(50);
+      yield();
+      //delay(50);
       if(!sendRes) {
         Serial.println(F("Failed to send"));
         blink(100, 2);
@@ -228,7 +234,7 @@ bool doWaitForConnect()
 
 bool doSend(TempData *pData) {
   WiFiClient client;
-  client.setTimeout(3000); //3s
+  client.setTimeout(5000); //5s
   if (!client.connect(CfgDrv::Cfg.srv_addr, CfgDrv::Cfg.srv_port)) {
       Serial.println("connection failed");
       return false;
@@ -246,6 +252,7 @@ bool doSend(TempData *pData) {
   rootOut["I"] = pData->id;
   rootOut["V"] = pData->vcc;
   rootOut["Y"] = pData->magic;
+  rootOut["F"] = rtcData.data[1];
   
   CfgDrv::Cfg.sensors_tojson(rootOut);
   
@@ -259,6 +266,7 @@ bool doSend(TempData *pData) {
   Serial.print(millis() - timeout);
   Serial.println("ms"); 
   delay(50);
+  yield();
   client.stop(); 
   return true;         
 }
@@ -310,8 +318,8 @@ bool doSendUdp(TempData *pData) {
   yield();
   delay(200);
   yield();
-  delay(200);
-  yield();
+  //delay(200);
+  //yield();
 
   return res;         
 }

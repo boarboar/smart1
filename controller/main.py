@@ -6,6 +6,12 @@ import socket,select
 import machine
 from machine import Pin
 
+html = """<html><head><title>ESP32 Web Server</title>
+<body>
+{0} messages
+</body></html>
+"""
+
 def handle_msg(sdata):
     global mc
     try :
@@ -15,15 +21,15 @@ def handle_msg(sdata):
         #print("Load ok for sensor %s" % str(sobj['I']))
         id = int(sobj['I'])
         t = int(sobj['T'])
-        if t < 1000 and t > -1000 :
-            if id in sensor_data :
+        if id in sensor_data :
+            if t < 1000 and t > -1000 :
                 print("Replace data for %s" % str(id))
                 sensor_data[id] = sobj
             else :
-                print("New data for %s" % str(id))
-                sensor_data[id] = sobj    
+                print("Invalid data ignored for %s" % str(id))
         else :
-            print("Invalid data for %s" % str(id))
+            print("New data for %s" % str(id))
+            sensor_data[id] = sobj   
             
         mc = mc + 1    
         #print(json.dumps(sensor_data))
@@ -37,9 +43,16 @@ def handle_msg(sdata):
 def handle_http(client, client_addr):    
     led.value(1)
     try :
-        #client.send("HTTP/1.0 200 OK\r\nContent-Type: application/json\r\n\r\n %s" % json.dumps(sensors))
-        client.send("HTTP/1.0 200 OK\r\nContent-Type: application/json\r\n\r\n ")
-        client.send(json.dumps(list(sensor_data.values())))
+        data = client.recv(4096)
+        if data:
+            sdata = data.decode('utf-8')
+            print("Recv HTTP: %s" % sdata)
+            if sdata.find('/status') != -1 :
+                client.send("HTTP/1.0 200 OK\r\nContent-Type: text/html\r\nConnection: close\r\n\r\n ")
+                client.sendall(html.format(str(mc)))
+            else :    
+                client.send("HTTP/1.0 200 OK\r\nContent-Type: application/json\r\nConnection: close\r\n\r\n ")
+                client.send(json.dumps(list(sensor_data.values())))
         client.close()
     except Exception as e:
         print('HTTP handler error: %s' % str(e)) 

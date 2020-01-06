@@ -6,12 +6,49 @@ import socket,select
 import machine
 from machine import Pin
 
-html = """<html><head><title>ESP32 Web Server</title>
+html_head = """<html><head><title>ESP32 Web Server</title>
 <body>
-{0} messages
+{0} message(s), avg rate {1} s
+<br>
+<br>
+<table border="1">
+<tr><th>ID</th><th>Timeout(s)</th></tr>
+"""
+html_row = "<tr><td>{0}</td><td>{1}</td></tr>"
+html_tail = """
+</table>
+<br>
+<br>
+Processed in {0} second(s)
 </body></html>
 """
 
+def handle_http(client, client_addr):    
+    led.value(1)
+    try :
+        now = time.time()
+        data = client.recv(4096)
+        if data:
+            sdata = data.decode('utf-8')
+            print("Recv HTTP: %s" % sdata)
+            if sdata.find('/status') != -1 :
+                client.send("HTTP/1.0 200 OK\r\nContent-Type: text/html\r\nConnection: close\r\n\r\n ")
+                if mc !=0 :
+                    client.send(html_head.format(str(mc), str(int( round((time.time()-start_time)/mc) )) ))
+                else :
+                    client.send(html_head.format(str(mc), "-"))    
+                for s in list(sensor_data.values()) :
+                    client.send(html_row.format(str(s['I']), str(int(round((now*1000-s['X'])/1000)))  ))
+                client.send(html_tail.format( str(int(round(time.time()-now))) ))
+            else :    
+                client.send("HTTP/1.0 200 OK\r\nContent-Type: application/json\r\nConnection: close\r\n\r\n ")
+                client.send(json.dumps(list(sensor_data.values())))
+        client.close()
+    except Exception as e:
+        print('HTTP handler error: %s' % str(e)) 
+    led.value(0)
+    gc.collect()
+    
 def handle_msg(sdata):
     global mc
     try :
@@ -33,31 +70,12 @@ def handle_msg(sdata):
             
         mc = mc + 1    
         #print(json.dumps(sensor_data))
-        print("avg duration between msgs: %s s" % str(int( round((time.time()-start_time)/mc) )))
+        #print("avg duration between msgs: %s s" % str(int( round((time.time()-start_time)/mc) )) )
     
     except ValueError:
         print('Invalid value!')    
     except Exception as e:
         print('Msg handler error: %s' % str(e)) 
-
-def handle_http(client, client_addr):    
-    led.value(1)
-    try :
-        data = client.recv(4096)
-        if data:
-            sdata = data.decode('utf-8')
-            print("Recv HTTP: %s" % sdata)
-            if sdata.find('/status') != -1 :
-                client.send("HTTP/1.0 200 OK\r\nContent-Type: text/html\r\nConnection: close\r\n\r\n ")
-                client.sendall(html.format(str(mc)))
-            else :    
-                client.send("HTTP/1.0 200 OK\r\nContent-Type: application/json\r\nConnection: close\r\n\r\n ")
-                client.send(json.dumps(list(sensor_data.values())))
-        client.close()
-    except Exception as e:
-        print('HTTP handler error: %s' % str(e)) 
-    led.value(0)
-    gc.collect()
     
 def handle_tcp(client, client_addr):    
     led.value(1)

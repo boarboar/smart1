@@ -25,7 +25,7 @@ class SensorFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
-        Log.v(SensorFragment.tag, "[ ON CREATE ]")
+        //Log.v(SensorFragment.tag, "[ ON CREATE ]")
         val sensor = SensorFragmentArgs.fromBundle(arguments!!).selectedSensor
         (activity as MainActivity).sensorDescr = sensor.description
 

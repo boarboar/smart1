@@ -104,12 +104,13 @@ class SensorRepository(appContext: Context) {
 
 
     fun getSensorData(id : Int) : LiveData<List<SensorData>> =
-        if (::_sensorDataList.isInitialized && _sensorDataId==id)
+        if (::_sensorDataList.isInitialized && _sensorDataId == id)
             _sensorDataList
         else try {
             Log.i(tag, "Loading sensor data ${id}")
             _sensorDataList =Transformations.map(database.weatherDao.getSensorData(id)) {
                 it.asSensorData() }
+            _sensorDataId = id
             _sensorDataList
         } catch (t: Throwable) {
             val msg = t.message ?: "Unknown DB error"

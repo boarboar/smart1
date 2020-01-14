@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
+import androidx.preference.PreferenceManager
 import com.example.android.weatherapp.database.*
 import com.example.android.weatherapp.domain.Sensor
 import com.example.android.weatherapp.domain.SensorData
@@ -18,12 +19,13 @@ import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 import java.util.*
 
-class SensorRepository(appContext: Context) {
+class SensorRepository(val appContext: Context) {
 
     private val database = com.example.android.weatherapp.database.getDatabase(appContext)
 
     companion object {
         const val tag = "SensorRepository"
+        const val DEFAULT_DATA_RETENTION = 31
     }
 
     lateinit private var _currentSensor: LiveData<Sensor>
@@ -131,7 +133,13 @@ class SensorRepository(appContext: Context) {
                 val stat = database.weatherDao.getSensorDataStat()
                 Log.i(tag, "${stat.count} total data records in DB from  ${DateUtils.convertDate(stat.from)}  to ${DateUtils.convertDate(stat.to)}")
 
-                // TODO - cleanup old records
+                // cleanup old records
+                val sharedPreferences =
+                    PreferenceManager.getDefaultSharedPreferences(appContext)
+                val retention_days = sharedPreferences.getString("data_retention_days", DEFAULT_DATA_RETENTION.toString()).toInt()
+                Log.w(tag, "Clear measurements older than $retention_days days")
+                val delcount = database.weatherDao.clearSensorData(System.currentTimeMillis() - 24L * 3600L * 1000L * retention_days)
+                Log.w(tag, "Cleared $delcount records")
 
                 true
             } catch (e: HttpException) {

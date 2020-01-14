@@ -198,6 +198,9 @@ interface WeatherDao {
     @Query("select * from dbsensorlatestdata where sensor_id=:id")
     fun getSensorLatestData(id: Int): DbSensorLatestData?
 
+    @Query("delete from dbsensordata where timestamp < :retention")
+    fun clearSensorData(retention : Long): Int
+
 }
 
 @Database(entities = [DbSensor::class, DbSensorData::class, DbSensorLatestData::class], version = 1)

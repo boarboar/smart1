@@ -50,7 +50,7 @@ void setup(void)
 
   pinMode(POWER_PIN, OUTPUT);
 
-  blink(20, 1);
+  blink(10, 1);
 
   Serial.begin(115200);
   Serial.println();
@@ -148,14 +148,14 @@ void setup(void)
 
   if(doWaitForConnect()) {
     ip_digit = WiFi.localIP()[3];
-    delay(50);
+    delay(25);
     yield();
     for(int i=0; i<TRIES_TO_SEND; i++) {
       bool sendRes = CfgDrv::Cfg.conn_type == CfgDrv::CONN_TCP ? doSend(&tData) : doSendUdp(&tData);
       if(sendRes) rtcData.data[1]=0;
       else rtcData.data[1]++;
-      delay(50);
-      yield();
+      delay(25);
+      //yield();
       //delay(50);
       if(!sendRes) {
         Serial.println(F("Failed to send"));
@@ -182,7 +182,7 @@ void setup(void)
   Serial.print(CfgDrv::Cfg.sleep_min);
   Serial.print(F(" min"));
 
-  blink(20, 1);
+  blink(10, 1);
 
   ESP.deepSleep(60000000L*CfgDrv::Cfg.sleep_min);
 

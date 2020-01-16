@@ -22,6 +22,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         sensors = [
         {'I': 1, 'T': 205, 'V': 3010, 'H' : 900, 'HD' : 2, 'X' : systime},
         {'I': 2, 'T': 215, 'V': 2910, 'H' : 0, 'HD' : 0, 'X' : systime},
+	{'I': 5, 'T': -215, 'V': 2910, 'H' : 0, 'HD' : 0, 'X' : systime},
         ]
 
         self.send_response(200)

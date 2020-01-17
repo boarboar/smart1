@@ -5,6 +5,7 @@ import gc
 import socket,select
 import machine
 from machine import Pin
+from machine import WDT
 
 html_head = """<html><head><title>ESP32 Web Server</title>
 <body>
@@ -42,7 +43,8 @@ def handle_http(client, client_addr):
                 client.send(html_tail.format( str(int(round(time.time()-now))) ))
             else :    
                 client.send("HTTP/1.0 200 OK\r\nContent-Type: application/json\r\nConnection: close\r\n\r\n ")
-                client.send(json.dumps(list(sensor_data.values())))
+                #client.send(json.dumps(list(sensor_data.values())))
+                client.send(json.dumps(list(filter(lambda s: now*1000-s['X'] < 3600000, sensor_data.values()))))
         client.close()
     except Exception as e:
         print('HTTP handler error: %s' % str(e)) 
@@ -69,8 +71,6 @@ def handle_msg(sdata):
             sensor_data[id] = sobj   
             
         mc = mc + 1    
-        #print(json.dumps(sensor_data))
-        #print("avg duration between msgs: %s s" % str(int( round((time.time()-start_time)/mc) )) )
     
     except ValueError:
         print('Invalid value!')    
@@ -126,6 +126,7 @@ def serv(port=80, tcpport=9999, udpport=9998):
         print("UDP server started on %s" % str(udpaddr))
         input = [http, tcp, udp]
         while True:
+            #wdt.feed()
             r, w, err = select.select(input, (), (), 1)
             if r:
                 for readable in r:
@@ -141,7 +142,7 @@ def serv(port=80, tcpport=9999, udpport=9998):
                         continue    
     except Exception as e:
         print('Service error: %s' % str(e))
-        print('Restsrting...')
+        print('Restarting...')
         machine.reset()
         
         
@@ -170,6 +171,7 @@ sensor_data = {}
 start_time = time.time()
 mc = 0   
         
+#wdt = WDT(timeout=60000)  # enable it with a timeout of 1 min
 
 serv()
 

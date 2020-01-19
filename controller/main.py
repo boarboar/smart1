@@ -3,7 +3,7 @@ import time
 import json
 import gc
 import socket,select
-import machine
+#import machine
 from machine import Pin
 from machine import WDT
 
@@ -19,10 +19,25 @@ html_row = "<tr><td>{0}</td><td>{1}</td></tr>"
 html_tail = """
 </table>
 <br>
+System uptime: {0}
 <br>
-Processed in {0} second(s)
+Module uptime: {1}
+<br>
+Free memory: {2}
+<br>
+Processed in {3} second(s)
 </body></html>
 """
+
+def format_time(t):
+    t = round(t)
+    s = t % 60
+    t = t // 60 #minutes
+    m = t % 60
+    t = t // 60 #hours
+    h = t % 24
+    d = t // 34 #days
+    return "{0} days {1} hours {2} minutes {3} seconds".format(d, h, m, s)
 
 def handle_http(client, client_addr):    
     led.value(1)
@@ -40,7 +55,7 @@ def handle_http(client, client_addr):
                     client.send(html_head.format(str(mc), "-"))    
                 for s in list(sensor_data.values()) :
                     client.send(html_row.format(str(s['I']), str(int(round((now*1000-s['X'])/1000)))  ))
-                client.send(html_tail.format( str(int(round(time.time()-now))) ))
+                client.send(html_tail.format( format_time(now),  format_time(now-start_time), gc.mem_free(), str(int(round(time.time()-now))) ))
             else :    
                 client.send("HTTP/1.0 200 OK\r\nContent-Type: application/json\r\nConnection: close\r\n\r\n ")
                 #client.send(json.dumps(list(sensor_data.values())))

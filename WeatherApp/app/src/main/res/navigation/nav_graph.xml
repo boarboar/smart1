@@ -13,6 +13,9 @@
         <action
             android:id="@+id/action_overviewFragment_to_settingsFragment"
             app:destination="@id/settingsFragment" />
+        <action
+            android:id="@+id/action_overviewFragment_to_forecastFragment"
+            app:destination="@id/forecastFragment" />
     </fragment>
     <fragment
         android:id="@+id/sensorFragment"
@@ -26,5 +29,9 @@
         android:id="@+id/settingsFragment"
         android:name="com.example.android.weatherapp.common_ui.SettingsFragment"
         android:label="SettingsFragment" />
+    <fragment
+        android:id="@+id/forecastFragment"
+        android:name="com.example.android.weatherapp.forecastview.ForecastFragment"
+        android:label="ForecastFragment" />
 </navigation>
 

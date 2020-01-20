@@ -3,21 +3,15 @@ package com.example.android.weatherapp.overview
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.*
-import androidx.lifecycle.Observer
 import androidx.preference.PreferenceManager
-import com.example.android.weatherapp.R
-import com.example.android.weatherapp.database.*
 import com.example.android.weatherapp.domain.*
+import com.example.android.weatherapp.network.WeatherApiStatus
 import com.example.android.weatherapp.network.WeatherServiceApi
-import com.example.android.weatherapp.repository.SensorRepository
 import com.example.android.weatherapp.repository.getSensorRepository
 import kotlinx.coroutines.*
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.concurrent.schedule
-
-enum class WeatherApiStatus { LOADING, ERROR, DONE }
-//enum class DbStatus { LOADING, ERROR, DONE, START }
 
 class OverviewViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -31,7 +25,6 @@ class OverviewViewModel(application: Application) : AndroidViewModel(application
 
     private var viewModelJob = Job()
     private val coroutineScope = CoroutineScope(viewModelJob + Dispatchers.Main )
-    //private val database = getDatabase(application)
     private val sensorRepository = getSensorRepository(application)
 
     // all data should be moved to Repository (todo)
@@ -40,14 +33,15 @@ class OverviewViewModel(application: Application) : AndroidViewModel(application
     val status: LiveData<WeatherApiStatus>
         get() = _status
 
-    private val _weather = MutableLiveData<Weather>()
+    //private val _weather = MutableLiveData<Weather>()
     val weather: LiveData<Weather>
-        get() = _weather
+        //get() = _weather
+        get() = sensorRepository.weather
 
-    private val _forecastList = MutableLiveData<ArrayList<WeatherForecastItem>>()
+    //private val _forecastList = MutableLiveData<ArrayList<WeatherForecastItem>>()
     val forecastItemList: LiveData<ArrayList<WeatherForecastItem>>
-        get() = _forecastList
-
+        //get() = _forecastList
+        get() = sensorRepository.forecastList
 
     val sensorList = sensorRepository.sensorList
 
@@ -88,12 +82,14 @@ class OverviewViewModel(application: Application) : AndroidViewModel(application
         Log.w(tag, "Forecast for: $citycode")
         coroutineScope.launch {
             var getWeatherDeferred = wservice.getWeather(citycode)
-            var getWeatherForecastDeferred = wservice.getWeatherForecast(citycode, cnt=6)
+            var getWeatherForecastDeferred = wservice.getWeatherForecast(citycode, cnt=12)
             try {
                 _status.value = WeatherApiStatus.LOADING
-                _weather.value = getWeatherDeferred.await()
-                val forecastResult = getWeatherForecastDeferred.await()
-                _forecastList.value = forecastResult.forecastList
+                //_weather.value = getWeatherDeferred.await()
+                sensorRepository.weather.value = getWeatherDeferred.await()
+                //val forecastResult = getWeatherForecastDeferred.await()
+                //_forecastList.value = forecastResult.forecastList
+                sensorRepository.forecastList.value = getWeatherForecastDeferred.await().forecastList
                 //delay(100) // to show spinner
                 _status.value = WeatherApiStatus.DONE
             } catch (e: Exception) {

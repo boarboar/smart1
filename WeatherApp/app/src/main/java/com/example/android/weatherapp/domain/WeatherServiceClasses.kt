@@ -6,6 +6,7 @@ import com.google.gson.annotations.SerializedName
 
 data class WeatherMain(
         @SerializedName("temp") val temp_f: Float,
+        @SerializedName("feels_like") val temp_feels_like_f: Float,
         @SerializedName("humidity") val humidity_f: Float,
         @SerializedName("pressure") val pressure_f: Float
 ) {
@@ -15,9 +16,13 @@ data class WeatherMain(
         get() = (humidity_f).toInt()
     val temp : Float
         get() = (temp_f*10).toInt()/10.0F
+    val temp_feels_like : Float
+        get() = (temp_feels_like_f*10).toInt()/10.0F
 
     val tempString : String
         get() = temp.toString()+"º"
+    val tempAndFeelsLikeString : String
+        get() = "${temp}º (${temp_feels_like}º)"
     val humString : String
         get() = humidity.toString()+"%"
     val presString : String
@@ -74,6 +79,8 @@ data class Weather(
 {
     val temp : String
         get() = main.tempString
+    val tempAndFeelsLike : String
+        get() = main.tempAndFeelsLikeString
     val humidity : String
         get() = main.humString
     val pressure : String

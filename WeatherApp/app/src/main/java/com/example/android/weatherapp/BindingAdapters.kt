@@ -17,13 +17,10 @@
 
 package com.example.android.weatherapp
 
-import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.core.net.toUri
 import androidx.databinding.BindingAdapter
-import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.RecyclerView
 import com.example.android.weatherapp.WeatherApplication.Companion.ctx
 import com.example.android.weatherapp.domain.Sensor
@@ -31,10 +28,9 @@ import com.example.android.weatherapp.domain.SensorData
 import com.example.android.weatherapp.domain.WeatherForecastItem
 import com.example.android.weatherapp.domain.WeatherWeather
 import com.example.android.weatherapp.draw.DrawView
+import com.example.android.weatherapp.network.WeatherApiStatus
 import com.example.android.weatherapp.overview.ForecastAdapter
 import com.example.android.weatherapp.overview.SensorAdapter
-
-import com.example.android.weatherapp.overview.WeatherApiStatus
 import com.example.android.weatherapp.sensorview.SensorDataAdapter
 import com.example.android.weatherapp.utils.resolveColor
 import com.example.android.weatherapp.utils.resolveColorAttr

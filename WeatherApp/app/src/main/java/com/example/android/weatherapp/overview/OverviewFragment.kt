@@ -38,8 +38,16 @@ class OverviewFragment : Fragment() {
         // Giving the binding access to the OverviewViewModel
         binding.viewModel = viewModel
 
-        binding.weatherForecastList.adapter = ForecastAdapter()
+        binding.weatherForecastList.adapter = ForecastAdapter(6,
+            ForecastAdapter.OnClickListener {
+                this.findNavController().navigate(OverviewFragmentDirections.actionOverviewFragmentToForecastFragment())
+            })
+
         //binding.weatherForecastList.setHasFixedSize(true)
+
+//        binding.forecastFrame.setOnClickListener {
+//            Toast.makeText(activity, "Forecast", Toast.LENGTH_SHORT).show()
+//        }
 
         binding.sensorsGrid.adapter = SensorAdapter(SensorAdapter.OnClickListener {
             viewModel.displaySensorDetails(it)
@@ -48,7 +56,6 @@ class OverviewFragment : Fragment() {
         viewModel.navigateToSelectedSensor.observe(this, Observer {
             if ( null != it ) {
                 this.findNavController().navigate(OverviewFragmentDirections.actionOverviewFragmentToSensorFragment(it))
-                //this.findNavController().navigate(OverviewFragmentDirections.actionOverviewFragmentToSensorFragment(it.id))
                 viewModel.displaySensorDetailsComplete()
             }
         })
@@ -71,10 +78,12 @@ class OverviewFragment : Fragment() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
+            /*
             R.id.refresh -> viewModel.updateForecast()
             R.id.populate_sensors -> viewModel.onPopulate()
             R.id.update_sensors -> viewModel.onUpdate()
             R.id.delete_sensor_data -> viewModel.onDeleteSensorData()
+             */
             R.id.add_sensor -> {
                 val sensDlg = SensorPropDialog(activity as Context, viewModel.getNewSensor())
                 sensDlg.create().onCancel{

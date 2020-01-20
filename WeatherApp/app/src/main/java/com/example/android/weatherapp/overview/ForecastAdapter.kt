@@ -8,11 +8,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.android.weatherapp.databinding.ForecastItemBinding
 import com.example.android.weatherapp.domain.WeatherForecastItem
 
-class ForecastAdapter(/*val onClickListener: OnClickListener*/) : ListAdapter<WeatherForecastItem, ForecastAdapter.ForecastViewHolder>(DiffCallback) {
+class ForecastAdapter(val limit : Int = 6, val onClickListener: OnClickListener) : ListAdapter<WeatherForecastItem, ForecastAdapter.ForecastViewHolder>(DiffCallback) {
 
     companion object DiffCallback : DiffUtil.ItemCallback<WeatherForecastItem>() {
         override fun areItemsTheSame(oldItem: WeatherForecastItem, newItem: WeatherForecastItem): Boolean {
-            //return oldItem === newItem
             return oldItem.dt === newItem.dt
         }
 
@@ -21,18 +20,22 @@ class ForecastAdapter(/*val onClickListener: OnClickListener*/) : ListAdapter<We
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ForecastAdapter.ForecastViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ForecastViewHolder {
         return ForecastViewHolder(ForecastItemBinding.inflate(LayoutInflater.from(parent.context)))
     }
 
     override fun onBindViewHolder(holder: ForecastAdapter.ForecastViewHolder, position: Int) {
         val forecast = getItem(position)
         holder.bind(forecast)
-        /*
+
         holder.itemView.setOnClickListener {
-            onClickListener.onClick(marsProperty)
+            onClickListener.onClick()
         }
-        */
+    }
+
+    override fun getItemCount(): Int {
+        val count = super.getItemCount()
+        return if (count > limit) limit  else count
     }
 
     class ForecastViewHolder(private var binding: ForecastItemBinding):
@@ -42,9 +45,8 @@ class ForecastAdapter(/*val onClickListener: OnClickListener*/) : ListAdapter<We
             binding.executePendingBindings()
         }
     }
-/*
-    class OnClickListener(val clickListener: (marsProperty: MarsProperty) -> Unit) {
-        fun onClick(marsProperty:MarsProperty) = clickListener(marsProperty)
+
+    class OnClickListener(val clickListener: () -> Unit) {
+        fun onClick() = clickListener()
     }
-*/
 }

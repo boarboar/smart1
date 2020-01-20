@@ -32,3 +32,5 @@ interface WeatherServiceApi {
             @Query("cnt") cnt: Int = 8
     ): Deferred<WeatherForecast>
 }
+
+enum class WeatherApiStatus { LOADING, ERROR, DONE }

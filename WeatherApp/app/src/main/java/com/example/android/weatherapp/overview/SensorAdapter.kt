@@ -18,7 +18,6 @@ class SensorAdapter(val onClickListener: OnClickListener) : ListAdapter<Sensor, 
 
         override fun areContentsTheSame(oldItem: Sensor, newItem: Sensor): Boolean {
             return oldItem == newItem
-            //return oldItem.equalData(newItem)
         }
     }
 
@@ -26,7 +25,7 @@ class SensorAdapter(val onClickListener: OnClickListener) : ListAdapter<Sensor, 
         return SensorViewHolder(SensorItemBinding.inflate(LayoutInflater.from(parent.context)))
     }
 
-    override fun onBindViewHolder(holder: SensorAdapter.SensorViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: SensorViewHolder, position: Int) {
         val sensor = getItem(position)
         holder.bind(sensor)
 

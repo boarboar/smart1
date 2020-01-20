@@ -7,9 +7,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.preference.PreferenceManager
 import com.example.android.weatherapp.database.*
-import com.example.android.weatherapp.domain.Sensor
-import com.example.android.weatherapp.domain.SensorData
-import com.example.android.weatherapp.domain.SensorTransferData
+import com.example.android.weatherapp.domain.*
 import com.example.android.weatherapp.overview.OverviewViewModel
 import com.example.android.weatherapp.work.RefreshDataWorker
 import com.example.android.weatherapp.work.nextInt
@@ -30,14 +28,14 @@ class SensorRepository(val appContext: Context) {
 
     lateinit private var _currentSensor: LiveData<Sensor>
 
+    val weather = MutableLiveData<Weather>()
+    var forecastList = MutableLiveData<ArrayList<WeatherForecastItem>>()
+
     val currentSensor: LiveData<Sensor>
         get() = _currentSensor
 
     lateinit private var _sensorDataList: LiveData<List<SensorData>>
     private var _sensorDataId = 0
-
-//    val currentSensorDataList: LiveData<List<SensorData>>
-//        get() = _currentSensorDataList
 
     var sensorList: LiveData<List<Sensor>> =
         try {
@@ -199,13 +197,6 @@ class SensorRepository(val appContext: Context) {
     }
 
     suspend fun populateDb() {
-
-        /*
-        _sensorList.value = arrayListOf(
-            Sensor(1, "Window"),
-            Sensor(2, "Balcony"),
-            Sensor(3, "Bathroom"))
-*/
 
         withContext(Dispatchers.IO) {
             try {

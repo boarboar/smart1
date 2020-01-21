@@ -64,7 +64,7 @@ def handle_http(client, client_addr):
     except Exception as e:
         print('HTTP handler error: %s' % str(e)) 
     led.value(0)
-    gc.collect()
+    #gc.collect()
     
 def handle_msg(sdata):
     global mc
@@ -103,7 +103,7 @@ def handle_tcp(client, client_addr):
     except Exception as e:
         print('TCP handler error: %s' % str(e)) 
     led.value(0)
-    gc.collect()
+    #gc.collect()
 
 def handle_udp(udp):
     led.value(1)
@@ -115,7 +115,7 @@ def handle_udp(udp):
     except Exception as e:
         print('UDP handler error: %s' % str(e))         
     led.value(0)
-    gc.collect()
+    #gc.collect()
 	
 def serv(port=80, tcpport=9999, udpport=9998):
     try :
@@ -141,7 +141,7 @@ def serv(port=80, tcpport=9999, udpport=9998):
         print("UDP server started on %s" % str(udpaddr))
         input = [http, tcp, udp]
         while True:
-            #wdt.feed()
+            wdt.feed()
             r, w, err = select.select(input, (), (), 1)
             if r:
                 for readable in r:
@@ -153,8 +153,10 @@ def serv(port=80, tcpport=9999, udpport=9998):
                     elif readable==tcp:	
                         client, client_addr = tcp.accept()
                         handle_tcp(client, client_addr)                      
-                    else:
+                    else:                        
                         continue    
+            gc.collect()
+            
     except Exception as e:
         print('Service error: %s' % str(e))
         print('Restarting...')
@@ -186,7 +188,7 @@ sensor_data = {}
 start_time = time.time()
 mc = 0   
         
-#wdt = WDT(timeout=60000)  # enable it with a timeout of 1 min
+wdt = WDT(timeout=60000)  # enable it with a timeout of 1 min
 
 serv()
 

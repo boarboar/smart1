@@ -36,7 +36,7 @@ def format_time(t):
     m = t % 60
     t = t // 60 #hours
     h = t % 24
-    d = t // 34 #days
+    d = t // 24 #days
     return "{0} days {1} hours {2} minutes {3} seconds".format(d, h, m, s)
 
 def handle_http(client, client_addr):    

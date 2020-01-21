@@ -28,7 +28,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:listForecastData="@{repository.forecastList}"
+            app:listForecastExtData="@{repository.forecastList}"
             tools:itemCount="12"
             tools:listitem="@layout/forecast_item"
             />

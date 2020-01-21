@@ -116,6 +116,8 @@ data class WeatherForecastItem(
 ) {
     val at : String
         get() = DateUtils.convertTimeShort(dt * 1000)
+    val at_full : String
+        get() = DateUtils.convertDateTime(dt * 1000)
 }
 
 data class WeatherForecast(

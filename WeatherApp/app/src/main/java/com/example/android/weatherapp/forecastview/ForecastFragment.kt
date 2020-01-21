@@ -23,8 +23,7 @@ class ForecastFragment : Fragment() {
         // Giving the binding access to the OverviewViewModel
         binding.repository = getSensorRepository(ctx)
 
-        binding.weatherForecastList.adapter = ForecastAdapter(12,
-            ForecastAdapter.OnClickListener {})
+        binding.weatherForecastList.adapter = ForecastExtAdapter(12)
 
         binding.weatherForecastList.setHasFixedSize(true)
 

@@ -28,6 +28,7 @@ import com.example.android.weatherapp.domain.SensorData
 import com.example.android.weatherapp.domain.WeatherForecastItem
 import com.example.android.weatherapp.domain.WeatherWeather
 import com.example.android.weatherapp.draw.DrawView
+import com.example.android.weatherapp.forecastview.ForecastExtAdapter
 import com.example.android.weatherapp.network.WeatherApiStatus
 import com.example.android.weatherapp.overview.ForecastAdapter
 import com.example.android.weatherapp.overview.SensorAdapter
@@ -38,8 +39,14 @@ import com.squareup.picasso.Picasso
 import java.util.ArrayList
 
 @BindingAdapter("listForecastData")
-fun bindRecyclerView(recyclerView: RecyclerView, data: ArrayList<WeatherForecastItem>?) {
+fun bindRecyclerForecastView(recyclerView: RecyclerView, data: ArrayList<WeatherForecastItem>?) {
     val adapter = recyclerView.adapter as ForecastAdapter
+    adapter.submitList(data)
+}
+
+@BindingAdapter("listForecastExtData")
+fun bindRecyclerForecastExtView(recyclerView: RecyclerView, data: ArrayList<WeatherForecastItem>?) {
+    val adapter = recyclerView.adapter as ForecastExtAdapter
     adapter.submitList(data)
 }
 

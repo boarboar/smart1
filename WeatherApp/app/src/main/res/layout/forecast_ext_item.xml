@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="forecast"
+            type="com.example.android.weatherapp.domain.WeatherForecastItem" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context="com.example.android.weatherapp.MainActivity">
+
+        <TextView
+            android:id="@+id/forecast_item_time"
+            android:layout_width="260dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin"
+            android:layout_marginLeft="@dimen/margin"
+            android:layout_marginTop="@dimen/margin"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:textSize="@dimen/size_medium"
+            android:text="@{forecast.at_full}"
+            tools:text="01/10/2020 06:00" />
+
+        <TextView
+            android:id="@+id/forecast_item_temp"
+            android:layout_width="180dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin"
+            android:layout_marginLeft="@dimen/margin"
+            android:layout_marginTop="@dimen/margin"
+            app:layout_constraintStart_toEndOf="@+id/forecast_item_time"
+            app:layout_constraintTop_toTopOf="parent"
+            android:text="@{forecast.main.tempAndFeelsLikeString}"
+            android:textSize="@dimen/size_medium"
+            tools:text="-12" />
+
+        <ImageView
+            android:id="@+id/forecast_weather_icon"
+            android:layout_marginStart="@dimen/margin"
+            android:layout_marginLeft="@dimen/margin"
+            android:layout_marginRight="@dimen/margin"
+            android:layout_marginTop="@dimen/margin"
+            app:layout_constraintStart_toEndOf="@+id/forecast_item_temp"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            app:weatherImage="@{forecast.weather}"
+            tools:src="@mipmap/ic_launcher" />
+
+        <TextView
+            android:id="@+id/forecast_weather_pressure"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin"
+            android:layout_marginLeft="@dimen/margin"
+            android:layout_marginTop="@dimen/margin"
+            app:layout_constraintStart_toEndOf="@+id/forecast_weather_icon"
+            app:layout_constraintTop_toTopOf="parent"
+            android:textSize="@dimen/size_medium"
+            android:text="@{forecast.main.presString}"
+            tools:text="777 mm" />
+
+        <TextView
+            android:id="@+id/forecast_weather_hum"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin"
+            android:layout_marginLeft="@dimen/margin"
+            android:layout_marginTop="@dimen/margin"
+            app:layout_constraintStart_toEndOf="@+id/forecast_weather_pressure"
+            app:layout_constraintTop_toTopOf="parent"
+            android:text="@{forecast.main.humString}"
+            android:textSize="@dimen/size_medium"
+            tools:text="99 %"
+            />
+            />
+
+        <TextView
+            android:id="@+id/forecast_wind_speed"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/margin"
+            android:layout_marginRight="@dimen/margin"
+            android:layout_marginStart="@dimen/margin"
+            android:layout_marginLeft="@dimen/margin"
+            android:layout_marginTop="@dimen/margin"
+            app:layout_constraintStart_toEndOf="@+id/forecast_weather_hum"
+            app:layout_constraintTop_toTopOf="parent"
+            android:textSize="@dimen/size_medium"
+            android:text="@{forecast.wind.speedString}"
+            tools:text = "12 m/s"
+            />
+
+        <TextView
+            android:id="@+id/weather_wind_dir"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/margin"
+            android:layout_marginRight="@dimen/margin"
+            android:layout_marginStart="@dimen/margin"
+            android:layout_marginLeft="@dimen/margin"
+            android:layout_marginTop="@dimen/margin"
+            app:layout_constraintStart_toEndOf="@+id/forecast_wind_speed"
+            app:layout_constraintTop_toTopOf="parent"
+            android:textSize="@dimen/size_medium"
+            android:text="@{forecast.wind.dir}"
+            tools:text = "С-З"
+            />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

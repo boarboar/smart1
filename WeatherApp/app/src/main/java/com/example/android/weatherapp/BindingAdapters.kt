@@ -23,12 +23,10 @@ import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.android.weatherapp.WeatherApplication.Companion.ctx
-import com.example.android.weatherapp.domain.Sensor
-import com.example.android.weatherapp.domain.SensorData
-import com.example.android.weatherapp.domain.WeatherForecastItem
-import com.example.android.weatherapp.domain.WeatherWeather
+import com.example.android.weatherapp.domain.*
 import com.example.android.weatherapp.draw.DrawView
 import com.example.android.weatherapp.forecastview.ForecastExtAdapter
+import com.example.android.weatherapp.logview.LogviewAdapter
 import com.example.android.weatherapp.network.WeatherApiStatus
 import com.example.android.weatherapp.overview.ForecastAdapter
 import com.example.android.weatherapp.overview.SensorAdapter
@@ -59,6 +57,13 @@ fun bindRecyclerSensorView(recyclerView: RecyclerView, data: List<Sensor>?) {
 @BindingAdapter("listSensorData")
 fun bindRecyclerSensorDataView(recyclerView: RecyclerView, data: List<SensorData>?) {
     val adapter = recyclerView.adapter as SensorDataAdapter
+    adapter.submitList(data)
+}
+
+
+@BindingAdapter("listLog")
+fun bindRecyclerLogView(recyclerView: RecyclerView, data: List<LogRecord>?) {
+    val adapter = recyclerView.adapter as LogviewAdapter
     adapter.submitList(data)
 }
 

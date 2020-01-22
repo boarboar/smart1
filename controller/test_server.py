@@ -19,7 +19,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         print("self.headers :", self.headers)
         print("<----- Request End -----\n")
         
-        time.sleep(60.0)
+        #time.sleep(60.0)
 
         systime = int(round(time.time() * 1000))
         

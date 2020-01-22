@@ -9,6 +9,25 @@ import androidx.room.migration.Migration
 /*
 val MIGRATION_1_2: Migration = object : Migration(1, 2) {
     override fun migrate(database: SupportSQLiteDatabase) {
+    }
+}
+
+
+val MIGRATION_2_3: Migration = object : Migration(2, 3) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("CREATE TABLE 'dblog' ( " +
+                "'_id' INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,"+
+                "'timestamp' INTEGER NOT NULL,"+
+                "'severity' INTEGER NOT NULL,"+
+                "'tag' TEXT NOT NULL,"+
+                "'msg' TEXT NOT NULL);")
+        database.execSQL("CREATE INDEX idx_log_timestamp ON dblog (timestamp);")
+    }
+}
+*/
+/*
+val MIGRATION_1_2: Migration = object : Migration(1, 2) {
+    override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL("ALTER TABLE  dbsensor ADD COLUMN updated INTEGER NOT NULL DEFAULT 0")
     }
 }
@@ -201,9 +220,21 @@ interface WeatherDao {
     @Query("delete from dbsensordata where timestamp < :retention")
     fun clearSensorData(retention : Long): Int
 
+    @Query("select * from dblog")
+    fun getLogs(): LiveData<List<DbLog>>
+
+    @Insert
+    fun insert_log(log : DbLog)
+
+    @Query("select count(*) as d_count, min(timestamp) as d_from, max(timestamp) as d_to from dblog")
+    fun getLogStat(): DbDataStat
+
+    @Query("delete from dblog where timestamp < :retention")
+    fun clearLog(retention : Long): Int
+
 }
 
-@Database(entities = [DbSensor::class, DbSensorData::class, DbSensorLatestData::class], version = 1)
+@Database(entities = [DbSensor::class, DbSensorData::class, DbSensorLatestData::class, DbLog::class], version = 1)
 abstract class WeatherDatabase : RoomDatabase() {
     abstract val weatherDao: WeatherDao
 }
@@ -216,8 +247,7 @@ fun getDatabase(context: Context): WeatherDatabase {
             INSTANCE = Room.databaseBuilder(context.applicationContext,
                 WeatherDatabase::class.java,
                 "weather")
-                //.addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5,
-                //    MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10)
+                //.addMigrations(MIGRATION_1_2, MIGRATION_2_3)
                 .build()
         }
     }

@@ -4,6 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.example.android.weatherapp.domain.LogRecord
 import com.example.android.weatherapp.domain.Sensor
 import com.example.android.weatherapp.domain.SensorData
 import com.example.android.weatherapp.domain.SensorTransferData
@@ -108,3 +109,21 @@ data class DbDataStat(
     @ColumnInfo(name = "d_from") val from : Long,
     @ColumnInfo(name = "d_to") val to : Long
 )
+
+@Entity
+data class DbLog(
+    @PrimaryKey(autoGenerate = true)
+    val _id: Int,
+    @ColumnInfo(index = true)
+    val timestamp: Long,
+    @ColumnInfo(index = true)
+    val severity: Int,
+    val tag: String,
+    val msg: String
+) {
+    fun toLogRecord() = LogRecord(_id, timestamp, severity, tag, msg)
+}
+
+fun List<DbLog>.asLogRecord(): List<LogRecord> {
+    return map { it.toLogRecord() }
+}

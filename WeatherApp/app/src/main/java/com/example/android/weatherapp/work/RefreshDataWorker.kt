@@ -4,6 +4,8 @@ import android.content.Context
 import android.util.Log
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import com.example.android.weatherapp.database.DbLog
+import com.example.android.weatherapp.domain.LogRecord
 import com.example.android.weatherapp.domain.SensorTransferData
 import com.example.android.weatherapp.network.SensorServiceApi
 import com.example.android.weatherapp.repository.getSensorRepository
@@ -32,11 +34,14 @@ class RefreshDataWorker(appContext: Context, params: WorkerParameters):
         try {
             val sdata = getSensorsDeferred.await()
             res = sensorRepository.refreshSensorsData(sdata)
+            sensorRepository.logEvent(LogRecord.SEVERITY_CODE.INFO, tag, "Refresh OK")
         } catch (se: SocketTimeoutException) {
             Log.e(tag, "Socket timeout")
+            sensorRepository.logEvent(LogRecord.SEVERITY_CODE.ERROR, tag, "Controller - Socket timeout")
         } catch (e: Exception) {
             val msg = e.message ?: "Unknown network error"
             Log.e(tag, "NET error: $msg")
+            sensorRepository.logEvent(LogRecord.SEVERITY_CODE.ERROR, tag, "Controller - Unknown error")
         }
 
         // fake data

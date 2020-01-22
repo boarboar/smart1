@@ -37,6 +37,20 @@ class SensorRepository(val appContext: Context) {
     lateinit private var _sensorDataList: LiveData<List<SensorData>>
     private var _sensorDataId = 0
 
+    var logList: LiveData<List<LogRecord>> =
+        try {
+            // TODO - convert to Domain
+            database.weatherDao.getLogs()
+            Transformations.map(database.weatherDao.getLogs()) {
+                it.asLogRecord()
+            }
+        } catch (t: Throwable) {
+            val msg = t.message ?: "Unknown DB error"
+            Log.e(tag, "DB error: $msg")
+            MutableLiveData<List<LogRecord>>()
+        }
+
+
     var sensorList: LiveData<List<Sensor>> =
         try {
             Transformations.map(database.weatherDao.getSensorsWithLatestData()) {
@@ -59,6 +73,8 @@ class SensorRepository(val appContext: Context) {
                 sensorLastId = it.maxBy {it.id}?.id ?: 0
             }
         }
+
+        //logEvent(DbLog.SEVERITY_CODE.INFO, tag, "Started")
     }
 
     fun getOneSensor(id : Int) : LiveData<Sensor> =
@@ -139,6 +155,13 @@ class SensorRepository(val appContext: Context) {
                 val delcount = database.weatherDao.clearSensorData(System.currentTimeMillis() - 24L * 3600L * 1000L * retention_days)
                 Log.w(tag, "Cleared $delcount records")
 
+                val logstat = database.weatherDao.getLogStat()
+                Log.i(tag, "${logstat.count} total log records in DB from  ${DateUtils.convertDate(logstat.from)}  to ${DateUtils.convertDate(logstat.to)}")
+
+                Log.w(tag, "Clear logs older than $retention_days days")
+                val dellogcount = database.weatherDao.clearLog(System.currentTimeMillis() - 24L * 3600L * 1000L * retention_days)
+                Log.w(tag, "Cleared $dellogcount records")
+
                 true
             } catch (e: HttpException) {
                 val msg = e.message ?: "Unknown HTTP error"
@@ -158,6 +181,7 @@ class SensorRepository(val appContext: Context) {
                     val latest = database.weatherDao.getSensorLatestData(sdata.sensor_id)
                     if(latest != null && latest.event_stamp == sdata.event_stamp) {
                         Log.i(tag, "Refresh sensor - old data ${sdata}")
+                        _logEvent(LogRecord.SEVERITY_CODE.INFO, tag, "Refresh sensor - old data ${sdata.sensor_id}")
                     }
                     else {
                         Log.i(tag, "Refresh sensor ${sdata}")
@@ -169,9 +193,12 @@ class SensorRepository(val appContext: Context) {
                                 DbSensorLatestData(it, sdata)
                             } ?: DbSensorLatestData(sdata)
                         database.weatherDao.insert_latest_data_and_update_sensor(latest_update) // transaction
+                        _logEvent(LogRecord.SEVERITY_CODE.INFO, tag, "Refresh sensor ${sdata.sensor_id}")
                     }
-                } else
+                } else {
                     Log.w(tag, "Refresh sensor - invalid data ${sdata}")
+                    _logEvent(LogRecord.SEVERITY_CODE.ERROR, tag, "Refresh sensor - invalid data ${sdata}")
+                }
                 true
             } catch (e: HttpException) {
                 val msg = e.message ?: "Unknown HTTP error"
@@ -196,52 +223,14 @@ class SensorRepository(val appContext: Context) {
         }
     }
 
-    suspend fun populateDb() {
+    private fun _logEvent(severity: LogRecord.SEVERITY_CODE, tag: String, msg: String) {
+        database.weatherDao.insert_log(DbLog(0, System.currentTimeMillis(), severity.value, tag, msg ))
+    }
 
+    suspend fun logEvent(severity: LogRecord.SEVERITY_CODE, tag: String, msg: String) {
         withContext(Dispatchers.IO) {
             try {
-                database.weatherDao.insert(DbSensor(1, "room", System.currentTimeMillis()))
-                database.weatherDao.insert(DbSensor(2, "balcony", System.currentTimeMillis()))
-                database.weatherDao.insert(DbSensor(3, "bath", System.currentTimeMillis()))
-            } catch (t: Throwable) {
-                val msg = t.message ?: "Unknown DB error"
-                Log.e(tag, "DB error: $msg")
-            }
-
-            try {
-                database.weatherDao.insert_data(
-                    DbSensorData(
-                        0,
-                        1,
-                        System.currentTimeMillis(),
-                        -100,
-                        3500,
-                        -1,
-                        -1
-                    )
-                )
-                database.weatherDao.insert_data(
-                    DbSensorData(
-                        0,
-                        2,
-                        System.currentTimeMillis(),
-                        100,
-                        3400,
-                        -1,
-                        -1
-                    )
-                )
-                database.weatherDao.insert_data(
-                    DbSensorData(
-                        0,
-                        3,
-                        System.currentTimeMillis(),
-                        250,
-                        3500,
-                        850,
-                        1
-                    )
-                )
+                _logEvent(severity, tag, msg)
             } catch (t: Throwable) {
                 val msg = t.message ?: "Unknown DB error"
                 Log.e(tag, "DB error: $msg")
@@ -249,59 +238,112 @@ class SensorRepository(val appContext: Context) {
         }
     }
 
-    suspend fun updateSensorsDb() {
-        Log.i(tag, "Update sens test")
-        withContext(Dispatchers.IO) {
-            try {
-                database.weatherDao.update(DbSensor(1, "SENSOR1", System.currentTimeMillis()))
-                database.weatherDao.update(DbSensor(2, "SENSOR2", System.currentTimeMillis()))
-                database.weatherDao.update(DbSensor(3, "SENSOR3", 0))
-                database.weatherDao.update(DbSensor(4, "SENSOR4", 0))
-                //database.weatherDao.insert(DbSensor(2, "balcony", System.currentTimeMillis()))
-                //database.weatherDao.insert(DbSensor(3, "bath", System.currentTimeMillis()))
-                database.weatherDao.insert_data(
-                    DbSensorData(
-                        0,
-                        1,
-                        System.currentTimeMillis(),
-                        155,
-                        3500,
-                        -1,
-                        -1
-                    )
-                )
-                //database.weatherDao.insert_data(DbSensorData(0,2, System.currentTimeMillis(), 100, 3400, -1, -1))
-                //database.weatherDao.insert_data(DbSensorData(0,3, System.currentTimeMillis(), 250, 3500, 850, 1))
-                database.weatherDao.insert_data(
-                    DbSensorData(
-                        0,
-                        3,
-                        System.currentTimeMillis(),
-                        254,
-                        3567,
-                        950,
-                        1
-                    )
-                )
-                //database.weatherDao.insert(DbSensor(4, "WC", System.currentTimeMillis()))
-            } catch (t: Throwable) {
-                val msg = t.message ?: "Unknown DB error"
-                Log.e(tag, "DB error: $msg")
-            }
-        }
-    }
-
-    suspend fun deleteSensorDataDb() {
-        Log.i(tag, "Delete sens data test")
-        withContext(Dispatchers.IO) {
-            try {
-                database.weatherDao.deleteSensorData(3)
-            } catch (t: Throwable) {
-                val msg = t.message ?: "Unknown DB error"
-                Log.e(tag, "DB error: $msg")
-            }
-        }
-    }
+//    suspend fun populateDb() {
+//
+//        withContext(Dispatchers.IO) {
+//            try {
+//                database.weatherDao.insert(DbSensor(1, "room", System.currentTimeMillis()))
+//                database.weatherDao.insert(DbSensor(2, "balcony", System.currentTimeMillis()))
+//                database.weatherDao.insert(DbSensor(3, "bath", System.currentTimeMillis()))
+//            } catch (t: Throwable) {
+//                val msg = t.message ?: "Unknown DB error"
+//                Log.e(tag, "DB error: $msg")
+//            }
+//
+//            try {
+//                database.weatherDao.insert_data(
+//                    DbSensorData(
+//                        0,
+//                        1,
+//                        System.currentTimeMillis(),
+//                        -100,
+//                        3500,
+//                        -1,
+//                        -1
+//                    )
+//                )
+//                database.weatherDao.insert_data(
+//                    DbSensorData(
+//                        0,
+//                        2,
+//                        System.currentTimeMillis(),
+//                        100,
+//                        3400,
+//                        -1,
+//                        -1
+//                    )
+//                )
+//                database.weatherDao.insert_data(
+//                    DbSensorData(
+//                        0,
+//                        3,
+//                        System.currentTimeMillis(),
+//                        250,
+//                        3500,
+//                        850,
+//                        1
+//                    )
+//                )
+//            } catch (t: Throwable) {
+//                val msg = t.message ?: "Unknown DB error"
+//                Log.e(tag, "DB error: $msg")
+//            }
+//        }
+//    }
+//
+//    suspend fun updateSensorsDb() {
+//        Log.i(tag, "Update sens test")
+//        withContext(Dispatchers.IO) {
+//            try {
+//                database.weatherDao.update(DbSensor(1, "SENSOR1", System.currentTimeMillis()))
+//                database.weatherDao.update(DbSensor(2, "SENSOR2", System.currentTimeMillis()))
+//                database.weatherDao.update(DbSensor(3, "SENSOR3", 0))
+//                database.weatherDao.update(DbSensor(4, "SENSOR4", 0))
+//                //database.weatherDao.insert(DbSensor(2, "balcony", System.currentTimeMillis()))
+//                //database.weatherDao.insert(DbSensor(3, "bath", System.currentTimeMillis()))
+//                database.weatherDao.insert_data(
+//                    DbSensorData(
+//                        0,
+//                        1,
+//                        System.currentTimeMillis(),
+//                        155,
+//                        3500,
+//                        -1,
+//                        -1
+//                    )
+//                )
+//                //database.weatherDao.insert_data(DbSensorData(0,2, System.currentTimeMillis(), 100, 3400, -1, -1))
+//                //database.weatherDao.insert_data(DbSensorData(0,3, System.currentTimeMillis(), 250, 3500, 850, 1))
+//                database.weatherDao.insert_data(
+//                    DbSensorData(
+//                        0,
+//                        3,
+//                        System.currentTimeMillis(),
+//                        254,
+//                        3567,
+//                        950,
+//                        1
+//                    )
+//                )
+//                //database.weatherDao.insert(DbSensor(4, "WC", System.currentTimeMillis()))
+//            } catch (t: Throwable) {
+//                val msg = t.message ?: "Unknown DB error"
+//                Log.e(tag, "DB error: $msg")
+//            }
+//        }
+//    }
+//
+//    suspend fun deleteSensorDataDb() {
+//        Log.i(tag, "Delete sens data test")
+//        withContext(Dispatchers.IO) {
+//            try {
+//                database.weatherDao.deleteSensorData(3)
+//            } catch (t: Throwable) {
+//                val msg = t.message ?: "Unknown DB error"
+//                Log.e(tag, "DB error: $msg")
+//            }
+//        }
+//    }
 
 }
 

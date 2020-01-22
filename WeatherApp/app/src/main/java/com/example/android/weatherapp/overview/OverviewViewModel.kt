@@ -4,10 +4,12 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.*
 import androidx.preference.PreferenceManager
+import com.example.android.weatherapp.database.DbLog
 import com.example.android.weatherapp.domain.*
 import com.example.android.weatherapp.network.WeatherApiStatus
 import com.example.android.weatherapp.network.WeatherServiceApi
 import com.example.android.weatherapp.repository.getSensorRepository
+import com.example.android.weatherapp.work.RefreshDataWorker
 import kotlinx.coroutines.*
 import java.util.*
 import kotlin.collections.ArrayList
@@ -51,7 +53,6 @@ class OverviewViewModel(application: Application) : AndroidViewModel(application
         get() = _navigateToSelectedSensor
 
 
-
     override fun onCleared() {
         super.onCleared()
         viewModelJob.cancel()
@@ -85,23 +86,18 @@ class OverviewViewModel(application: Application) : AndroidViewModel(application
             var getWeatherForecastDeferred = wservice.getWeatherForecast(citycode, cnt=12)
             try {
                 _status.value = WeatherApiStatus.LOADING
-                //_weather.value = getWeatherDeferred.await()
                 sensorRepository.weather.value = getWeatherDeferred.await()
-                //val forecastResult = getWeatherForecastDeferred.await()
-                //_forecastList.value = forecastResult.forecastList
                 sensorRepository.forecastList.value = getWeatherForecastDeferred.await().forecastList
                 //delay(100) // to show spinner
+                sensorRepository.logEvent(LogRecord.SEVERITY_CODE.INFO, tag, "Forecast refresh OK")
                 _status.value = WeatherApiStatus.DONE
             } catch (e: Exception) {
-                _status.value = WeatherApiStatus.ERROR
                 val msg = e.message ?: "Unknown network error"
                 Log.e(tag, "NET error: $msg")
+                sensorRepository.logEvent(LogRecord.SEVERITY_CODE.ERROR, tag, "Forecast NET error: $msg")
+                _status.value = WeatherApiStatus.ERROR
             }
         }
-    }
-
-    fun updateForecast() {
-        getWeatherForecast()
     }
 
     fun getNewSensor() : Sensor {
@@ -109,22 +105,26 @@ class OverviewViewModel(application: Application) : AndroidViewModel(application
         return Sensor(id, "SENSOR$id")
     }
 
-    fun onPopulate() {
-        coroutineScope.launch {
-            sensorRepository.populateDb()
-            //getSensors()
-        }
-    }
+//    fun updateForecast() {
+//        getWeatherForecast()
+//    }
+//    fun onPopulate() {
+//        coroutineScope.launch {
+//            sensorRepository.populateDb()
+//            //getSensors()
+//        }
+//    }
+//
+//    fun onUpdate() {
+//        coroutineScope.launch {
+//            sensorRepository.updateSensorsDb()
+//        }
+//    }
+//
+//    fun onDeleteSensorData() {
+//        coroutineScope.launch {
+//            sensorRepository.deleteSensorDataDb()
+//        }
+//    }
 
-    fun onUpdate() {
-        coroutineScope.launch {
-            sensorRepository.updateSensorsDb()
-        }
-    }
-
-    fun onDeleteSensorData() {
-        coroutineScope.launch {
-            sensorRepository.deleteSensorDataDb()
-        }
-    }
 }

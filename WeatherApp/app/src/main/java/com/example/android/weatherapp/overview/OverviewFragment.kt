@@ -101,6 +101,9 @@ class OverviewFragment : Fragment() {
             R.id.settings -> {
                 this.findNavController().navigate(OverviewFragmentDirections.actionOverviewFragmentToSettingsFragment())
             }
+            R.id.log -> {
+                this.findNavController().navigate(OverviewFragmentDirections.actionOverviewFragmentToLogviewFragment())
+            }
         }
         return true
     }

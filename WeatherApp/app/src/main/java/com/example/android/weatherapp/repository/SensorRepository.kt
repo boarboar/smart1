@@ -39,8 +39,6 @@ class SensorRepository(val appContext: Context) {
 
     var logList: LiveData<List<LogRecord>> =
         try {
-            // TODO - convert to Domain
-            database.weatherDao.getLogs()
             Transformations.map(database.weatherDao.getLogs()) {
                 it.asLogRecord()
             }

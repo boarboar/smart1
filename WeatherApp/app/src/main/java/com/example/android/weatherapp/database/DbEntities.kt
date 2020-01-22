@@ -63,7 +63,7 @@ data class DbSensorLatestData(
 }
 
 // combine
-
+/*
 @Entity
 data class DbSensorWithData(
     @Embedded
@@ -78,6 +78,7 @@ data class DbSensorWithData(
         data = sdata?.toSensorData() //?: SensorData(0,0,0,0,0,0)
      )
 }
+*/
 
 @Entity
 data class DbSensorWithLatestData(

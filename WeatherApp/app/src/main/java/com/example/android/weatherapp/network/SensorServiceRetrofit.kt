@@ -18,7 +18,7 @@ object SensorServiceRetrofit {
     //const val BASE_URL = "http://192.168.1.144:80/"
 
     fun obtain(
-            readTimeoutInSeconds: Long = 5,
+            readTimeoutInSeconds: Long = 10,
             connectTimeoutInSeconds: Long = 15
     ): Retrofit {
         val sharedPreferences =

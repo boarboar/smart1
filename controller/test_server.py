@@ -12,11 +12,15 @@ class RequestHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         request_path = self.path
 
+	
+
         print("\n----- Request Start ----->\n")
         print("request_path :", request_path)
         print("self.headers :", self.headers)
         print("<----- Request End -----\n")
         
+        time.sleep(60.0)
+
         systime = int(round(time.time() * 1000))
         
         sensors = [

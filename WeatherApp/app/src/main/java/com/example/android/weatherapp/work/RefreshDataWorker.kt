@@ -7,6 +7,7 @@ import androidx.work.WorkerParameters
 import com.example.android.weatherapp.domain.SensorTransferData
 import com.example.android.weatherapp.network.SensorServiceApi
 import com.example.android.weatherapp.repository.getSensorRepository
+import java.net.SocketTimeoutException
 import java.util.*
 
 fun Random.nextInt(range: IntRange): Int {
@@ -18,6 +19,7 @@ class RefreshDataWorker(appContext: Context, params: WorkerParameters):
     CoroutineWorker(appContext, params) {
 
     companion object {
+        const val tag = "WORKER"
         const val WORK_NAME = "RefreshDataWorker"
     }
 
@@ -29,14 +31,12 @@ class RefreshDataWorker(appContext: Context, params: WorkerParameters):
         var getSensorsDeferred = sservice.getSensors()
         try {
             val sdata = getSensorsDeferred.await()
-//            for(s in sdata) {
-//                Log.i("WORKER", "Retrieved: $s")
-//            }
             res = sensorRepository.refreshSensorsData(sdata)
-
+        } catch (se: SocketTimeoutException) {
+            Log.e(tag, "Socket timeout")
         } catch (e: Exception) {
             val msg = e.message ?: "Unknown network error"
-            Log.e("WORKER", "NET error: $msg")
+            Log.e(tag, "NET error: $msg")
         }
 
         // fake data

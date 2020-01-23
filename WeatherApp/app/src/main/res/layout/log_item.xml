@@ -10,7 +10,7 @@
     </data>
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
@@ -25,15 +25,35 @@
             tools:text="--.--.-- --:--:--"/>
 
         <TextView
+            android:id="@+id/severity"
+            android:layout_width="120dp"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/size_small"
+            android:layout_marginLeft="@dimen/margin"
+            android:layout_marginRight="@dimen/margin"
+            android:text="@{log.severityString}"
+            tools:text="INFO"/>
+
+        <TextView
+            android:id="@+id/tag"
+            android:layout_width="240dp"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/size_small"
+            android:layout_marginLeft="@dimen/margin"
+            android:layout_marginRight="@dimen/margin"
+            android:text="@{log.tag}"
+            tools:text="Repository"/>
+
+        <TextView
             android:id="@+id/msg"
-            android:layout_width="@dimen/value_cell_width"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="right"
             android:textSize="@dimen/size_small"
             android:layout_marginLeft="@dimen/margin"
             android:layout_marginRight="@dimen/margin"
             android:text="@{log.msg}"
-            tools:text="--"/>
+            tools:text="Very long message with exception code and stack trace"/>
     </LinearLayout>
 
 

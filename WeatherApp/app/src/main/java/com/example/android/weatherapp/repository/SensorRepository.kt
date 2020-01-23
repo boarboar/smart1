@@ -37,7 +37,7 @@ class SensorRepository(val appContext: Context) {
     lateinit private var _sensorDataList: LiveData<List<SensorData>>
     private var _sensorDataId = 0
 
-    var logList: LiveData<List<LogRecord>> =
+    private var _logList: LiveData<List<LogRecord>> =
         try {
             Transformations.map(database.weatherDao.getLogs()) {
                 it.asLogRecord()
@@ -48,6 +48,8 @@ class SensorRepository(val appContext: Context) {
             MutableLiveData<List<LogRecord>>()
         }
 
+    val logList: LiveData<List<LogRecord>>
+        get() = _logList
 
     var sensorList: LiveData<List<Sensor>> =
         try {
@@ -67,12 +69,13 @@ class SensorRepository(val appContext: Context) {
         // is it legal?
         sensorList.observeForever {
             if (null != it) {
-                Log.w(tag, "==== READ ${it.size} sensors")
+                Log.i(tag, "==== READ ${it.size} sensors")
                 sensorLastId = it.maxBy {it.id}?.id ?: 0
             }
         }
-
         //logEvent(DbLog.SEVERITY_CODE.INFO, tag, "Started")
+
+        Log.i(tag, "==== READ ${_logList.value?.size} logs")
     }
 
     fun getOneSensor(id : Int) : LiveData<Sensor> =
@@ -148,7 +151,7 @@ class SensorRepository(val appContext: Context) {
                 // cleanup old records
                 val sharedPreferences =
                     PreferenceManager.getDefaultSharedPreferences(appContext)
-                val retention_days = sharedPreferences.getString("data_retention_days", DEFAULT_DATA_RETENTION.toString()).toInt()
+                val retention_days = sharedPreferences.getString("data_retention_days", DEFAULT_DATA_RETENTION.toString())?.toInt() ?: 30
                 Log.w(tag, "Clear measurements older than $retention_days days")
                 val delcount = database.weatherDao.clearSensorData(System.currentTimeMillis() - 24L * 3600L * 1000L * retention_days)
                 Log.w(tag, "Cleared $delcount records")
@@ -156,8 +159,9 @@ class SensorRepository(val appContext: Context) {
                 val logstat = database.weatherDao.getLogStat()
                 Log.i(tag, "${logstat.count} total log records in DB from  ${DateUtils.convertDate(logstat.from)}  to ${DateUtils.convertDate(logstat.to)}")
 
-                Log.w(tag, "Clear logs older than $retention_days days")
-                val dellogcount = database.weatherDao.clearLog(System.currentTimeMillis() - 24L * 3600L * 1000L * retention_days)
+                val log_retention_days = 7
+                Log.w(tag, "Clear logs older than $log_retention_days days")
+                val dellogcount = database.weatherDao.clearLog(System.currentTimeMillis() - 24L * 3600L * 1000L * log_retention_days)
                 Log.w(tag, "Cleared $dellogcount records")
 
                 true
@@ -230,8 +234,8 @@ class SensorRepository(val appContext: Context) {
             try {
                 _logEvent(severity, tag, msg)
             } catch (t: Throwable) {
-                val msg = t.message ?: "Unknown DB error"
-                Log.e(tag, "DB error: $msg")
+                val errmsg = t.message ?: "Unknown DB error"
+                Log.e(tag, "DB error: $errmsg")
             }
         }
     }

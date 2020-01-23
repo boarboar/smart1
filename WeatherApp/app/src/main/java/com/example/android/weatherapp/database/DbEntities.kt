@@ -121,7 +121,7 @@ data class DbLog(
     val tag: String,
     val msg: String
 ) {
-    fun toLogRecord() = LogRecord(_id, timestamp, severity, tag, msg)
+    fun toLogRecord() = LogRecord(_id, timestamp, LogRecord.SEVERITY_CODE.valueOf(severity), tag, msg)
 }
 
 fun List<DbLog>.asLogRecord(): List<LogRecord> {

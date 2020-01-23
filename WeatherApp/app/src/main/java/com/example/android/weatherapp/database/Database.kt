@@ -220,7 +220,7 @@ interface WeatherDao {
     @Query("delete from dbsensordata where timestamp < :retention")
     fun clearSensorData(retention : Long): Int
 
-    @Query("select * from dblog")
+    @Query("select * from dblog order by timestamp desc")
     fun getLogs(): LiveData<List<DbLog>>
 
     @Insert

@@ -19,7 +19,7 @@ import java.util.*
 
 class SensorRepository(val appContext: Context) {
 
-    private val database = com.example.android.weatherapp.database.getDatabase(appContext)
+    private val database = getDatabase(appContext)
 
     companion object {
         const val tag = "SensorRepository"

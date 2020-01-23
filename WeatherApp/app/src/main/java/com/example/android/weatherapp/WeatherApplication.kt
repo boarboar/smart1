@@ -5,6 +5,7 @@ import android.content.Context
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
+import com.example.android.weatherapp.database.closeDatabaseInstance
 import com.example.android.weatherapp.work.RefreshDataWorker
 import com.jakewharton.threetenabp.AndroidThreeTen
 import kotlinx.coroutines.CoroutineScope
@@ -32,6 +33,11 @@ class WeatherApplication : Application() {
         ctx = applicationContext
         AndroidThreeTen.init(this)
         delayedInit()
+    }
+
+    override fun onTerminate() {
+        closeDatabaseInstance()
+        super.onTerminate()
     }
 
     private fun delayedInit() = applicationScope.launch {

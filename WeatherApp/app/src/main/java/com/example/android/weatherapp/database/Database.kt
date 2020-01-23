@@ -254,3 +254,8 @@ fun getDatabase(context: Context): WeatherDatabase {
     return INSTANCE
 }
 
+fun closeDatabaseInstance() {
+    if (INSTANCE?.isOpen == true) {
+        INSTANCE?.close()
+    }
+}

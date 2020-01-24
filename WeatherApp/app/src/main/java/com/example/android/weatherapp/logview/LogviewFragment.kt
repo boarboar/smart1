@@ -19,10 +19,10 @@ import com.example.android.weatherapp.domain.LogRecord
 import com.example.android.weatherapp.forecastview.ForecastExtAdapter
 import com.example.android.weatherapp.repository.SensorRepository
 import com.example.android.weatherapp.repository.getSensorRepository
+import java.util.*
+import kotlin.concurrent.schedule
 
 class LogviewFragment : Fragment() {
-
-    //lateinit var logList : LiveData<List<LogRecord>>
 
     private val viewModel: LogViewModel by lazy {
         ViewModelProviders.of(this).get(LogViewModel::class.java)
@@ -33,17 +33,25 @@ class LogviewFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val binding = FragmentLogviewBinding.inflate(inflater)
+        val adapter = LogviewAdapter()
         binding.setLifecycleOwner(this)
         binding.viewModel = viewModel
-        binding.logList.adapter = LogviewAdapter()
+        binding.logList.adapter = adapter
         binding.logList.setHasFixedSize(true)
         (activity as MainActivity).toolbar.setNavigationOnClickListener { activity?.onBackPressed() }
         (activity as MainActivity).toolbarTitle = ""
+
+        // hack to make log appear at first time
+        Timer().schedule(100) {
+            getActivity()?.runOnUiThread {
+                adapter.notifyDataSetChanged()
+            }
+        }
+
         return binding.root
     }
 }
 
-
 class LogViewModel(app: Application) : AndroidViewModel(app) {
-    var logList : LiveData<List<LogRecord>>  = getSensorRepository(WeatherApplication.ctx).logList
+    var logList : LiveData<List<LogRecord>>  = getSensorRepository(app).logList
 }

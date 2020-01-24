@@ -75,7 +75,7 @@ class SensorRepository(val appContext: Context) {
         }
         //logEvent(DbLog.SEVERITY_CODE.INFO, tag, "Started")
 
-        Log.i(tag, "==== READ ${_logList.value?.size} logs")
+        //Log.i(tag, "==== READ ${_logList.value?.size} logs")
     }
 
     fun getOneSensor(id : Int) : LiveData<Sensor> =

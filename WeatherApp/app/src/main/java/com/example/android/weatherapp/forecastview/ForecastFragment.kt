@@ -27,6 +27,7 @@ class ForecastFragment : Fragment() {
 
         binding.weatherForecastList.setHasFixedSize(true)
 
+        (activity as MainActivity).toolbar.setNavigationOnClickListener { activity?.onBackPressed() }
         (activity as MainActivity).toolbarTitle = ""
         return binding.root
     }

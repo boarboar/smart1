@@ -30,6 +30,7 @@ class RefreshDataWorker(appContext: Context, params: WorkerParameters):
 
     override suspend fun doWork(): Result {
         var res = false
+        sensorRepository.logEvent(LogRecord.SEVERITY_CODE.INFO, tag, "Refreshing sensor data...")
         var getSensorsDeferred = sservice.getSensors()
         try {
             val sdata = getSensorsDeferred.await()

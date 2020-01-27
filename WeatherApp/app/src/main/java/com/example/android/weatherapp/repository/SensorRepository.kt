@@ -20,8 +20,9 @@ import java.util.*
 class SensorRepository(val appContext: Context) {
 
     private val database = getDatabase(appContext)
+    var retention_days = 30
 
-    companion object {
+        companion object {
         const val tag = "SensorRepository"
         const val DEFAULT_DATA_RETENTION = 31
     }
@@ -66,6 +67,11 @@ class SensorRepository(val appContext: Context) {
     var sensorLastId = 0
 
     init {
+
+        val sharedPreferences =
+            PreferenceManager.getDefaultSharedPreferences(appContext)
+        retention_days = sharedPreferences.getString("data_retention_days", DEFAULT_DATA_RETENTION.toString())?.toInt() ?: 30
+
         // is it legal?
         sensorList.observeForever {
             if (null != it) {
@@ -149,9 +155,7 @@ class SensorRepository(val appContext: Context) {
                 Log.i(tag, "${stat.count} total data records in DB from  ${DateUtils.convertDate(stat.from)}  to ${DateUtils.convertDate(stat.to)}")
 
                 // cleanup old records
-                val sharedPreferences =
-                    PreferenceManager.getDefaultSharedPreferences(appContext)
-                val retention_days = sharedPreferences.getString("data_retention_days", DEFAULT_DATA_RETENTION.toString())?.toInt() ?: 30
+
                 Log.w(tag, "Clear measurements older than $retention_days days")
                 val delcount = database.weatherDao.clearSensorData(System.currentTimeMillis() - 24L * 3600L * 1000L * retention_days)
                 Log.w(tag, "Cleared $delcount records")
@@ -165,11 +169,7 @@ class SensorRepository(val appContext: Context) {
                 Log.w(tag, "Cleared $dellogcount records")
 
                 true
-            } catch (e: HttpException) {
-                val msg = e.message ?: "Unknown HTTP error"
-                Log.e(tag, "HTTP error: $msg")
-                false
-            } catch (t: Throwable) {
+            }  catch (t: Throwable) {
                 val msg = t.message ?: "Unknown DB error"
                 Log.e(tag, "DB error: $msg")
                 false
@@ -202,11 +202,7 @@ class SensorRepository(val appContext: Context) {
                     _logEvent(LogRecord.SEVERITY_CODE.ERROR, tag, "Refresh sensor - invalid data ${sdata}")
                 }
                 true
-            } catch (e: HttpException) {
-                val msg = e.message ?: "Unknown HTTP error"
-                Log.e(tag, "HTTP error: $msg")
-                false
-            } catch (t: Throwable) {
+            }  catch (t: Throwable) {
                 val msg = t.message ?: "Unknown DB error"
                 Log.e(tag, "DB error: $msg")
                 false

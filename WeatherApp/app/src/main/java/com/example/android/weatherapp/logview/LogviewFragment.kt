@@ -28,13 +28,15 @@ class LogviewFragment : Fragment() {
         ViewModelProviders.of(this).get(LogViewModel::class.java)
     }
 
+    lateinit var binding: FragmentLogviewBinding
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val binding = FragmentLogviewBinding.inflate(inflater)
-        val adapter = LogviewAdapter()
+        binding = FragmentLogviewBinding.inflate(inflater)
         binding.setLifecycleOwner(this)
+        val adapter = LogviewAdapter()
         binding.viewModel = viewModel
         binding.logList.adapter = adapter
         binding.logList.setHasFixedSize(true)
@@ -45,6 +47,7 @@ class LogviewFragment : Fragment() {
         Timer().schedule(100) {
             getActivity()?.runOnUiThread {
                 adapter.notifyDataSetChanged()
+                binding.logList.scrollToPosition(0)
             }
         }
 

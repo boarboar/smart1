@@ -8,6 +8,7 @@ import com.example.android.weatherapp.database.DbLog
 import com.example.android.weatherapp.domain.*
 import com.example.android.weatherapp.network.WeatherApiStatus
 import com.example.android.weatherapp.network.WeatherServiceApi
+import com.example.android.weatherapp.repository.SensorRepository
 import com.example.android.weatherapp.repository.getSensorRepository
 import com.example.android.weatherapp.work.RefreshDataWorker
 import kotlinx.coroutines.*
@@ -20,7 +21,7 @@ class OverviewViewModel(application: Application) : AndroidViewModel(application
     companion object {
         private const val tag = "OverviewViewModel"
         private val DEF_CITYCODE = "193312,Ru"
-        private val FORECAST_REFRESH_TIMEOUT_MIN =  15L
+        private val FORECAST_REFRESH_TIMEOUT_MIN =  30L
     }
 
     private val wservice : WeatherServiceApi by lazy  { WeatherServiceApi.obtain() }
@@ -59,7 +60,10 @@ class OverviewViewModel(application: Application) : AndroidViewModel(application
     }
 
     init {
-        Timer().schedule(400, 1000*60*FORECAST_REFRESH_TIMEOUT_MIN) { getWeatherForecast() }
+        val sharedPreferences =
+            PreferenceManager.getDefaultSharedPreferences(application)
+        val pollTimeout : Long = sharedPreferences.getString("forecast_refresh_min", FORECAST_REFRESH_TIMEOUT_MIN.toString())?.toLong() ?: FORECAST_REFRESH_TIMEOUT_MIN
+        Timer().schedule(400, 1000*60*pollTimeout) { getWeatherForecast() }
         }
 
     fun displaySensorDetails(sensor: Sensor) {
@@ -82,6 +86,7 @@ class OverviewViewModel(application: Application) : AndroidViewModel(application
         val citycode = sharedPreferences.getString("location_code", DEF_CITYCODE)
         Log.w(tag, "Forecast for: $citycode")
         coroutineScope.launch {
+            sensorRepository.logEvent(LogRecord.SEVERITY_CODE.INFO, tag, "Getting forecast for $citycode")
             var getWeatherDeferred = wservice.getWeather(citycode)
             var getWeatherForecastDeferred = wservice.getWeatherForecast(citycode, cnt=12)
             try {

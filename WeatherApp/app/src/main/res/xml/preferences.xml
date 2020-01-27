@@ -18,6 +18,14 @@
         android:singleLine="true" />
 
     <EditTextPreference
+        android:key="forecast_refresh_min"
+        android:defaultValue="30"
+        android:inputType="number"
+        android:title="Обновление прогноза (минут)"
+        android:summary="Интервал обновления прогноза (минут)"
+        android:singleLine="true" />
+
+    <EditTextPreference
         android:key="data_retention_days"
         android:defaultValue="30"
         android:inputType="number"

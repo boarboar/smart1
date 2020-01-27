@@ -36,7 +36,8 @@ class WeatherApplication : Application() {
     }
 
     override fun onTerminate() {
-        closeDatabaseInstance()
+        //closeDatabaseInstance()
+        //W/SQLiteDatabase: database lock has not been available for 30 sec. Current Owner of the lock is
         super.onTerminate()
     }
 

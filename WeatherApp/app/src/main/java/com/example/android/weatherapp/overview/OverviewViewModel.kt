@@ -6,12 +6,14 @@ import androidx.lifecycle.*
 import androidx.preference.PreferenceManager
 import com.example.android.weatherapp.database.DbLog
 import com.example.android.weatherapp.domain.*
+import com.example.android.weatherapp.network.SensorServiceApi
 import com.example.android.weatherapp.network.WeatherApiStatus
 import com.example.android.weatherapp.network.WeatherServiceApi
 import com.example.android.weatherapp.repository.SensorRepository
 import com.example.android.weatherapp.repository.getSensorRepository
 import com.example.android.weatherapp.work.RefreshDataWorker
 import kotlinx.coroutines.*
+import java.net.SocketTimeoutException
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.concurrent.schedule
@@ -25,6 +27,7 @@ class OverviewViewModel(application: Application) : AndroidViewModel(application
     }
 
     private val wservice : WeatherServiceApi by lazy  { WeatherServiceApi.obtain() }
+    private val sservice : SensorServiceApi by lazy  { SensorServiceApi.obtain() }
 
     private var viewModelJob = Job()
     private val coroutineScope = CoroutineScope(viewModelJob + Dispatchers.Main )
@@ -64,6 +67,7 @@ class OverviewViewModel(application: Application) : AndroidViewModel(application
             PreferenceManager.getDefaultSharedPreferences(application)
         val pollTimeout : Long = sharedPreferences.getString("forecast_refresh_min", FORECAST_REFRESH_TIMEOUT_MIN.toString())?.toLong() ?: FORECAST_REFRESH_TIMEOUT_MIN
         Timer().schedule(400, 1000*60*pollTimeout) { getWeatherForecast() }
+        Timer().schedule(2000, 1000*15*pollTimeout) { getSensorsData() }
         }
 
     fun displaySensorDetails(sensor: Sensor) {
@@ -77,6 +81,38 @@ class OverviewViewModel(application: Application) : AndroidViewModel(application
     fun addSensor(sensor: Sensor) {
         coroutineScope.launch {
             sensorRepository.addSensor(sensor)
+        }
+    }
+
+    private fun getSensorsData() {
+        var res = false
+        coroutineScope.launch {
+            sensorRepository.logEvent(
+                LogRecord.SEVERITY_CODE.INFO,
+                tag,
+                "Refreshing sensor data..."
+            )
+            var getSensorsDeferred = sservice.getSensors()
+            try {
+                val sdata = getSensorsDeferred.await()
+                res = sensorRepository.refreshSensorsData(sdata)
+                sensorRepository.logEvent(LogRecord.SEVERITY_CODE.INFO, tag, "Refresh OK")
+            } catch (se: SocketTimeoutException) {
+                Log.e(tag, "Socket timeout")
+                sensorRepository.logEvent(
+                    LogRecord.SEVERITY_CODE.ERROR,
+                    tag,
+                    "Controller - Socket timeout"
+                )
+            } catch (e: Exception) {
+                val msg = e.message ?: "Unknown network error"
+                Log.e(tag, "NET error: $msg")
+                sensorRepository.logEvent(
+                    LogRecord.SEVERITY_CODE.ERROR,
+                    tag,
+                    "Controller - Unknown error"
+                )
+            }
         }
     }
 

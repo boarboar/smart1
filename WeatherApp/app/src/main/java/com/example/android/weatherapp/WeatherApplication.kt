@@ -32,7 +32,7 @@ class WeatherApplication : Application() {
         super.onCreate()
         ctx = applicationContext
         AndroidThreeTen.init(this)
-        delayedInit()
+        //delayedInit()
     }
 
     override fun onTerminate() {
@@ -41,18 +41,18 @@ class WeatherApplication : Application() {
         super.onTerminate()
     }
 
-    private fun delayedInit() = applicationScope.launch {
-        setupRecurringWork()
-    }
-
-    private fun setupRecurringWork() {
-        val repeatingRequest = PeriodicWorkRequestBuilder<RefreshDataWorker>(15, TimeUnit.MINUTES) // can't be less
-            .setInitialDelay(10, TimeUnit.SECONDS)
-            .build()
-
-        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
-            RefreshDataWorker.WORK_NAME,
-            ExistingPeriodicWorkPolicy.REPLACE,
-            repeatingRequest)
-    }
+//    private fun delayedInit() = applicationScope.launch {
+//        setupRecurringWork()
+//    }
+//
+//    private fun setupRecurringWork() {
+//        val repeatingRequest = PeriodicWorkRequestBuilder<RefreshDataWorker>(15, TimeUnit.MINUTES) // can't be less
+//            .setInitialDelay(10, TimeUnit.SECONDS)
+//            .build()
+//
+//        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
+//            RefreshDataWorker.WORK_NAME,
+//            ExistingPeriodicWorkPolicy.REPLACE,
+//            repeatingRequest)
+//    }
 }

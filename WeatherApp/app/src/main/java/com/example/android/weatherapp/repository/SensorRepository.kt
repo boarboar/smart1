@@ -194,7 +194,11 @@ class SensorRepository(val appContext: Context) {
                                 //Log.i(tag, "Sensor ${data.sensor_id} prev latest data is ${latest}")
                                 DbSensorLatestData(it, sdata)
                             } ?: DbSensorLatestData(sdata)
-                        database.weatherDao.insert_latest_data_and_update_sensor(latest_update) // transaction
+                        //database.weatherDao.insert_latest_data_and_update_sensor(latest_update) // transaction
+
+                        database.weatherDao.insert_latest_data(latest_update)
+                        database.weatherDao.updateSensor(sdata.sensor_id)
+
                         _logEvent(LogRecord.SEVERITY_CODE.INFO, tag, "Refresh sensor ${sdata.sensor_id}")
                     }
                 } else {

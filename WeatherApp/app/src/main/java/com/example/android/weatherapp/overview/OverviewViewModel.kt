@@ -67,7 +67,7 @@ class OverviewViewModel(application: Application) : AndroidViewModel(application
             PreferenceManager.getDefaultSharedPreferences(application)
         val pollTimeout : Long = sharedPreferences.getString("forecast_refresh_min", FORECAST_REFRESH_TIMEOUT_MIN.toString())?.toLong() ?: FORECAST_REFRESH_TIMEOUT_MIN
         Timer().schedule(400, 1000*60*pollTimeout) { getWeatherForecast() }
-        Timer().schedule(2000, 1000*15*pollTimeout) { getSensorsData() }
+        Timer().schedule(2000, 1000*60*15) { getSensorsData() }
         }
 
     fun displaySensorDetails(sensor: Sensor) {

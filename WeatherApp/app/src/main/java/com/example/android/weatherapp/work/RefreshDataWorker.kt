@@ -30,20 +30,20 @@ class RefreshDataWorker(appContext: Context, params: WorkerParameters):
 
     override suspend fun doWork(): Result {
         var res = false
-        sensorRepository.logEvent(LogRecord.SEVERITY_CODE.INFO, tag, "Refreshing sensor data...")
-        var getSensorsDeferred = sservice.getSensors()
-        try {
-            val sdata = getSensorsDeferred.await()
-            res = sensorRepository.refreshSensorsData(sdata)
-            sensorRepository.logEvent(LogRecord.SEVERITY_CODE.INFO, tag, "Refresh OK")
-        } catch (se: SocketTimeoutException) {
-            Log.e(tag, "Socket timeout")
-            sensorRepository.logEvent(LogRecord.SEVERITY_CODE.ERROR, tag, "Controller - Socket timeout")
-        } catch (e: Exception) {
-            val msg = e.message ?: "Unknown network error"
-            Log.e(tag, "NET error: $msg")
-            sensorRepository.logEvent(LogRecord.SEVERITY_CODE.ERROR, tag, "Controller - Unknown error")
-        }
+//        sensorRepository.logEvent(LogRecord.SEVERITY_CODE.INFO, tag, "Refreshing sensor data...")
+//        var getSensorsDeferred = sservice.getSensors()
+//        try {
+//            val sdata = getSensorsDeferred.await()
+//            res = sensorRepository.refreshSensorsData(sdata)
+//            sensorRepository.logEvent(LogRecord.SEVERITY_CODE.INFO, tag, "Refresh OK")
+//        } catch (se: SocketTimeoutException) {
+//            Log.e(tag, "Socket timeout")
+//            sensorRepository.logEvent(LogRecord.SEVERITY_CODE.ERROR, tag, "Controller - Socket timeout")
+//        } catch (e: Exception) {
+//            val msg = e.message ?: "Unknown network error"
+//            Log.e(tag, "NET error: $msg")
+//            sensorRepository.logEvent(LogRecord.SEVERITY_CODE.ERROR, tag, "Controller - Unknown error")
+//        }
 
         // fake data
 //        val random = Random()

@@ -130,8 +130,8 @@ val MIGRATION_9_10: Migration = object : Migration(9, 10) {
 
 @Dao
 interface WeatherDao {
-    @Query("select * from dbsensor")
-    fun getSensors(): LiveData<List<DbSensor>>
+//    @Query("select * from dbsensor")
+//    fun getSensors(): LiveData<List<DbSensor>>
     @Insert
     fun insert(sensor : DbSensor)
     @Update
@@ -143,12 +143,11 @@ interface WeatherDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert_latest_data(sensor_latest_data : DbSensorLatestData)
 
-    @Query("select * from dbsensordata")
-    fun getSensorsData(): LiveData<List<DbSensorData>>
+//    @Query("select * from dbsensordata")
+//    fun getSensorsData(): LiveData<List<DbSensorData>>
 
-    @Query("select * from dbsensordata where sensor_id = :id LIMIT 1")
-    //fun getOneSensorData(id : Int): LiveData<List<DbSensorData>>
-    fun getOneSensorData(id : Int): DbSensorData
+//    @Query("select * from dbsensordata where sensor_id = :id LIMIT 1")
+//    fun getOneSensorData(id : Int): DbSensorData
 
     @Query("DELETE FROM dbsensor where id=:id")
     fun deleteSensor(id : Int)
@@ -190,23 +189,23 @@ interface WeatherDao {
     @Query("UPDATE dbsensor SET updated= :at where id=:id")
     fun updateSensor(id : Int, at: Long=System.currentTimeMillis())
 
-    @Transaction
-    fun insert_latest_data_and_update_sensor(data : DbSensorLatestData) {
-        insert_latest_data(data)
-        updateSensor(data.sensor_id)
-    }
+//    @Transaction
+//    fun insert_latest_data_and_update_sensor(data : DbSensorLatestData) {
+//        insert_latest_data(data)
+//        updateSensor(data.sensor_id)
+//    }
 
     @Query("UPDATE dbsensor SET updated=updated-1 where updated < :timeout and updated>0")
     fun updateOutdated(timeout: Long)
 
-    @Query("DELETE FROM dbsensordata where sensor_id=:id")
-    fun deleteSensorData(id : Int)
+//    @Query("DELETE FROM dbsensordata where sensor_id=:id")
+//    fun deleteSensorData(id : Int)
 
-    @Query("select count(*) from dbsensordata")
-    fun getSensorDataCount(): Int
+//    @Query("select count(*) from dbsensordata")
+//    fun getSensorDataCount(): Int
 
-    @Query("select max(id) from dbsensor")
-    fun getLastSensorId(): Int
+//    @Query("select max(id) from dbsensor")
+//    fun getLastSensorId(): Int
 
     @Query("select count(*) as d_count, min(timestamp) as d_from, max(timestamp) as d_to from dbsensordata")
     fun getSensorDataStat(): DbDataStat

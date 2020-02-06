@@ -24,9 +24,9 @@ class RequestHandler(BaseHTTPRequestHandler):
         systime = int(round(time.time() * 1000))
         
         sensors = [
-        {'I': 1, 'T': 205, 'V': 3010, 'H' : 300, 'HD' : 2, 'X' : systime},
-        {'I': 2, 'T': 215, 'V': 2910, 'H' : 0, 'HD' : 0, 'X' : systime},
-        {'I': 3, 'T': -215, 'V': 2910, 'H' : 900, 'HD' : 1, 'X' : systime},
+        {'I': 1, 'T': -55, 'V': 3010, 'H' : 0, 'HD' : 0, 'X' : systime},
+        {'I': 2, 'T': 115, 'V': 2910, 'H' : 0, 'HD' : 0, 'X' : systime},
+        {'I': 3, 'T': 215, 'V': 2910, 'H' : 900, 'HD' : 1, 'X' : systime},
         ]
 
         self.send_response(200)

@@ -148,18 +148,18 @@ class SensorRepository(val appContext: Context) {
         withContext(Dispatchers.IO) {
             try {
                 Log.i(tag, "REFRESH RUN")
-                for(d in data)  refreshSensorData(d)
+                for(d in data)  _refreshSensorData(d)
                 // update outdated to refresh UI
                 database.weatherDao.updateOutdated(System.currentTimeMillis()-Sensor.MEAS_OUTDATED_PERIOD)
-                //val count = database.weatherDao.getSensorDataCount()
-                val stat = database.weatherDao.getSensorDataStat()
-                Log.i(tag, "${stat.count} total data records in DB from  ${DateUtils.convertDate(stat.from)}  to ${DateUtils.convertDate(stat.to)}")
 
-                // cleanup old records
-
-                Log.w(tag, "Clear measurements older than $retention_days days")
-                val delcount = database.weatherDao.clearSensorData(System.currentTimeMillis() - 24L * 3600L * 1000L * retention_days)
-                Log.w(tag, "Cleared $delcount records")
+//                val stat = database.weatherDao.getSensorDataStat()
+//                Log.i(tag, "${stat.count} total data records in DB from  ${DateUtils.convertDate(stat.from)}  to ${DateUtils.convertDate(stat.to)}")
+//
+//                // cleanup old records
+//
+//                Log.w(tag, "Clear measurements older than $retention_days days")
+//                val delcount = database.weatherDao.clearSensorData(System.currentTimeMillis() - 24L * 3600L * 1000L * retention_days)
+//                Log.w(tag, "Cleared $delcount records")
 
 //                val logstat = database.weatherDao.getLogStat()
 //                Log.i(tag, "${logstat.count} total log records in DB from  ${DateUtils.convertDate(logstat.from)}  to ${DateUtils.convertDate(logstat.to)}")
@@ -177,42 +177,72 @@ class SensorRepository(val appContext: Context) {
             }
         }
 
-    suspend fun refreshSensorData(sdata : SensorTransferData): Boolean =
-        withContext(Dispatchers.IO) {
-            try {
-                if(sdata.isValid) {
-                    val latest = database.weatherDao.getSensorLatestData(sdata.sensor_id)
-                    if(latest != null && latest.event_stamp == sdata.event_stamp) {
-                        Log.i(tag, "Refresh sensor - old data ${sdata}")
-                        _logEvent(LogRecord.SEVERITY_CODE.INFO, tag, "Refresh sensor - old data ${sdata.sensor_id}")
-                    }
-                    else {
-                        Log.i(tag, "Refresh sensor ${sdata}")
-                        val data = DbSensorData(sdata)
-                        database.weatherDao.insert_data(data)
-                        val latest_update: DbSensorLatestData =
-                            latest?.let {
-                                //Log.i(tag, "Sensor ${data.sensor_id} prev latest data is ${latest}")
-                                DbSensorLatestData(it, sdata)
-                            } ?: DbSensorLatestData(sdata)
-                        //database.weatherDao.insert_latest_data_and_update_sensor(latest_update) // transaction
+//    suspend fun refreshSensorData(sdata : SensorTransferData): Boolean =
+//        withContext(Dispatchers.IO) {
+//            try {
+//                if(sdata.isValid) {
+//                    val latest = database.weatherDao.getSensorLatestData(sdata.sensor_id)
+//                    if(latest != null && latest.event_stamp == sdata.event_stamp) {
+//                        Log.i(tag, "Refresh sensor - old data ${sdata}")
+//                        _logEvent(LogRecord.SEVERITY_CODE.INFO, tag, "Refresh sensor - old data ${sdata.sensor_id}")
+//                    }
+//                    else {
+//                        Log.i(tag, "Refresh sensor ${sdata}")
+//                        val data = DbSensorData(sdata)
+//                        database.weatherDao.insert_data(data)
+//                        val latest_update: DbSensorLatestData =
+//                            latest?.let {
+//                                //Log.i(tag, "Sensor ${data.sensor_id} prev latest data is ${latest}")
+//                                DbSensorLatestData(it, sdata)
+//                            } ?: DbSensorLatestData(sdata)
+//                        //database.weatherDao.insert_latest_data_and_update_sensor(latest_update) // transaction
+//
+//                        database.weatherDao.insert_latest_data(latest_update)
+//                        database.weatherDao.updateSensor(sdata.sensor_id)
+//
+//                        _logEvent(LogRecord.SEVERITY_CODE.INFO, tag, "Refresh sensor ${sdata.sensor_id}")
+//                    }
+//                } else {
+//                    Log.w(tag, "Refresh sensor - invalid data ${sdata}")
+//                    _logEvent(LogRecord.SEVERITY_CODE.ERROR, tag, "Refresh sensor - invalid data ${sdata}")
+//                }
+//                true
+//            }  catch (t: Throwable) {
+//                val msg = t.message ?: "Unknown DB error"
+//                Log.e(tag, "DB error: $msg")
+//                false
+//            }
+//        }
 
-                        database.weatherDao.insert_latest_data(latest_update)
-                        database.weatherDao.updateSensor(sdata.sensor_id)
-
-                        _logEvent(LogRecord.SEVERITY_CODE.INFO, tag, "Refresh sensor ${sdata.sensor_id}")
-                    }
-                } else {
-                    Log.w(tag, "Refresh sensor - invalid data ${sdata}")
-                    _logEvent(LogRecord.SEVERITY_CODE.ERROR, tag, "Refresh sensor - invalid data ${sdata}")
-                }
-                true
-            }  catch (t: Throwable) {
-                val msg = t.message ?: "Unknown DB error"
-                Log.e(tag, "DB error: $msg")
-                false
+    private fun _refreshSensorData(sdata : SensorTransferData)
+    {
+        if(sdata.isValid) {
+            val latest = database.weatherDao.getSensorLatestData(sdata.sensor_id)
+            if(latest != null && latest.event_stamp == sdata.event_stamp) {
+                Log.i(tag, "Refresh sensor - old data ${sdata}")
+                _logEvent(LogRecord.SEVERITY_CODE.INFO, tag, "Refresh sensor - old data ${sdata.sensor_id}")
             }
+            else {
+                Log.i(tag, "Refresh sensor ${sdata}")
+                val data = DbSensorData(sdata)
+                database.weatherDao.insert_data(data)
+                val latest_update: DbSensorLatestData =
+                    latest?.let {
+                        //Log.i(tag, "Sensor ${data.sensor_id} prev latest data is ${latest}")
+                        DbSensorLatestData(it, sdata)
+                    } ?: DbSensorLatestData(sdata)
+                //database.weatherDao.insert_latest_data_and_update_sensor(latest_update) // transaction
+
+                database.weatherDao.insert_latest_data(latest_update)
+                database.weatherDao.updateSensor(sdata.sensor_id)
+
+                _logEvent(LogRecord.SEVERITY_CODE.INFO, tag, "Refresh sensor ${sdata.sensor_id}")
+            }
+        } else {
+            Log.w(tag, "Refresh sensor - invalid data ${sdata}")
+            _logEvent(LogRecord.SEVERITY_CODE.ERROR, tag, "Refresh sensor - invalid data ${sdata}")
         }
+    }
 
 
     suspend fun addSensor(sensor : Sensor) {

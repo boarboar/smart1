@@ -148,9 +148,15 @@ class SensorRepository(val appContext: Context) {
         withContext(Dispatchers.IO) {
             try {
                 Log.i(tag, "REFRESH RUN")
-                for(d in data)  _refreshSensorData(d)
-                // update outdated to refresh UI
-                database.weatherDao.updateOutdated(System.currentTimeMillis()-Sensor.MEAS_OUTDATED_PERIOD)
+
+                database.runInTransaction {
+                    for (d in data) _refreshSensorData(d)
+
+                    // update outdated to refresh UI
+                    database.weatherDao.updateOutdated(System.currentTimeMillis()-Sensor.MEAS_OUTDATED_PERIOD)
+
+                }
+
 
 //                val stat = database.weatherDao.getSensorDataStat()
 //                Log.i(tag, "${stat.count} total data records in DB from  ${DateUtils.convertDate(stat.from)}  to ${DateUtils.convertDate(stat.to)}")
@@ -228,7 +234,6 @@ class SensorRepository(val appContext: Context) {
                 database.weatherDao.insert_data(data)
                 val latest_update: DbSensorLatestData =
                     latest?.let {
-                        //Log.i(tag, "Sensor ${data.sensor_id} prev latest data is ${latest}")
                         DbSensorLatestData(it, sdata)
                     } ?: DbSensorLatestData(sdata)
                 //database.weatherDao.insert_latest_data_and_update_sensor(latest_update) // transaction

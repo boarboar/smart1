@@ -157,15 +157,14 @@ class SensorRepository(val appContext: Context) {
 
                 }
 
+                val stat = database.weatherDao.getSensorDataStat()
+                Log.i(tag, "${stat.count} total data records in DB from  ${DateUtils.convertDate(stat.from)}  to ${DateUtils.convertDate(stat.to)}")
 
-//                val stat = database.weatherDao.getSensorDataStat()
-//                Log.i(tag, "${stat.count} total data records in DB from  ${DateUtils.convertDate(stat.from)}  to ${DateUtils.convertDate(stat.to)}")
-//
-//                // cleanup old records
-//
-//                Log.w(tag, "Clear measurements older than $retention_days days")
-//                val delcount = database.weatherDao.clearSensorData(System.currentTimeMillis() - 24L * 3600L * 1000L * retention_days)
-//                Log.w(tag, "Cleared $delcount records")
+                // cleanup old records
+
+                Log.w(tag, "Clear measurements older than $retention_days days")
+                val delcount = database.weatherDao.clearSensorData(System.currentTimeMillis() - 24L * 3600L * 1000L * retention_days)
+                Log.w(tag, "Cleared $delcount records")
 
 //                val logstat = database.weatherDao.getLogStat()
 //                Log.i(tag, "${logstat.count} total log records in DB from  ${DateUtils.convertDate(logstat.from)}  to ${DateUtils.convertDate(logstat.to)}")

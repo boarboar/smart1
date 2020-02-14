@@ -24,6 +24,7 @@ class OverviewViewModel(application: Application) : AndroidViewModel(application
         private const val tag = "OverviewViewModel"
         private val DEF_CITYCODE = "193312,Ru"
         private val FORECAST_REFRESH_TIMEOUT_MIN =  30L
+        private val SENSOR_REFRESH_TIMEOUT_MIN =  15L
     }
 
     private val wservice : WeatherServiceApi by lazy  { WeatherServiceApi.obtain() }
@@ -65,9 +66,10 @@ class OverviewViewModel(application: Application) : AndroidViewModel(application
     init {
         val sharedPreferences =
             PreferenceManager.getDefaultSharedPreferences(application)
-        val pollTimeout : Long = sharedPreferences.getString("forecast_refresh_min", FORECAST_REFRESH_TIMEOUT_MIN.toString())?.toLong() ?: FORECAST_REFRESH_TIMEOUT_MIN
-        Timer().schedule(400, 1000*60*pollTimeout) { getWeatherForecast() }
-        Timer().schedule(2000, 1000*60*15) { getSensorsData() }
+        val pollTimeoutWeather : Long = sharedPreferences.getString("forecast_refresh_min", FORECAST_REFRESH_TIMEOUT_MIN.toString())?.toLong() ?: FORECAST_REFRESH_TIMEOUT_MIN
+        val pollTimeoutSensor : Long = sharedPreferences.getString("sensor_refresh_min", SENSOR_REFRESH_TIMEOUT_MIN.toString())?.toLong() ?: SENSOR_REFRESH_TIMEOUT_MIN
+        Timer().schedule(400, 1000*60*pollTimeoutWeather) { getWeatherForecast() }
+        Timer().schedule(2000, 1000*60*pollTimeoutSensor) { getSensorsData() }
         }
 
     fun displaySensorDetails(sensor: Sensor) {

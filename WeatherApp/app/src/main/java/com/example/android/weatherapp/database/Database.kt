@@ -247,7 +247,7 @@ fun getDatabase(context: Context): WeatherDatabase {
                 WeatherDatabase::class.java,
                 "weather")
                 //.addMigrations(MIGRATION_1_2, MIGRATION_2_3)
-                .setJournalMode(RoomDatabase.JournalMode.TRUNCATE)  // TRUNCATE WRITE_AHEAD_LOGGING // AUTOMATIC
+                .setJournalMode(RoomDatabase.JournalMode.AUTOMATIC)  // TRUNCATE WRITE_AHEAD_LOGGING // AUTOMATIC
                 .build()
         }
     }

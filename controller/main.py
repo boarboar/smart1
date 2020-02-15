@@ -14,9 +14,9 @@ html_head = """<html><head><title>ESP32 Web Server</title>
 {2} request(s), last one {3} ago
 <br><br>
 <table border="1">
-<tr><th>ID</th><th>Timeout(sec)</th></tr>
+<tr><th>ID</th><th>Timeout(sec)</th><th>T</th><th>Vcc</th></tr>
 """
-html_row = "<tr><td>{0}</td><td>{1}</td></tr>"
+html_row = "<tr><td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td></tr>"
 html_tail = """
 </table>
 <br>
@@ -61,7 +61,7 @@ def handle_http(client, client_addr):
                 else :
                     client.send(html_head.format(str(mc), "-", str(rc), req_time_str))    
                 for s in list(sensor_data.values()) :
-                    client.send(html_row.format(str(s['I']), str(int(round((now*1000-s['X'])/1000)))  ))
+                    client.send(html_row.format(str(s['I']), str(int(round((now*1000-s['X'])/1000))), str(s['T']/10), str(s['V']/1000)  ))
                 client.send(html_tail.format( format_time(now),  format_time(now-start_time), gc.mem_free(), str(int(round(time.time()-now))) ))
             else :    
                 client.send("HTTP/1.0 200 OK\r\nContent-Type: application/json\r\nConnection: close\r\n\r\n ")

@@ -1,6 +1,7 @@
 package com.example.android.weatherapp.overview
 
 import android.app.Application
+import android.content.SharedPreferences
 import android.util.Log
 import androidx.lifecycle.*
 import androidx.preference.PreferenceManager
@@ -29,25 +30,23 @@ class OverviewViewModel(application: Application) : AndroidViewModel(application
 
     private val wservice : WeatherServiceApi by lazy  { WeatherServiceApi.obtain() }
     private val sservice : SensorServiceApi by lazy  { SensorServiceApi.obtain() }
+    private var wServiceTimer = Timer()
+    private var sServiceTimer = Timer()
 
     private var viewModelJob = Job()
     private val coroutineScope = CoroutineScope(viewModelJob + Dispatchers.Main )
     private val sensorRepository = getSensorRepository(application)
 
-    // all data should be moved to Repository (todo)
+    private val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(application)
 
     private val _status = MutableLiveData<WeatherApiStatus>()
     val status: LiveData<WeatherApiStatus>
         get() = _status
 
-    //private val _weather = MutableLiveData<Weather>()
     val weather: LiveData<Weather>
-        //get() = _weather
         get() = sensorRepository.weather
 
-    //private val _forecastList = MutableLiveData<ArrayList<WeatherForecastItem>>()
     val forecastItemList: LiveData<ArrayList<WeatherForecastItem>>
-        //get() = _forecastList
         get() = sensorRepository.forecastList
 
     val sensorList = sensorRepository.sensorList
@@ -57,6 +56,21 @@ class OverviewViewModel(application: Application) : AndroidViewModel(application
     val navigateToSelectedSensor: LiveData<Sensor>
         get() = _navigateToSelectedSensor
 
+    val prefChangeListener = SharedPreferences.OnSharedPreferenceChangeListener { preferences, s ->
+        Log.i(tag, "Preference $s changed")
+        when (s) {
+            "forecast_refresh_min" -> {
+                Log.i(tag, "Restart forecast scheduler")
+                wServiceTimer.cancel()
+                scheduleForecast()
+            }
+            "sensor_refresh_min" -> {
+                Log.i(tag, "Restart sensor refresh scheduler")
+                sServiceTimer.cancel()
+                scheduleSensorRefresh()
+            }
+        }
+    }
 
     override fun onCleared() {
         super.onCleared()
@@ -64,13 +78,10 @@ class OverviewViewModel(application: Application) : AndroidViewModel(application
     }
 
     init {
-        val sharedPreferences =
-            PreferenceManager.getDefaultSharedPreferences(application)
-        val pollTimeoutWeather : Long = sharedPreferences.getString("forecast_refresh_min", FORECAST_REFRESH_TIMEOUT_MIN.toString())?.toLong() ?: FORECAST_REFRESH_TIMEOUT_MIN
-        val pollTimeoutSensor : Long = sharedPreferences.getString("sensor_refresh_min", SENSOR_REFRESH_TIMEOUT_MIN.toString())?.toLong() ?: SENSOR_REFRESH_TIMEOUT_MIN
-        Timer().schedule(400, 1000*60*pollTimeoutWeather) { getWeatherForecast() }
-        Timer().schedule(2000, 1000*60*pollTimeoutSensor) { getSensorsData() }
-        }
+        scheduleSensorRefresh()
+        scheduleForecast()
+        sharedPreferences.registerOnSharedPreferenceChangeListener(prefChangeListener)
+    }
 
     fun displaySensorDetails(sensor: Sensor) {
         _navigateToSelectedSensor.value = sensor
@@ -84,6 +95,24 @@ class OverviewViewModel(application: Application) : AndroidViewModel(application
         coroutineScope.launch {
             sensorRepository.addSensor(sensor)
         }
+    }
+
+    private fun scheduleForecast() {
+        val pollTimeoutWeather: Long = sharedPreferences.getString(
+            "forecast_refresh_min",
+            FORECAST_REFRESH_TIMEOUT_MIN.toString()
+        )?.toLong() ?: FORECAST_REFRESH_TIMEOUT_MIN
+        wServiceTimer = Timer()
+        wServiceTimer.schedule(400, 1000*60*pollTimeoutWeather) { getWeatherForecast() }
+    }
+
+    private fun scheduleSensorRefresh() {
+        val pollTimeoutSensor: Long = sharedPreferences.getString(
+            "sensor_refresh_min",
+            SENSOR_REFRESH_TIMEOUT_MIN.toString()
+        )?.toLong() ?: SENSOR_REFRESH_TIMEOUT_MIN
+        sServiceTimer = Timer()
+        sServiceTimer.schedule(2000, 1000 * 60 * pollTimeoutSensor) { getSensorsData() }
     }
 
     private fun getSensorsData() {

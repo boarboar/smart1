@@ -29,7 +29,8 @@ class OverviewViewModel(application: Application) : AndroidViewModel(application
     }
 
     private val wservice : WeatherServiceApi by lazy  { WeatherServiceApi.obtain() }
-    private val sservice : SensorServiceApi by lazy  { SensorServiceApi.obtain() }
+    //private val sservice : SensorServiceApi by lazy  { SensorServiceApi.obtain() }
+    private lateinit var sservice : SensorServiceApi
     private var wServiceTimer = Timer()
     private var sServiceTimer = Timer()
 
@@ -59,7 +60,7 @@ class OverviewViewModel(application: Application) : AndroidViewModel(application
     val prefChangeListener = SharedPreferences.OnSharedPreferenceChangeListener { preferences, s ->
         Log.i(tag, "Preference $s changed")
         when (s) {
-            "forecast_refresh_min" -> {
+            "forecast_refresh_min", "location_code" -> {
                 Log.i(tag, "Restart forecast scheduler")
                 wServiceTimer.cancel()
                 scheduleForecast()
@@ -67,6 +68,12 @@ class OverviewViewModel(application: Application) : AndroidViewModel(application
             "sensor_refresh_min" -> {
                 Log.i(tag, "Restart sensor refresh scheduler")
                 sServiceTimer.cancel()
+                scheduleSensorRefresh()
+            }
+            "sensor_service_url" -> {
+                Log.i(tag, "Change URL, restart sensor refresh scheduler")
+                sServiceTimer.cancel()
+                sservice = SensorServiceApi.obtain()
                 scheduleSensorRefresh()
             }
         }
@@ -78,6 +85,7 @@ class OverviewViewModel(application: Application) : AndroidViewModel(application
     }
 
     init {
+        sservice = SensorServiceApi.obtain()
         scheduleSensorRefresh()
         scheduleForecast()
         sharedPreferences.registerOnSharedPreferenceChangeListener(prefChangeListener)

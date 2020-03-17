@@ -166,13 +166,13 @@ class SensorRepository(val appContext: Context) {
                 val delcount = database.weatherDao.clearSensorData(System.currentTimeMillis() - 24L * 3600L * 1000L * retention_days)
                 Log.w(tag, "Cleared $delcount records")
 
-//                val logstat = database.weatherDao.getLogStat()
-//                Log.i(tag, "${logstat.count} total log records in DB from  ${DateUtils.convertDate(logstat.from)}  to ${DateUtils.convertDate(logstat.to)}")
-//
-//                val log_retention_days = 7
-//                Log.w(tag, "Clear logs older than $log_retention_days days")
-//                val dellogcount = database.weatherDao.clearLog(System.currentTimeMillis() - 24L * 3600L * 1000L * log_retention_days)
-//                Log.w(tag, "Cleared $dellogcount records")
+                val logstat = database.weatherDao.getLogStat()
+                Log.i(tag, "${logstat.count} total log records in DB from  ${DateUtils.convertDate(logstat.from)}  to ${DateUtils.convertDate(logstat.to)}")
+
+                val log_retention_days = 7
+                Log.w(tag, "Clear logs older than $log_retention_days days")
+                val dellogcount = database.weatherDao.clearLog(System.currentTimeMillis() - 24L * 3600L * 1000L * log_retention_days)
+                Log.w(tag, "Cleared $dellogcount records")
 
                 true
             }  catch (t: Throwable) {
@@ -267,7 +267,8 @@ class SensorRepository(val appContext: Context) {
     suspend fun logEvent(severity: LogRecord.SEVERITY_CODE, tag: String, msg: String) {
         withContext(Dispatchers.IO) {
             try {
-                _logEvent(severity, tag, msg)
+                //_logEvent(severity, tag, msg)
+                database.weatherDao.insert_log(DbLog(0, System.currentTimeMillis(), severity.value, tag, msg ))
             } catch (t: Throwable) {
                 val errmsg = t.message ?: "Unknown DB error"
                 Log.e(tag, "DB error: $errmsg")

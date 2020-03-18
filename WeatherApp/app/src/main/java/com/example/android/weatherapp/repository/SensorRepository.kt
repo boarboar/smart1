@@ -8,13 +8,9 @@ import androidx.lifecycle.Transformations
 import androidx.preference.PreferenceManager
 import com.example.android.weatherapp.database.*
 import com.example.android.weatherapp.domain.*
-import com.example.android.weatherapp.overview.OverviewViewModel
-import com.example.android.weatherapp.work.RefreshDataWorker
-import com.example.android.weatherapp.work.nextInt
 import com.example.android.weatherapp.utils.DateUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import retrofit2.HttpException
 import java.util.*
 
 class SensorRepository(val appContext: Context) {

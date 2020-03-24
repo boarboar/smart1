@@ -50,10 +50,11 @@ void setup(void)
 
   pinMode(POWER_PIN, OUTPUT);
 
-  blink(10, 1);
+  blink(5, 1);
 
   Serial.begin(115200);
   Serial.println();
+  Serial.println(F("Press button1 now to enter setup"));
 
   if (ESP.rtcUserMemoryRead(0, (uint32_t*) &rtcData, sizeof(rtcData))) {   
     Serial.println("Read RTC "); 
@@ -89,11 +90,11 @@ void setup(void)
   }
 
   if(isCfgValid) {
-    Serial.println(F("Press button1 now to enter setup"));
-    delay(1000);  
+    //Serial.println(F("Press button1 now to enter setup"));
+    delay(100);  
     pinMode(SETUP_PIN, INPUT);  
     isSetup = false;  
-    if(digitalRead(SETUP_PIN)==LOW) {
+    if(digitalRead(SETUP_PIN)==LOW) { // debounce
       delay(100);
       if(digitalRead(SETUP_PIN)==LOW) {
         isSetup = true;
@@ -140,28 +141,34 @@ void setup(void)
 
   digitalWrite(POWER_PIN, LOW); 
     
-  Serial.print(F("Getting vcc..."));
+
   tData.id = CfgDrv::Cfg.id;
   tData.vcc = ESP.getVcc();
   tData.magic = 37;
+
+  Serial.print(F("Vcc="));
   Serial.println(tData.vcc);
 
   if(doWaitForConnect()) {
     ip_digit = WiFi.localIP()[3];
-    delay(25);
+    //delay(25); //!!!
     yield();
     for(int i=0; i<TRIES_TO_SEND; i++) {
       bool sendRes = CfgDrv::Cfg.conn_type == CfgDrv::CONN_TCP ? doSend(&tData) : doSendUdp(&tData);
       if(sendRes) rtcData.data[1]=0;
       else rtcData.data[1]++;
-      delay(25);
+      //delay(25);
       //yield();
       //delay(50);
       if(!sendRes) {
         Serial.println(F("Failed to send"));
         blink(100, 2);
         if(i<TRIES_TO_SEND-1) delay(1000+i*1000);
-      } else break;
+      } else {
+        //delay(25);
+        yield(); //!!!
+        break;
+      }
     }
   } else {
     blink(50, 3);   
@@ -182,7 +189,7 @@ void setup(void)
   Serial.print(CfgDrv::Cfg.sleep_min);
   Serial.print(F(" min"));
 
-  blink(10, 1);
+  blink(5, 1);
 
   ESP.deepSleep(60000000L*CfgDrv::Cfg.sleep_min);
 

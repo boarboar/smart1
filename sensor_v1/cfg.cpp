@@ -71,7 +71,7 @@ int16_t CfgDrv::load() {
   uint32_t ms1=millis();
   File f = SPIFFS.open(szFileName, "r");
   if (!f) {
-    Serial.println(F("Failed to open config file"));
+    Serial.println(F("Failed to open cfg file"));
     return 0;
   }
   size_t size = f.size();
@@ -87,7 +87,7 @@ int16_t CfgDrv::load() {
     }
     if(p>buf) { //non-empty
       *p=0; 
-      Serial.println(buf);  
+      //Serial.println(buf);  
       const char *ps;
       StaticJsonBuffer<400> jsonBuffer;
       JsonObject& json = jsonBuffer.parseObject(buf);  

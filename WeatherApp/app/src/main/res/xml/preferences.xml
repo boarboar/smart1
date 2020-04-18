@@ -35,7 +35,7 @@
 
     <EditTextPreference
         android:key="data_retention_days"
-        android:defaultValue="30"
+        android:defaultValue="31"
         android:inputType="number"
         android:title="Глубина хранения (дней)"
         android:summary="Глубина хранения измерений(дней)"

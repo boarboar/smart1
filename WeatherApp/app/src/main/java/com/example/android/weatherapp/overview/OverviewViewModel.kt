@@ -76,6 +76,10 @@ class OverviewViewModel(application: Application) : AndroidViewModel(application
                 sservice = SensorServiceApi.obtain()
                 scheduleSensorRefresh()
             }
+            "data_retention_days"-> {
+                Log.i(tag, "Change retention period")
+                sensorRepository.setRetention()
+            }
         }
     }
 
@@ -161,7 +165,7 @@ class OverviewViewModel(application: Application) : AndroidViewModel(application
         val citycode = sharedPreferences.getString("location_code", DEF_CITYCODE)
         Log.w(tag, "Forecast for: $citycode")
         coroutineScope.launch {
-            sensorRepository.logEvent(LogRecord.SEVERITY_CODE.INFO, tag, "Getting forecast for $citycode")
+            //sensorRepository.logEvent(LogRecord.SEVERITY_CODE.INFO, tag, "Getting forecast for $citycode")
             var getWeatherDeferred = wservice.getWeather(citycode)
             var getWeatherForecastDeferred = wservice.getWeatherForecast(citycode, cnt=12)
             try {
@@ -169,12 +173,12 @@ class OverviewViewModel(application: Application) : AndroidViewModel(application
                 sensorRepository.weather.value = getWeatherDeferred.await()
                 sensorRepository.forecastList.value = getWeatherForecastDeferred.await().forecastList
                 //delay(100) // to show spinner
-                sensorRepository.logEvent(LogRecord.SEVERITY_CODE.INFO, tag, "Forecast refresh OK")
+                //sensorRepository.logEvent(LogRecord.SEVERITY_CODE.INFO, tag, "Forecast refresh OK")
                 _status.value = WeatherApiStatus.DONE
             } catch (e: Exception) {
                 val msg = e.message ?: "Unknown network error"
                 Log.e(tag, "NET error: $msg")
-                sensorRepository.logEvent(LogRecord.SEVERITY_CODE.ERROR, tag, "Forecast NET error: $msg")
+                //sensorRepository.logEvent(LogRecord.SEVERITY_CODE.ERROR, tag, "Forecast NET error: $msg")
                 _status.value = WeatherApiStatus.ERROR
             }
         }

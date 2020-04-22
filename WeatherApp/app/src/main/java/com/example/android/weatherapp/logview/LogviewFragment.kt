@@ -7,17 +7,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.*
+//import androidx.lifecycle.Observer
 import com.example.android.weatherapp.MainActivity
-import com.example.android.weatherapp.WeatherApplication
-import com.example.android.weatherapp.databinding.FragmentForecastBinding
+//import com.example.android.weatherapp.WeatherApplication
+//import com.example.android.weatherapp.databinding.FragmentForecastBinding
 import com.example.android.weatherapp.databinding.FragmentLogviewBinding
 import com.example.android.weatherapp.domain.LogRecord
-import com.example.android.weatherapp.forecastview.ForecastExtAdapter
-import com.example.android.weatherapp.repository.SensorRepository
+//import com.example.android.weatherapp.forecastview.ForecastExtAdapter
+//import com.example.android.weatherapp.repository.SensorRepository
 import com.example.android.weatherapp.repository.getSensorRepository
 import java.util.*
 import kotlin.concurrent.schedule
@@ -25,7 +23,7 @@ import kotlin.concurrent.schedule
 class LogviewFragment : Fragment() {
 
     private val viewModel: LogViewModel by lazy {
-        ViewModelProviders.of(this).get(LogViewModel::class.java)
+        ViewModelProvider(this).get(LogViewModel::class.java)
     }
 
     lateinit var binding: FragmentLogviewBinding

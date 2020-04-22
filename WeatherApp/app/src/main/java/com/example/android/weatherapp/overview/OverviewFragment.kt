@@ -7,23 +7,21 @@ import android.view.*
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.DividerItemDecoration
+//import androidx.recyclerview.widget.DividerItemDecoration
 import com.example.android.weatherapp.MainActivity
 import com.example.android.weatherapp.R
 import com.example.android.weatherapp.common_ui.SensorPropDialog
 import com.example.android.weatherapp.databinding.FragmentOverviewBinding
-import com.example.android.weatherapp.domain.Sensor
-
+//import com.example.android.weatherapp.domain.Sensor
 
 class OverviewFragment : Fragment() {
-
     /**
      * Lazily initialize our [OverviewViewModel].
      */
     private val viewModel: OverviewViewModel by lazy {
-        ViewModelProviders.of(this).get(OverviewViewModel::class.java)
+        ViewModelProvider(this).get(OverviewViewModel::class.java)
     }
 
     /**

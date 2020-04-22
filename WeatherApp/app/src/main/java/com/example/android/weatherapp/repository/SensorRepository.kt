@@ -25,7 +25,7 @@ class SensorRepository(val appContext: Context) {
         const val DEFAULT_DATA_RETENTION = 31
     }
 
-    val errorHandler = CoroutineExceptionHandler { conteaxt, error ->
+    val errorHandler = CoroutineExceptionHandler { _, error ->
         Log.e(tag, "Coroutine DB error: $error")
     }
 

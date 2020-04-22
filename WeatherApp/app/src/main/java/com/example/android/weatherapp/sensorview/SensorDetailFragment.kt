@@ -8,22 +8,18 @@ import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import com.example.android.weatherapp.MainActivity
 import com.example.android.weatherapp.R
 import com.example.android.weatherapp.common_ui.SensorPropDialog
 import com.example.android.weatherapp.databinding.FragmentSensordetailBinding
 import com.example.android.weatherapp.repository.getSensorRepository
 
-
 class SensorDetailFragment : SensorBaseFragment() {
-
     override val ftag = "Detail frag"
-
     private val viewModel: SensorDetailViewModel by lazy {
         val viewModelFactory = SensorDetailViewModelFactory(sensorId, (activity as MainActivity).application)
-        ViewModelProviders.of(
-            this, viewModelFactory).get(SensorDetailViewModel::class.java)
+        ViewModelProvider(this, viewModelFactory).get(SensorDetailViewModel::class.java)
     }
 
     override fun onCreateView(
@@ -54,7 +50,8 @@ class SensorDetailFragment : SensorBaseFragment() {
                     viewModel.onDeleteSensor()
                     activity?.onBackPressed()
                 }
-                dialog.show(fragmentManager!!, "DELETE_SENSOR_ALERT")
+                //dialog.show(fragmentManager!!, "DELETE_SENSOR_ALERT")
+                dialog.show(requireActivity().supportFragmentManager, "DELETE_SENSOR_ALERT")
             }
             R.id.edit_sensor -> {
                 val sensDlg = SensorPropDialog(activity as Context, getSensorRepository(activity as Context).currentSensor.value, true)

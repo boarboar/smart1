@@ -23,7 +23,7 @@ object SensorServiceRetrofit {
     ): Retrofit {
         val sharedPreferences =
             PreferenceManager.getDefaultSharedPreferences(ctx)
-        var url = sharedPreferences.getString("sensor_service_url", DEF_BASE_URL)
+        var url = sharedPreferences.getString("sensor_service_url", DEF_BASE_URL) ?: DEF_BASE_URL
         if(!url.startsWith("http://"))  url = "http://"+url
         if(!url.endsWith("/"))  url = url + "/"
 

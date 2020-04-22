@@ -4,7 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import com.example.android.weatherapp.MainActivity
 import com.example.android.weatherapp.databinding.FragmentSensorlogBinding
 
@@ -21,14 +21,9 @@ class SensorLogFragment : SensorBaseFragment() {
         binding.setLifecycleOwner(this)
 
         val viewModelFactory = SensorLogViewModelFactory(sensorId, (activity as MainActivity).application)
-
-        binding.viewModel = ViewModelProviders.of(
-            this, viewModelFactory).get(SensorLogViewModel::class.java)
-
+        binding.viewModel = ViewModelProvider(this, viewModelFactory).get(SensorLogViewModel::class.java)
         binding.sensorLogList.adapter = SensorDataAdapter()
-
         //setHasOptionsMenu(true)
-
         return binding.root
     }
 }

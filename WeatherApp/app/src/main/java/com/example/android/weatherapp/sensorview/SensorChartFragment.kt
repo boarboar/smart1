@@ -6,7 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import com.example.android.weatherapp.MainActivity
 import com.example.android.weatherapp.databinding.FragmentSensorchartBinding
 
@@ -18,14 +18,10 @@ class SensorChartFragment : SensorBaseFragment() {
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
         //Log.v(ftag, "[ ON VIEW CREATED ]")
-
         val binding = FragmentSensorchartBinding.inflate(inflater)
         binding.setLifecycleOwner(this)
         val viewModelFactory = SensorChartViewModelFactory(sensorId, (activity as MainActivity).application)
-
-        val viewModel = ViewModelProviders.of(
-            this, viewModelFactory).get(SensorChartViewModel::class.java)
-
+        val viewModel = ViewModelProvider(this, viewModelFactory).get(SensorChartViewModel::class.java)
         binding.viewModel = viewModel
 
         viewModel.chartDispType.observe(this, Observer {

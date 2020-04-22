@@ -57,7 +57,7 @@ class OverviewViewModel(application: Application) : AndroidViewModel(application
     val navigateToSelectedSensor: LiveData<Sensor>
         get() = _navigateToSelectedSensor
 
-    val prefChangeListener = SharedPreferences.OnSharedPreferenceChangeListener { preferences, s ->
+    val prefChangeListener = SharedPreferences.OnSharedPreferenceChangeListener { _, s ->
         Log.i(tag, "Preference $s changed")
         when (s) {
             "forecast_refresh_min", "location_code" -> {
@@ -128,7 +128,7 @@ class OverviewViewModel(application: Application) : AndroidViewModel(application
     }
 
     private fun getSensorsData() {
-        var res = false
+        //var res = false
         coroutineScope.launch {
             sensorRepository.logEvent(
                 LogRecord.SEVERITY_CODE.INFO,
@@ -138,7 +138,8 @@ class OverviewViewModel(application: Application) : AndroidViewModel(application
             var getSensorsDeferred = sservice.getSensors()
             try {
                 val sdata = getSensorsDeferred.await()
-                res = sensorRepository.refreshSensorsData(sdata)
+                //res = sensorRepository.refreshSensorsData(sdata)
+                sensorRepository.refreshSensorsData(sdata)
                 sensorRepository.logEvent(LogRecord.SEVERITY_CODE.INFO, tag, "Refresh OK")
             } catch (se: SocketTimeoutException) {
                 Log.e(tag, "Socket timeout")
@@ -162,7 +163,7 @@ class OverviewViewModel(application: Application) : AndroidViewModel(application
     private fun getWeatherForecast() {
         val sharedPreferences =
             PreferenceManager.getDefaultSharedPreferences(getApplication())
-        val citycode = sharedPreferences.getString("location_code", DEF_CITYCODE)
+        val citycode = sharedPreferences.getString("location_code", DEF_CITYCODE) ?: DEF_CITYCODE
         Log.w(tag, "Forecast for: $citycode")
         coroutineScope.launch {
             //sensorRepository.logEvent(LogRecord.SEVERITY_CODE.INFO, tag, "Getting forecast for $citycode")

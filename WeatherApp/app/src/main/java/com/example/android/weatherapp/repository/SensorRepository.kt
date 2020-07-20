@@ -277,7 +277,8 @@ class SensorRepository(val appContext: Context) {
     }
 
     private fun _logEvent(severity: LogRecord.SEVERITY_CODE, tag: String, msg: String) {
-        //database.weatherDao.insert_log(DbLog(0, System.currentTimeMillis(), severity.value, tag, msg ))
+        if(database.inTransaction())
+            database.weatherDao.insert_log(DbLog(0, System.currentTimeMillis(), severity.value, tag, msg ))
     }
 
     suspend fun logEvent(severity: LogRecord.SEVERITY_CODE, tag: String, msg: String) {

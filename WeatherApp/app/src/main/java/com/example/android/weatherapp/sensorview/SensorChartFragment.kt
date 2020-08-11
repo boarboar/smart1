@@ -24,13 +24,13 @@ class SensorChartFragment : SensorBaseFragment() {
         val viewModel = ViewModelProvider(this, viewModelFactory).get(SensorChartViewModel::class.java)
         binding.viewModel = viewModel
 
-        viewModel.chartDispType.observe(this, Observer {
+        viewModel.chartDispType.observe(viewLifecycleOwner, Observer {
             binding.drawView.disp = it
             binding.drawView.prepare()
             binding.drawView.invalidate()
         })
 
-        viewModel.chartDispPeriod.observe(this, Observer {
+        viewModel.chartDispPeriod.observe(viewLifecycleOwner, Observer {
             binding.drawView.dispPeriod = it
             binding.drawView.prepare()
             binding.drawView.invalidate()

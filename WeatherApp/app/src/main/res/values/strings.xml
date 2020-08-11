@@ -12,5 +12,9 @@
     <string name="intrv_day">День</string>
     <string name="intrv_week">Неделя</string>
     <string name="intrv_month">Месяц</string>
+    <string name="intrv_hour">Час</string>
+    <string name="intrv_all_period">Все</string>
+    <string name="log_severity_error">Ошибки</string>
+    <string name="log_severity_all">Все</string>
     <string name="settings">Настройки</string>
 </resources>

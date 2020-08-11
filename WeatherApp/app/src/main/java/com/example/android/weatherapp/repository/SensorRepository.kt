@@ -42,19 +42,31 @@ class SensorRepository(val appContext: Context) {
     lateinit private var _sensorDataList: LiveData<List<SensorData>>
     private var _sensorDataId = 0
 
-    private var _logList: LiveData<List<LogRecord>> =
-        try {
+//    private var _logList: LiveData<List<LogRecord>> =
+//        try {
+//            Transformations.map(database.weatherDao.getLogs()) {
+//                it.asLogRecord().filter{it.severity==LogRecord.SEVERITY_CODE.ERROR}
+//            }
+//        } catch (t: Throwable) {
+//            val msg = t.message ?: "Unknown DB error"
+//            Log.e(tag, "DB error: $msg")
+//            MutableLiveData<List<LogRecord>>()
+//        }
+//
+//    val logList: LiveData<List<LogRecord>>
+//        get() = _logList
+
+    fun getFilteredLog(level : LogRecord.SEVERITY_CODE = LogRecord.SEVERITY_CODE.ERROR, interval_hr: Int = 1) : LiveData<List<LogRecord>> = try {
             Transformations.map(database.weatherDao.getLogs()) {
-                it.asLogRecord()
+                it.asLogRecord().filter{
+                    it.severity<=level &&
+                            (interval_hr==-1 || System.currentTimeMillis()-it.timestamp < 3600_000L*interval_hr)}
             }
         } catch (t: Throwable) {
             val msg = t.message ?: "Unknown DB error"
             Log.e(tag, "DB error: $msg")
             MutableLiveData<List<LogRecord>>()
         }
-
-    val logList: LiveData<List<LogRecord>>
-        get() = _logList
 
     var sensorList: LiveData<List<Sensor>> =
         try {

@@ -295,22 +295,22 @@ class SensorRepository(val appContext: Context) {
 
     suspend fun logEvent(severity: LogRecord.SEVERITY_CODE, tag: String, msg: String) {
         withContext(Dispatchers.IO) {
-            try {
-                database.runInTransaction {
-                    database.weatherDao.insert_log(
-                        DbLog(
-                            0,
-                            System.currentTimeMillis(),
-                            severity.value,
-                            tag,
-                            msg
-                        )
-                    )
-                }
-            } catch (t: Throwable) {
-                val errmsg = t.message ?: "Unknown DB error"
-                Log.e(tag, "DB error: $errmsg")
-            }
+//            try {
+//                database.runInTransaction {
+//                    database.weatherDao.insert_log(
+//                        DbLog(
+//                            0,
+//                            System.currentTimeMillis(),
+//                            severity.value,
+//                            tag,
+//                            msg
+//                        )
+//                    )
+//                }
+//            } catch (t: Throwable) {
+//                val errmsg = t.message ?: "Unknown DB error"
+//                Log.e(tag, "DB error: $errmsg")
+//            }
         }
     }
 

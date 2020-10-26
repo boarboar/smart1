@@ -41,4 +41,11 @@
         android:summary="Глубина хранения измерений(дней)"
         android:singleLine="true" />
 
+    <CheckBoxPreference
+        android:key="run_at_startup"
+        android:title="Run at startup"
+        android:defaultValue="false"
+        android:summary="Run main application after device starts"
+         />
+
 </PreferenceScreen>

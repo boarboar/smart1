@@ -1,23 +1,23 @@
 package com.example.android.weatherapp.overview
 
 import android.app.Application
-import android.content.SharedPreferences
+import android.content.*
+import android.net.ConnectivityManager
+import android.net.NetworkInfo
 import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.*
 import androidx.preference.PreferenceManager
-import com.example.android.weatherapp.database.DbLog
 import com.example.android.weatherapp.domain.*
 import com.example.android.weatherapp.network.SensorServiceApi
 import com.example.android.weatherapp.network.WeatherApiStatus
 import com.example.android.weatherapp.network.WeatherServiceApi
-import com.example.android.weatherapp.repository.SensorRepository
 import com.example.android.weatherapp.repository.getSensorRepository
-import com.example.android.weatherapp.work.RefreshDataWorker
 import kotlinx.coroutines.*
 import java.net.SocketTimeoutException
 import java.util.*
-import kotlin.collections.ArrayList
 import kotlin.concurrent.schedule
+
 
 class OverviewViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -33,9 +33,11 @@ class OverviewViewModel(application: Application) : AndroidViewModel(application
     private lateinit var sservice : SensorServiceApi
     private var wServiceTimer = Timer()
     private var sServiceTimer = Timer()
+    private var isWSScheduled = false
+    private var isSSScheduled = false
 
     private var viewModelJob = Job()
-    private val coroutineScope = CoroutineScope(viewModelJob + Dispatchers.Main )
+    private val coroutineScope = CoroutineScope(viewModelJob + Dispatchers.Main)
     private val sensorRepository = getSensorRepository(application)
 
     private val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(application)
@@ -62,21 +64,21 @@ class OverviewViewModel(application: Application) : AndroidViewModel(application
         when (s) {
             "forecast_refresh_min", "location_code" -> {
                 Log.i(tag, "Restart forecast scheduler")
-                wServiceTimer.cancel()
+                //wServiceTimer.cancel()
                 scheduleForecast()
             }
             "sensor_refresh_min" -> {
                 Log.i(tag, "Restart sensor refresh scheduler")
-                sServiceTimer.cancel()
+                //sServiceTimer.cancel()
                 scheduleSensorRefresh()
             }
             "sensor_service_url" -> {
                 Log.i(tag, "Change URL, restart sensor refresh scheduler")
-                sServiceTimer.cancel()
+                //sServiceTimer.cancel()
                 sservice = SensorServiceApi.obtain()
                 scheduleSensorRefresh()
             }
-            "data_retention_days"-> {
+            "data_retention_days" -> {
                 Log.i(tag, "Change retention period")
                 sensorRepository.setRetention()
             }
@@ -90,9 +92,19 @@ class OverviewViewModel(application: Application) : AndroidViewModel(application
 
     init {
         sservice = SensorServiceApi.obtain()
+        sharedPreferences.registerOnSharedPreferenceChangeListener(prefChangeListener)
+    }
+
+    fun initSchedulers() {
         scheduleSensorRefresh()
         scheduleForecast()
-        sharedPreferences.registerOnSharedPreferenceChangeListener(prefChangeListener)
+    }
+
+    fun stopSchedulers() {
+        if(isWSScheduled) wServiceTimer.cancel()
+        isWSScheduled = true
+        if(isSSScheduled) sServiceTimer.cancel()
+        isSSScheduled = true
     }
 
     fun displaySensorDetails(sensor: Sensor) {
@@ -110,21 +122,25 @@ class OverviewViewModel(application: Application) : AndroidViewModel(application
     }
 
     private fun scheduleForecast() {
+        if(isWSScheduled) wServiceTimer.cancel()
         val pollTimeoutWeather: Long = sharedPreferences.getString(
             "forecast_refresh_min",
             FORECAST_REFRESH_TIMEOUT_MIN.toString()
         )?.toLong() ?: FORECAST_REFRESH_TIMEOUT_MIN
         wServiceTimer = Timer()
-        wServiceTimer.schedule(400, 1000*60*pollTimeoutWeather) { getWeatherForecast() }
+        wServiceTimer.schedule(400, 1000 * 60 * pollTimeoutWeather) { getWeatherForecast() }
+        isWSScheduled = true
     }
 
     private fun scheduleSensorRefresh() {
+        if(isSSScheduled) sServiceTimer.cancel()
         val pollTimeoutSensor: Long = sharedPreferences.getString(
             "sensor_refresh_min",
             SENSOR_REFRESH_TIMEOUT_MIN.toString()
         )?.toLong() ?: SENSOR_REFRESH_TIMEOUT_MIN
         sServiceTimer = Timer()
         sServiceTimer.schedule(2000, 1000 * 60 * pollTimeoutSensor) { getSensorsData() }
+        isSSScheduled = true
     }
 
     private fun getSensorsData() {
@@ -168,7 +184,7 @@ class OverviewViewModel(application: Application) : AndroidViewModel(application
         coroutineScope.launch {
             //sensorRepository.logEvent(LogRecord.SEVERITY_CODE.INFO, tag, "Getting forecast for $citycode")
             var getWeatherDeferred = wservice.getWeather(citycode)
-            var getWeatherForecastDeferred = wservice.getWeatherForecast(citycode, cnt=12)
+            var getWeatherForecastDeferred = wservice.getWeatherForecast(citycode, cnt = 12)
             try {
                 _status.value = WeatherApiStatus.LOADING
                 sensorRepository.weather.value = getWeatherDeferred.await()

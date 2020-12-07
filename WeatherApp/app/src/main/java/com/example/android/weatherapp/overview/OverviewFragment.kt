@@ -1,6 +1,11 @@
 package com.example.android.weatherapp.overview
 
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import android.net.ConnectivityManager
+import android.net.NetworkInfo
 import android.os.Bundle
 import android.util.Log
 import android.view.*
@@ -17,6 +22,36 @@ import com.example.android.weatherapp.databinding.FragmentOverviewBinding
 //import com.example.android.weatherapp.domain.Sensor
 
 class OverviewFragment : Fragment() {
+
+    private val connectivityManager
+        get() = requireActivity().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+
+    var mConnectivityReceiver: BroadcastReceiver = object : BroadcastReceiver() {
+        private var isConnected = false
+        @Suppress("DEPRECATION")
+        override fun onReceive(context: Context?, intent: Intent?) {
+            if (ConnectivityManager.CONNECTIVITY_ACTION != intent?.action) {
+                return
+            }
+            val networkInfo = connectivityManager.activeNetworkInfo
+            if (networkInfo != null && networkInfo.isConnected) {
+                if(!isConnected) {
+                    Toast.makeText(context, "Connected", Toast.LENGTH_SHORT).show()
+                    viewModel.initSchedulers()
+                    isConnected = true
+                }
+            } else {
+                if (isConnected) {
+                    Toast.makeText(context, "Disonnected", Toast.LENGTH_SHORT).show()
+                    viewModel.stopSchedulers()
+                    isConnected = false
+                }
+            }
+
+        }
+
+    }
+
     /**
      * Lazily initialize our [OverviewViewModel].
      */
@@ -65,7 +100,19 @@ class OverviewFragment : Fragment() {
         return binding.root
     }
 
-    /**
+    override fun onStart() {
+        @Suppress("DEPRECATION")
+        requireActivity().registerReceiver(mConnectivityReceiver, IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+        super.onStart()
+    }
+
+    override fun onStop() {
+        requireActivity().unregisterReceiver(mConnectivityReceiver)
+        super.onStop()
+    }
+
+
+        /**
      * Inflates the overflow menu that contains filtering options.
      */
 
